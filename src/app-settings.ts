@@ -6,4 +6,8 @@ configDotenv({
 
 export const appSettings = {
   PORT: process.env.PORT,
+  PATHS: {
+    BLOGS: "/blogs",
+    POSTS: "/posts",
+  },
 };

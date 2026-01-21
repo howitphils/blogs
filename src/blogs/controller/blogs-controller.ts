@@ -5,15 +5,29 @@ import {
   RequestWithParamsIdAndBody,
 } from "../../request-types";
 import { BlogInputModel } from "../types/blogs-types";
+import { HttpStatus } from "../../types";
+import { db } from "../../db/db";
 
 export const blogsController = {
   getAllBlogs: async (req: Request, res: Response) => {
-    // Implementation here
-    res.send("Get all blogs");
+    res.status(HttpStatus.OK).json(db.blogs);
+    return;
   },
 
   getBlogById: async (req: RequestWithParamsId, res: Response) => {
-    // Implementation here
+    const blogId = req.params.id;
+    const blog = db.blogs.find((b) => b.id === blogId);
+
+    if (!blog) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
+    res
+      .status(HttpStatus.OK)
+      .json(db.blogs.find((blog) => blog.id === req.params.id));
+
+    return;
   },
 
   createBlog: async (req: RequestWithBody<BlogInputModel>, res: Response) => {
