@@ -11,4 +11,8 @@ export const appSettings = {
     POSTS: "/posts",
     TESTING: "/testing",
   },
+  ADMIN_CREDENTIALS: {
+    USERNAME: process.env.BASIC_AUTH_USERNAME,
+    PASSWORD: process.env.BASIC_AUTH_PASSWORD,
+  },
 };

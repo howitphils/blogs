@@ -1,13 +1,25 @@
 import { NextFunction, Request, Response } from "express";
-import { ValidationError, validationResult } from "express-validator";
-import { FieldError } from "../types/errors-types";
-import { HttpStatus } from "../types/http-status-types";
+import {
+  FieldValidationError,
+  validationResult,
+  ValidationError,
+} from "express-validator";
+import { FieldError } from "../../types/errors-types";
+import { HttpStatus } from "../../types/http-status-types";
 
 const errorFormatter = (error: ValidationError): FieldError => {
-  return {
-    field: error.type,
-    message: error.msg,
-  };
+  if (error.type === "field") {
+    const fieldError = error as FieldValidationError;
+    return {
+      field: fieldError.path,
+      message: error.msg,
+    };
+  } else {
+    return {
+      field: "unknown",
+      message: error.msg,
+    };
+  }
 };
 
 export const validationChainResult = (

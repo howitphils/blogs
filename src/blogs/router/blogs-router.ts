@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { blogsController } from "../controller/blogs-controller";
-import { validateParamsId } from "../../core/middlewares/params-id-validation";
-import { validationChainResult } from "../../core/middlewares/validation-chain-result";
+import { validateParamsId } from "../../core/middlewares/validation/params-id-validation";
+import { validationChainResult } from "../../core/middlewares/validation/validation-chain-result";
+import { validateBlogBody } from "../validations/blog-body-validation";
+import { basicAuthGuard } from "../../core/middlewares/authentication/basic-auth-guard";
 
 export const blogsRouter = Router();
 
@@ -12,6 +14,25 @@ blogsRouter.get(
   validationChainResult,
   blogsController.getBlogById,
 );
-blogsRouter.post("/", blogsController.createBlog);
-blogsRouter.put("/:id", blogsController.updateBlog);
-blogsRouter.delete("/:id", blogsController.deleteBlog);
+blogsRouter.post(
+  "/",
+  basicAuthGuard,
+  validateBlogBody,
+  validationChainResult,
+  blogsController.createBlog,
+);
+blogsRouter.put(
+  "/:id",
+  basicAuthGuard,
+  validateParamsId,
+  validateBlogBody,
+  validationChainResult,
+  blogsController.updateBlog,
+);
+blogsRouter.delete(
+  "/:id",
+  basicAuthGuard,
+  validateParamsId,
+  validationChainResult,
+  blogsController.deleteBlog,
+);
