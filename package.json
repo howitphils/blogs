@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon dist/index.js",
+    "start": "nodemon --inspect dist/index.js",
     "watch": "tsc -w",
     "test": "jest --runInBand --detectOpenHandles --watchAll"
   },
