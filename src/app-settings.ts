@@ -9,5 +9,6 @@ export const appSettings = {
   PATHS: {
     BLOGS: "/blogs",
     POSTS: "/posts",
+    TESTING: "/testing",
   },
 };

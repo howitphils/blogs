@@ -4,7 +4,7 @@ import {
   RequestWithBody,
   RequestWithParamsId,
   RequestWithParamsIdAndBody,
-} from "../../request-types";
+} from "../../common-types/request-types";
 
 export const postsController = {
   getAllPosts: async (req: Request, res: Response) => {
