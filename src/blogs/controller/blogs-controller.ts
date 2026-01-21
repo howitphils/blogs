@@ -7,6 +7,7 @@ import {
 import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
 import { db } from "../../db/db";
 import { HttpStatus } from "../../common-types/http-status-types";
+import { blogsRepository } from "../repository/blogs-repository";
 
 export const blogsController = {
   getAllBlogs: async (req: Request, res: Response) => {
@@ -16,7 +17,7 @@ export const blogsController = {
 
   getBlogById: async (req: RequestWithParamsId, res: Response) => {
     const blogId = req.params.id;
-    const blog = db.blogs.find((b) => b.id === blogId);
+    const blog = await blogsRepository.getBlogById(blogId);
 
     if (!blog) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -28,14 +29,7 @@ export const blogsController = {
   },
 
   createBlog: async (req: RequestWithBody<BlogInputModel>, res: Response) => {
-    const newBlog: BlogViewModel = {
-      id: (db.blogs.length + 1).toString(),
-      name: req.body.name,
-      description: req.body.description,
-      websiteUrl: req.body.websiteUrl,
-    };
-
-    db.blogs.unshift(newBlog);
+    const newBlog: BlogViewModel = await blogsRepository.createBlog(req.body);
 
     res.status(HttpStatus.CREATED).json(newBlog);
 
@@ -47,33 +41,29 @@ export const blogsController = {
     res: Response,
   ) => {
     const blogId = req.params.id;
-    const blog = db.blogs.find((b) => b.id === blogId);
+
+    const blog = await blogsRepository.updateBlog(blogId, req.body);
 
     if (!blog) {
       res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
+    } else {
+      res.sendStatus(HttpStatus.NO_CONTENT);
     }
 
-    blog.name = req.body.name;
-    blog.description = req.body.description;
-    blog.websiteUrl = req.body.websiteUrl;
-
-    res.sendStatus(HttpStatus.NO_CONTENT);
     return;
   },
 
   deleteBlog: async (req: RequestWithParamsId, res: Response) => {
     const blogId = req.params.id;
-    const blogIndex = db.blogs.findIndex((b) => b.id === blogId);
 
-    if (blogIndex === -1) {
+    const isDeleted = await blogsRepository.deleteBlog(blogId);
+
+    if (!isDeleted) {
       res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
+    } else {
+      res.sendStatus(HttpStatus.NO_CONTENT);
     }
 
-    db.blogs.splice(blogIndex, 1);
-
-    res.sendStatus(HttpStatus.NO_CONTENT);
     return;
   },
 };
