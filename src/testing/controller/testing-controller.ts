@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HttpStatus } from "../../common-types/http-status-types";
+import { HttpStatus } from "../../core/types/http-status-types";
 import { db } from "../../db/db";
 
 export const testingController = {

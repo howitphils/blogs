@@ -3,10 +3,10 @@ import {
   RequestWithBody,
   RequestWithParamsId,
   RequestWithParamsIdAndBody,
-} from "../../common-types/request-types";
+} from "../../core/types/request-types";
 import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
 import { db } from "../../db/db";
-import { HttpStatus } from "../../common-types/http-status-types";
+import { HttpStatus } from "../../core/types/http-status-types";
 import { blogsRepository } from "../repository/blogs-repository";
 
 export const blogsController = {
