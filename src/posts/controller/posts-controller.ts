@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { BlogInputModel } from "../../blogs/types/blogs-types";
 import {
   RequestWithBody,
   RequestWithParamsId,
