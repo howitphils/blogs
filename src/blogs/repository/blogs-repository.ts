@@ -1,9 +1,10 @@
 import { db } from "../../db/db";
+import { blogsCollection } from "../../db/mongodb";
 import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
 
 export const blogsRepository = {
   async getAllBlogs(): Promise<BlogViewModel[]> {
-    return db.blogs;
+    return blogsCollection.find({}).toArray();
   },
 
   async getBlogById(blogId: string): Promise<BlogViewModel | null> {
@@ -12,13 +13,14 @@ export const blogsRepository = {
 
   async createBlog(blogDto: BlogInputModel): Promise<BlogViewModel> {
     const newBlog: BlogViewModel = {
-      id: (db.blogs.length + 1).toString(),
+      id: "23",
       name: blogDto.name,
       description: blogDto.description,
       websiteUrl: blogDto.websiteUrl,
     };
 
-    db.blogs.unshift(newBlog);
+    await blogsCollection.insertOne(newBlog);
+
     return newBlog;
   },
 

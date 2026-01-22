@@ -15,4 +15,7 @@ export const appConfig = {
     USERNAME: process.env.BASIC_AUTH_USERNAME,
     PASSWORD: process.env.BASIC_AUTH_PASSWORD,
   },
+  MONGODB_URI: process.env.MONGODB_URI as string,
+  DB_NAME: process.env.DB_NAME as string,
+  DB_NAME_TEST: "test-db",
 };

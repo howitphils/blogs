@@ -5,13 +5,14 @@ import {
   RequestWithParamsIdAndBody,
 } from "../../core/types/request-types";
 import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
-import { db } from "../../db/db";
 import { HttpStatus } from "../../core/types/http-status-types";
 import { blogsRepository } from "../repository/blogs-repository";
 
 export const blogsController = {
   getAllBlogs: async (req: Request, res: Response) => {
-    res.status(HttpStatus.OK).json(db.blogs);
+    const blogs = await blogsRepository.getAllBlogs();
+
+    res.status(HttpStatus.OK).json(blogs);
     return;
   },
 
