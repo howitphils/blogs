@@ -13,3 +13,11 @@ export type PostViewModel = {
   blogId: string;
   blogName: string;
 };
+
+export type UpdatePostDtoModel = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+};
