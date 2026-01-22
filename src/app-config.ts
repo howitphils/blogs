@@ -4,7 +4,7 @@ configDotenv({
   path: ["./.env.dev", "./.env.production"],
 });
 
-export const appSettings = {
+export const appConfig = {
   PORT: process.env.PORT,
   PATHS: {
     BLOGS: "/blogs",

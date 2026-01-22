@@ -1,6 +1,6 @@
 import { app } from "./app";
-import { appSettings } from "./app-settings";
+import { appConfig } from "./app-config";
 
-app.listen(appSettings.PORT, () => {
-  console.log(`Server is running on port ${appSettings.PORT}`);
+app.listen(appConfig.PORT, () => {
+  console.log(`Server is running on port ${appConfig.PORT}`);
 });

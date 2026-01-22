@@ -33,6 +33,7 @@ export const postsRepository = {
 
   async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {
     const post = db.posts.find((p) => p.id === dto.id);
+
     if (!post) {
       return false;
     }
@@ -45,7 +46,7 @@ export const postsRepository = {
     return true;
   },
 
-  async deletePost(postId: number): Promise<boolean> {
+  async deletePost(postId: string): Promise<boolean> {
     const postIndex = db.posts.findIndex((p) => p.id === postId.toString());
 
     if (postIndex === -1) {

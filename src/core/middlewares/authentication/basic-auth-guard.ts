@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../../types/http-status-types";
-import { appSettings } from "../../../app-settings";
+import { appConfig } from "../../../app-config";
 
 export const basicAuthGuard = (
   req: Request,
@@ -22,8 +22,8 @@ export const basicAuthGuard = (
 
   const [username, password] = credentials.split(":");
 
-  const validUserName = appSettings.ADMIN_CREDENTIALS.USERNAME;
-  const validPassword = appSettings.ADMIN_CREDENTIALS.PASSWORD;
+  const validUserName = appConfig.ADMIN_CREDENTIALS.USERNAME;
+  const validPassword = appConfig.ADMIN_CREDENTIALS.PASSWORD;
 
   if (username !== validUserName || password !== validPassword) {
     res.status(HttpStatus.UNAUTHORIZED).send("Invalid credentials.");

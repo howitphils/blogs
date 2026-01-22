@@ -3,6 +3,7 @@ import { postsController } from "../controller/posts-controller";
 import { validateParamsId } from "../../core/middlewares/validation/params-id-validation";
 import { validationChainResult } from "../../core/middlewares/validation/validation-chain-result";
 import { validatePostBody } from "../validations/posts-body-validations";
+import { basicAuthGuard } from "../../core/middlewares/authentication/basic-auth-guard";
 
 export const postsRouter = Router();
 
@@ -15,12 +16,14 @@ postsRouter.get(
 );
 postsRouter.post(
   "/",
+  basicAuthGuard,
   validatePostBody,
   validationChainResult,
   postsController.createPost,
 );
 postsRouter.put(
   "/:id",
+  basicAuthGuard,
   validateParamsId,
   validatePostBody,
   validationChainResult,
@@ -28,6 +31,7 @@ postsRouter.put(
 );
 postsRouter.delete(
   "/:id",
+  basicAuthGuard,
   validateParamsId,
   validationChainResult,
   postsController.deletePost,
