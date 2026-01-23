@@ -7,18 +7,22 @@ import {
 import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
 import { HttpStatus } from "../../core/types/http-status-types";
 import { blogsRepository } from "../repository/blogs-repository";
+import { blogsQueryRepository } from "../repository/blogs-query-repository";
 
 export const blogsController = {
-  getAllBlogs: async (req: Request, res: Response) => {
-    const blogs = await blogsRepository.getAllBlogs();
+  getAllBlogs: async (req: Request, res: Response<BlogViewModel[]>) => {
+    const blogs = await blogsQueryRepository.getBlogs();
 
     res.status(HttpStatus.OK).json(blogs);
     return;
   },
 
-  getBlogById: async (req: RequestWithParamsId, res: Response) => {
+  getBlogById: async (
+    req: RequestWithParamsId,
+    res: Response<BlogViewModel>,
+  ) => {
     const blogId = req.params.id;
-    const blog = await blogsRepository.getBlogById(blogId);
+    const blog = await blogsQueryRepository.getBlogById(blogId);
 
     if (!blog) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -35,7 +39,7 @@ export const blogsController = {
   ) => {
     const newBlogId = await blogsRepository.createBlog(req.body);
 
-    const newBlog = await blogsRepository.getBlogById(newBlogId);
+    const newBlog = await blogsQueryRepository.getBlogById(newBlogId);
 
     if (!newBlog) {
       res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
