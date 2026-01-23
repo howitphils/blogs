@@ -1,27 +1,44 @@
+import { ObjectId } from "mongodb";
 import { db } from "../../db/db";
 import { blogsCollection } from "../../db/mongodb";
-import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
+import {
+  BlogDbModel,
+  BlogInputModel,
+  BlogViewModel,
+} from "../types/blogs-types";
 
 export const blogsRepository = {
-  async getAllBlogs(): Promise<BlogViewModel[]> {
+  async getAllBlogs(): Promise<BlogDbModel[]> {
     return blogsCollection.find({}).toArray();
   },
 
   async getBlogById(blogId: string): Promise<BlogViewModel | null> {
-    return db.blogs.find((b) => b.id === blogId) || null;
+    const convertedId = new ObjectId(blogId);
+
+    const blog = await blogsCollection.findOne({ _id: convertedId });
+
+    if (!blog) {
+      return null;
+    }
+
+    return {
+      id: blog._id.toString(),
+      description: blog.description,
+      name: blog.name,
+      websiteUrl: blog.websiteUrl,
+    };
   },
 
-  async createBlog(blogDto: BlogInputModel): Promise<BlogViewModel> {
-    const newBlog: BlogViewModel = {
-      id: "23",
+  async createBlog(blogDto: BlogInputModel): Promise<string> {
+    const newBlog: BlogDbModel = {
       name: blogDto.name,
       description: blogDto.description,
       websiteUrl: blogDto.websiteUrl,
     };
 
-    await blogsCollection.insertOne(newBlog);
+    const { insertedId } = await blogsCollection.insertOne(newBlog);
 
-    return newBlog;
+    return insertedId.toString();
   },
 
   async updateBlog(

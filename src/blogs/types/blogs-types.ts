@@ -10,3 +10,9 @@ export type BlogViewModel = {
   description: string;
   websiteUrl: string;
 };
+
+export type BlogDbModel = {
+  name: string;
+  description: string;
+  websiteUrl: string;
+};

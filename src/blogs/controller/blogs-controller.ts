@@ -29,8 +29,18 @@ export const blogsController = {
     return;
   },
 
-  createBlog: async (req: RequestWithBody<BlogInputModel>, res: Response) => {
-    const newBlog: BlogViewModel = await blogsRepository.createBlog(req.body);
+  createBlog: async (
+    req: RequestWithBody<BlogInputModel>,
+    res: Response<BlogViewModel>,
+  ) => {
+    const newBlogId = await blogsRepository.createBlog(req.body);
+
+    const newBlog = await blogsRepository.getBlogById(newBlogId);
+
+    if (!newBlog) {
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
 
     res.status(HttpStatus.CREATED).json(newBlog);
 

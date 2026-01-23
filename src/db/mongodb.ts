@@ -1,7 +1,7 @@
 import { Collection, MongoClient } from "mongodb";
-import { BlogViewModel } from "../blogs/types/blogs-types";
+import { BlogDbModel } from "../blogs/types/blogs-types";
 
-export let blogsCollection: Collection<BlogViewModel>;
+export let blogsCollection: Collection<BlogDbModel>;
 
 export const runDb = async (url: string, dbName: string) => {
   const client = new MongoClient(url);

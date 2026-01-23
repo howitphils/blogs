@@ -17,5 +17,5 @@ export const appConfig = {
   },
   MONGODB_URI: process.env.MONGODB_URI as string,
   DB_NAME: process.env.DB_NAME as string,
-  DB_NAME_TEST: "test-db",
+  DB_NAME_TEST: "test-db-blogs",
 };
