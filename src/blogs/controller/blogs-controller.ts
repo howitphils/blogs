@@ -57,9 +57,9 @@ export const blogsController = {
   ) => {
     const blogId = req.params.id;
 
-    const blog = await blogsRepository.updateBlog(blogId, req.body);
+    const updateResult = await blogsRepository.updateBlog(blogId, req.body);
 
-    if (!blog) {
+    if (!updateResult) {
       res.sendStatus(HttpStatus.NOT_FOUND);
     } else {
       res.sendStatus(HttpStatus.NO_CONTENT);

@@ -1,7 +1,7 @@
 import { Collection, Db, MongoClient } from "mongodb";
 import { BlogDbModel } from "../blogs/types/blogs-types";
 
-export let db: Db; // Export for tests. Will contain db name, that was up and running after runDb function
+export let db: Db; // Export for tests. It will contain db name, that was up and running after runDb function
 
 export let blogsCollection: Collection<BlogDbModel>;
 
