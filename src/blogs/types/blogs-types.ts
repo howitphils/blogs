@@ -9,10 +9,21 @@ export type BlogViewModel = {
   name: string;
   description: string;
   websiteUrl: string;
+  createdAt: string;
+  isMemberShip: boolean;
+};
+
+export type UpdateBlogDtoModel = {
+  blogId: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
 };
 
 export type BlogDbModel = {
   name: string;
   description: string;
   websiteUrl: string;
+  createdAt: string;
+  isMemberShip: boolean;
 };

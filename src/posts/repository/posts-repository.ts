@@ -20,7 +20,8 @@ export const postsRepository = {
       content: dto.content,
       shortDescription: dto.shortDescription,
       blogId: dto.blogId,
-      blogName: blog.name || "Unknown Blog", // TODO: check for blog name
+      blogName: blog.name || "Unknown Blog", // TODO: check for blog name,
+      createdAt: new Date().toISOString(),
     };
 
     const { insertedId } = await postsCollection.insertOne(newPost);

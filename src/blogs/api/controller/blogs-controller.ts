@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
+import { HttpStatus } from "../../../core/types/http-status-types";
 import {
-  RequestWithBody,
   RequestWithParamsId,
+  RequestWithBody,
   RequestWithParamsIdAndBody,
-} from "../../core/types/request-types";
-import { BlogInputModel, BlogViewModel } from "../types/blogs-types";
-import { HttpStatus } from "../../core/types/http-status-types";
-import { blogsRepository } from "../repository/blogs-repository";
-import { blogsQueryRepository } from "../repository/blogs-query-repository";
+} from "../../../core/types/request-types";
+import { blogsQueryRepository } from "../../repository/blogs-query-repository";
+import { BlogViewModel, BlogInputModel } from "../../types/blogs-types";
+import { blogsService } from "../../application/blogs-service";
 
 export const blogsController = {
   getAllBlogs: async (req: Request, res: Response<BlogViewModel[]>) => {
@@ -37,7 +37,7 @@ export const blogsController = {
     req: RequestWithBody<BlogInputModel>,
     res: Response<BlogViewModel>,
   ) => {
-    const newBlogId = await blogsRepository.createBlog(req.body);
+    const newBlogId = await blogsService.createBlog(req.body);
 
     const newBlog = await blogsQueryRepository.getBlogById(newBlogId);
 
@@ -56,8 +56,9 @@ export const blogsController = {
     res: Response,
   ) => {
     const blogId = req.params.id;
+    const blogDto = { ...req.body, blogId };
 
-    const updateResult = await blogsRepository.updateBlog(blogId, req.body);
+    const updateResult = await blogsService.updateBlog(blogDto);
 
     if (!updateResult) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -71,7 +72,7 @@ export const blogsController = {
   deleteBlog: async (req: RequestWithParamsId, res: Response) => {
     const blogId = req.params.id;
 
-    const isDeleted = await blogsRepository.deleteBlog(blogId);
+    const isDeleted = await blogsService.deleteBlog(blogId);
 
     if (!isDeleted) {
       res.sendStatus(HttpStatus.NOT_FOUND);

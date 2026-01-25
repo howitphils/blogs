@@ -24,6 +24,8 @@ export const blogsQueryRepository = {
       description: blog.description,
       name: blog.name,
       websiteUrl: blog.websiteUrl,
+      createdAt: blog.createdAt,
+      isMemberShip: blog.isMemberShip,
     };
   },
 };

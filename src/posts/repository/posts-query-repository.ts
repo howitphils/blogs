@@ -27,6 +27,7 @@ export const postsQueryRepository = {
       shortDescription: post.shortDescription,
       content: post.content,
       title: post.title,
+      createdAt: post.createdAt,
     };
   },
 };

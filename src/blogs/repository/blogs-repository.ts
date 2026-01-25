@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { blogsCollection } from "../../db/mongodb";
-import { BlogDbModel, BlogInputModel } from "../types/blogs-types";
+import { BlogDbModel, UpdateBlogDtoModel } from "../types/blogs-types";
 
 export const blogsRepository = {
   async getAllBlogs(): Promise<BlogDbModel[]> {
@@ -13,28 +13,22 @@ export const blogsRepository = {
     return blogsCollection.findOne({ _id: convertedId });
   },
 
-  async createBlog(blogDto: BlogInputModel): Promise<string> {
-    const newBlog: BlogDbModel = {
-      name: blogDto.name,
-      description: blogDto.description,
-      websiteUrl: blogDto.websiteUrl,
-    };
-
-    const { insertedId } = await blogsCollection.insertOne(newBlog);
+  async createBlog(blogDto: BlogDbModel): Promise<string> {
+    const { insertedId } = await blogsCollection.insertOne(blogDto);
 
     return insertedId.toString();
   },
 
-  async updateBlog(blogId: string, blogDto: BlogInputModel): Promise<boolean> {
+  async updateBlog(dto: UpdateBlogDtoModel): Promise<boolean> {
     const updateResult = await blogsCollection.updateOne(
       {
-        _id: new ObjectId(blogId),
+        _id: new ObjectId(dto.blogId),
       },
       {
         $set: {
-          description: blogDto.description,
-          name: blogDto.name,
-          websiteUrl: blogDto.websiteUrl,
+          description: dto.description,
+          name: dto.name,
+          websiteUrl: dto.websiteUrl,
         },
       },
     );
