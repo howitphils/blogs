@@ -1,4 +1,5 @@
 import { param } from "express-validator";
+import { ObjectId } from "mongodb";
 
 export const validateParamsId = param("id")
   .exists()
@@ -7,5 +8,7 @@ export const validateParamsId = param("id")
   .withMessage("ID must be a string")
   .notEmpty()
   .withMessage("ID cannot be empty")
-  .isNumeric()
-  .withMessage("ID must be a numeric string");
+  .custom((id) => {
+    return ObjectId.isValid(id);
+  })
+  .withMessage("ID must be a valid type");

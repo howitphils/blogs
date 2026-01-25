@@ -1,21 +1,31 @@
-import { Collection, MongoClient } from "mongodb";
+import { Collection, Db, MongoClient } from "mongodb";
 import { BlogDbModel } from "../blogs/types/blogs-types";
+
+export let db: Db; // Export for tests. Will contain db name, that was up and running after runDb function
 
 export let blogsCollection: Collection<BlogDbModel>;
 
 export const runDb = async (url: string, dbName: string) => {
-  const client = new MongoClient(url);
-  const db = client.db(dbName);
+  const mongoClient = new MongoClient(url);
+  db = mongoClient.db(dbName);
 
   blogsCollection = db.collection("blogsCollection");
 
   try {
-    await client.connect();
+    await mongoClient.connect();
     console.log("Sucessfully connected to db");
   } catch (e) {
-    await client.close();
+    await mongoClient.close();
     throw new Error(`❌ Database not connected: ${e}`);
   }
 
-  return client;
+  return mongoClient;
+};
+
+export const clearCollections = async () => {
+  const collections = await db.listCollections().toArray();
+
+  for (const coll of collections) {
+    await db.collection(coll.name).deleteMany({});
+  }
 };
