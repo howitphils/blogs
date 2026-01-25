@@ -4,14 +4,25 @@ import {
   RequestWithParamsId,
   RequestWithBody,
   RequestWithParamsIdAndBody,
+  RequestWithQuery,
 } from "../../../core/types/request-types";
 import { blogsQueryRepository } from "../../repository/blogs-query-repository";
-import { BlogViewModel, BlogInputModel } from "../../types/blogs-types";
+import {
+  BlogViewModel,
+  BlogInputModel,
+  BlogQueryParams,
+} from "../../types/blogs-types";
 import { blogsService } from "../../application/blogs-service";
+import { PaginationType } from "../../../core/types/pagination-type";
 
 export const blogsController = {
-  getAllBlogs: async (req: Request, res: Response<BlogViewModel[]>) => {
-    const blogs = await blogsQueryRepository.getBlogs();
+  getAllBlogs: async (
+    req: RequestWithQuery<BlogQueryParams>,
+    res: Response<PaginationType<BlogViewModel>>,
+  ) => {
+    const sortParams = req.query;
+
+    const blogs = await blogsQueryRepository.getBlogs(sortParams);
 
     res.status(HttpStatus.OK).json(blogs);
     return;

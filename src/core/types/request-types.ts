@@ -14,4 +14,4 @@ export type RequestWithParamsAndBody<TParams, TBody> = Request<
   TBody
 >;
 
-export type RequestWithquery<TQuery> = Request<{}, {}, {}, TQuery>;
+export type RequestWithQuery<TQuery> = Request<{}, {}, {}, TQuery>;

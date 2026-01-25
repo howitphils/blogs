@@ -1,3 +1,5 @@
+import { BaseQueryParams } from "../../core/types/query-params-types";
+
 export type BlogInputModel = {
   name: string; // max length 15
   description: string; // max length 500
@@ -27,3 +29,7 @@ export type BlogDbModel = {
   createdAt: string;
   isMemberShip: boolean;
 };
+
+export interface BlogQueryParams extends BaseQueryParams {
+  searchNameTerm: string | null;
+}

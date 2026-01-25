@@ -1,13 +1,21 @@
 import { ObjectId, WithId } from "mongodb";
-import { BlogDbModel, BlogViewModel } from "../types/blogs-types";
+import {
+  BlogDbModel,
+  BlogQueryParams,
+  BlogViewModel,
+} from "../types/blogs-types";
 import { blogsCollection } from "../../db/mongodb";
+import { PaginationType } from "../../core/types/pagination-type";
 
 export const blogsQueryRepository = {
-  async getBlogs() {
+  async getBlogs(
+    params: BlogQueryParams,
+  ): Promise<PaginationType<BlogViewModel>> {
     const blogs = await blogsCollection.find({}).toArray();
 
     return blogs.map(blogsQueryRepository.mapFromDbToView);
   },
+
   async getBlogById(id: string): Promise<BlogViewModel | null> {
     const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
