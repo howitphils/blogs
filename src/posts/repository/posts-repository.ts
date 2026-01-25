@@ -1,64 +1,58 @@
-import { db } from "../../db/db";
+import { postsCollection } from "./../../db/mongodb";
+import { blogsRepository } from "../../blogs/repository/blogs-repository";
 import {
+  PostDbModel,
   PostInputModel,
-  PostViewModel,
   UpdatePostDtoModel,
 } from "../types/posts-types";
+import { ObjectId } from "mongodb";
 
 export const postsRepository = {
-  async createPost(dto: PostInputModel): Promise<PostViewModel | null> {
-    const blog = db.blogs.find((b) => b.id === dto.blogId);
+  async createPost(dto: PostInputModel): Promise<string | null> {
+    const blog = await blogsRepository.getBlogById(dto.blogId);
 
     if (!blog) {
       return null;
     }
 
-    const newPost: PostViewModel = {
-      id: (db.posts.length + 1).toString(),
+    const newPost: PostDbModel = {
       title: dto.title,
       content: dto.content,
       shortDescription: dto.shortDescription,
       blogId: dto.blogId,
-      blogName: blog.name || "Unknown Blog",
+      blogName: blog.name || "Unknown Blog", // TODO: check for blog name
     };
 
-    db.posts.unshift(newPost);
+    const { insertedId } = await postsCollection.insertOne(newPost);
 
-    return newPost;
+    return insertedId.toString();
   },
 
-  async getPostById(postId: string): Promise<PostViewModel | null> {
-    return db.posts.find((post) => post.id === postId) || null;
+  async getPostById(postId: string): Promise<PostDbModel | null> {
+    return postsCollection.findOne({ _id: new ObjectId(postId) });
   },
 
   async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {
-    const post = db.posts.find((p) => p.id === dto.id);
+    const updateResult = await postsCollection.updateOne(
+      { _id: new ObjectId(dto.id) },
+      {
+        $set: {
+          title: dto.title,
+          blogId: dto.blogId,
+          content: dto.content,
+          shortDescription: dto.shortDescription,
+        },
+      },
+    );
 
-    if (!post) {
-      return false;
-    }
-
-    post.title = dto.title;
-    post.content = dto.content;
-    post.shortDescription = dto.shortDescription;
-    post.blogId = dto.blogId;
-
-    return true;
+    return updateResult.matchedCount !== 0;
   },
 
   async deletePost(postId: string): Promise<boolean> {
-    const postIndex = db.posts.findIndex((p) => p.id === postId.toString());
+    const deleteResult = await postsCollection.deleteOne({
+      _id: new ObjectId(postId),
+    });
 
-    if (postIndex === -1) {
-      return false;
-    }
-
-    db.posts.splice(postIndex, 1);
-
-    return true;
-  },
-
-  async getAllPosts(): Promise<PostViewModel[]> {
-    return db.posts;
+    return deleteResult.deletedCount !== 0;
   },
 };

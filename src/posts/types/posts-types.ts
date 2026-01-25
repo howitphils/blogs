@@ -21,3 +21,11 @@ export type UpdatePostDtoModel = {
   content: string;
   blogId: string;
 };
+
+export type PostDbModel = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+};

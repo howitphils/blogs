@@ -33,6 +33,6 @@ export const validatePostBody = [
     .trim()
     .notEmpty()
     .withMessage("Blog ID is required")
-    .isNumeric()
-    .withMessage("Blog ID must be a numeric value"),
+    .isMongoId()
+    .withMessage("Blog ID must have correct format"),
 ];
