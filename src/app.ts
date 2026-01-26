@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import { postsRouter } from "./posts/router/posts-router";
 import { appConfig } from "./app-config";
 import { testingRouter } from "./testing/router/testing-router";
 import { blogsRouter } from "./blogs/api/router/blogs-router";
+import { postsRouter } from "./posts/api/router/posts-router";
 
 export const app = express();
 

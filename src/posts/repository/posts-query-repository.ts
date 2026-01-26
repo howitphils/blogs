@@ -1,12 +1,33 @@
 import { ObjectId, WithId } from "mongodb";
 import { postsCollection } from "../../db/mongodb";
 import { PostDbModel, PostViewModel } from "../types/posts-types";
+import { PaginationType } from "../../core/types/pagination-types";
+import { BaseQueryParams } from "../../core/types/query-params-types";
 
 export const postsQueryRepository = {
-  async getPosts(): Promise<PostViewModel[]> {
-    const dbPosts = await postsCollection.find({}).toArray();
+  async getPosts(
+    params: BaseQueryParams,
+  ): Promise<PaginationType<PostViewModel>> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = params;
 
-    return dbPosts.map(postsQueryRepository.mapFromDbToView);
+    const skip = (pageNumber - 1) * pageSize;
+
+    const posts = await postsCollection
+      .find()
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection })
+      .toArray();
+
+    const totalCount = await postsCollection.countDocuments();
+
+    return {
+      page: pageNumber,
+      pagesCount: Math.ceil(totalCount / pageSize),
+      pageSize,
+      totalCount,
+      items: posts.map(postsQueryRepository.mapFromDbToView),
+    };
   },
 
   async getPostById(id: string): Promise<PostViewModel | null> {

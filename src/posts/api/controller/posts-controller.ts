@@ -1,17 +1,26 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { HttpStatus } from "../../../core/types/http-status-types";
 import {
-  RequestWithBody,
   RequestWithParamsId,
+  RequestWithBody,
   RequestWithParamsIdAndBody,
-} from "../../core/types/request-types";
-import { HttpStatus } from "../../core/types/http-status-types";
-import { postsRepository } from "../repository/posts-repository";
-import { PostInputModel, PostViewModel } from "../types/posts-types";
-import { postsQueryRepository } from "../repository/posts-query-repository";
+  RequestWithQuery,
+} from "../../../core/types/request-types";
+import { postsQueryRepository } from "../../repository/posts-query-repository";
+import { PostViewModel, PostInputModel } from "../../types/posts-types";
+import { postsService } from "../../application/posts-service";
+import { BaseQueryParams } from "../../../core/types/query-params-types";
+import { matchedData } from "express-validator";
+import { PaginationType } from "../../../core/types/pagination-types";
 
 export const postsController = {
-  getAllPosts: async (req: Request, res: Response<PostViewModel[]>) => {
-    const posts = await postsQueryRepository.getPosts();
+  getAllPosts: async (
+    req: RequestWithQuery<BaseQueryParams>,
+    res: Response<PaginationType<PostViewModel>>,
+  ) => {
+    const sortParams = matchedData<BaseQueryParams>(req);
+
+    const posts = await postsQueryRepository.getPosts(sortParams);
 
     res.status(HttpStatus.OK).json(posts);
 
@@ -40,7 +49,7 @@ export const postsController = {
   ) => {
     const dto = req.body;
 
-    const newPostId = await postsRepository.createPost(dto);
+    const newPostId = await postsService.createPost(dto);
 
     if (!newPostId) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -65,7 +74,7 @@ export const postsController = {
     const postId = req.params.id;
     const dto = req.body;
 
-    const isUpdated = await postsRepository.updatePost({
+    const isUpdated = await postsService.updatePost({
       id: postId,
       ...dto,
     });
@@ -82,7 +91,7 @@ export const postsController = {
   deletePost: async (req: RequestWithParamsId, res: Response) => {
     const postId = req.params.id;
 
-    const isDeleted = await postsRepository.deletePost(postId);
+    const isDeleted = await postsService.deletePost(postId);
 
     if (!isDeleted) {
       res.sendStatus(HttpStatus.NOT_FOUND);
