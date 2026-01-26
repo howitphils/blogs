@@ -1,13 +1,19 @@
 import { Router } from "express";
 import { blogsController } from "../controller/blogs-controller";
-import { validateParamsId } from "../../core/middlewares/validation/params-id-validation";
-import { validationChainResult } from "../../core/middlewares/validation/validation-chain-result";
 import { validateBlogBody } from "../validations/blog-body-validation";
-import { basicAuthGuard } from "../../core/middlewares/authentication/basic-auth-guard";
+import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth-guard";
+import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
+import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
+import { validateQueryParams } from "../../../core/middlewares/validation/base-query-validations";
 
 export const blogsRouter = Router();
 
-blogsRouter.get("/", blogsController.getAllBlogs);
+blogsRouter.get(
+  "/",
+  validateQueryParams,
+  validationChainResult,
+  blogsController.getAllBlogs,
+);
 blogsRouter.get(
   "/:id",
   validateParamsId,

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-status-types";
 import {
   RequestWithParamsId,
@@ -13,14 +13,15 @@ import {
   BlogQueryParams,
 } from "../../types/blogs-types";
 import { blogsService } from "../../application/blogs-service";
-import { PaginationType } from "../../../core/types/pagination-type";
+import { PaginationType } from "../../../core/types/pagination-types";
+import { matchedData } from "express-validator";
 
 export const blogsController = {
   getAllBlogs: async (
     req: RequestWithQuery<BlogQueryParams>,
     res: Response<PaginationType<BlogViewModel>>,
   ) => {
-    const sortParams = req.query;
+    const sortParams = matchedData<BlogQueryParams>(req);
 
     const blogs = await blogsQueryRepository.getBlogs(sortParams);
 

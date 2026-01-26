@@ -5,15 +5,37 @@ import {
   BlogViewModel,
 } from "../types/blogs-types";
 import { blogsCollection } from "../../db/mongodb";
-import { PaginationType } from "../../core/types/pagination-type";
+import { PaginationType } from "../../core/types/pagination-types";
 
 export const blogsQueryRepository = {
   async getBlogs(
     params: BlogQueryParams,
   ): Promise<PaginationType<BlogViewModel>> {
-    const blogs = await blogsCollection.find({}).toArray();
+    const { pageNumber, pageSize, searchNameTerm, sortBy, sortDirection } =
+      params;
 
-    return blogs.map(blogsQueryRepository.mapFromDbToView);
+    const skip = (pageNumber - 1) * pageSize;
+
+    const filter = searchNameTerm
+      ? { name: { $regex: searchNameTerm, options: "i" } }
+      : {};
+
+    const blogs = await blogsCollection
+      .find(filter)
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ [sortBy]: sortDirection })
+      .toArray();
+
+    const totalCount = await blogsCollection.countDocuments(filter);
+
+    return {
+      page: pageNumber,
+      pagesCount: Math.ceil(totalCount / pageSize),
+      pageSize,
+      totalCount,
+      items: blogs.map(blogsQueryRepository.mapFromDbToView),
+    };
   },
 
   async getBlogById(id: string): Promise<BlogViewModel | null> {

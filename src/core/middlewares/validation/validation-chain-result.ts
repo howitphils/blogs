@@ -4,7 +4,7 @@ import {
   validationResult,
   ValidationError,
 } from "express-validator";
-import { FieldError } from "../../types/errors-types";
+import { FieldError } from "../../types/error-response-types";
 import { HttpStatus } from "../../types/http-status-types";
 
 const errorFormatter = (error: ValidationError): FieldError => {
@@ -23,7 +23,7 @@ const errorFormatter = (error: ValidationError): FieldError => {
 };
 
 export const validationChainResult = (
-  req: Request,
+  req: Request<{}, {}, {}, any>,
   res: Response,
   next: NextFunction,
 ) => {
