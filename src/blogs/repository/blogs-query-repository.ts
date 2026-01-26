@@ -17,7 +17,7 @@ export const blogsQueryRepository = {
     const skip = (pageNumber - 1) * pageSize;
 
     const filter = searchNameTerm
-      ? { name: { $regex: searchNameTerm, options: "i" } }
+      ? { name: { $regex: searchNameTerm, $options: "i" } }
       : {};
 
     const blogs = await blogsCollection
