@@ -7,7 +7,7 @@ export const validatePostBody = [
     .isString()
     .withMessage("Title must be a string")
     .trim()
-    .isLength({ min: 1, max: 100 })
+    .isLength({ min: 1, max: 30 })
     .withMessage("Title must be between 1 and 100 characters"),
   body("content")
     .exists()
@@ -23,7 +23,7 @@ export const validatePostBody = [
     .isString()
     .withMessage("Short description must be a string")
     .trim()
-    .isLength({ min: 1, max: 300 })
+    .isLength({ min: 1, max: 100 })
     .withMessage("Short description must be between 1 and 300 characters"),
   body("blogId")
     .exists()

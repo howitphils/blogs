@@ -5,6 +5,7 @@ import {
   RequestWithBody,
   RequestWithParamsIdAndBody,
   RequestWithQuery,
+  RequestWithParamsIdAndQuery,
 } from "../../../core/types/request-types";
 import { blogsQueryRepository } from "../../repository/blogs-query-repository";
 import {
@@ -15,6 +16,10 @@ import {
 import { blogsService } from "../../application/blogs-service";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { matchedData } from "express-validator";
+import { PostViewModel } from "../../../posts/types/posts-types";
+import { BaseQueryParams } from "../../../core/types/query-params-types";
+
+// TODO: get post for blog + create post for blog endpoints
 
 export const blogsController = {
   getAllBlogs: async (
@@ -44,6 +49,16 @@ export const blogsController = {
 
     return;
   },
+
+  getPostForBlog: async (
+    req: RequestWithParamsIdAndQuery<BaseQueryParams>,
+    res: PaginationType<PostViewModel>,
+  ) => {},
+
+  createPostForBlog: async (
+    req: RequestWithParamsIdAndBody<>, // TODO: Type for postforblog body 
+    res: PostViewModel,
+  ) => {},
 
   createBlog: async (
     req: RequestWithBody<BlogInputModel>,

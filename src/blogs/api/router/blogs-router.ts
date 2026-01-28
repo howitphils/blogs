@@ -5,6 +5,7 @@ import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-a
 import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { validateBlogQueryParams } from "../validations/blog-query-validation";
+import { validatePostBody } from "../../../posts/validations/posts-body-validations";
 
 export const blogsRouter = Router();
 
@@ -20,6 +21,14 @@ blogsRouter.get(
   validationChainResult,
   blogsController.getBlogById,
 );
+
+blogsRouter.get(
+  "/:id/posts",
+  validateParamsId,
+  validationChainResult,
+  blogsController.getBlogById,
+);
+
 blogsRouter.post(
   "/",
   basicAuthGuard,
@@ -27,6 +36,15 @@ blogsRouter.post(
   validationChainResult,
   blogsController.createBlog,
 );
+
+blogsRouter.post(
+  "/:id/posts",
+  basicAuthGuard,
+  // validatePostBody, // TODO: PostForBlogBody validations
+  validationChainResult,
+  blogsController.createBlog,
+);
+
 blogsRouter.put(
   "/:id",
   basicAuthGuard,
