@@ -62,6 +62,11 @@ export const blogsController = {
 
     const posts = await postsQueryRepository.getPosts(queryParams, blogId);
 
+    if (!posts) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
     res.status(HttpStatus.OK).json(posts);
 
     return;

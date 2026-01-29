@@ -3,17 +3,28 @@ import { postsCollection } from "../../db/mongodb";
 import { PostDbModel, PostViewModel } from "../types/posts-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
+import { blogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
 
 export const postsQueryRepository = {
   async getPosts(
     params: BaseQueryParams,
     blogId?: string,
-  ): Promise<PaginationType<PostViewModel>> {
+  ): Promise<PaginationType<PostViewModel> | null> {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
 
-    const skip = (pageNumber - 1) * pageSize;
+    let filter = {};
 
-    const filter = blogId ? { blogId } : {};
+    if (blogId) {
+      const blog = await blogsQueryRepository.getBlogById(blogId);
+
+      if (!blog) {
+        return null;
+      }
+
+      filter = { blogId };
+    }
+
+    const skip = (pageNumber - 1) * pageSize;
 
     const posts = await postsCollection
       .find(filter)

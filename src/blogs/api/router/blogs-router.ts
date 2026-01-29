@@ -1,3 +1,4 @@
+import { validateQueryParams } from "./../../../core/middlewares/validation/base-query-validations";
 import { Router } from "express";
 import { blogsController } from "../controller/blogs-controller";
 import { validateBlogBody } from "../validations/blog-body-validation";
@@ -25,6 +26,7 @@ blogsRouter.get(
 blogsRouter.get(
   "/:id/posts",
   validateParamsId,
+  validateQueryParams,
   validationChainResult,
   blogsController.getPostsForBlog,
 );

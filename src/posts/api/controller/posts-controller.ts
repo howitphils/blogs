@@ -22,6 +22,11 @@ export const postsController = {
 
     const posts = await postsQueryRepository.getPosts(sortParams);
 
+    if (!posts) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
     res.status(HttpStatus.OK).json(posts);
 
     return;

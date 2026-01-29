@@ -56,4 +56,17 @@ export const postsRepository = {
 
     return deleteResult.deletedCount !== 0;
   },
+
+  async updateBlogNameForPost(blogId: string, blogName: string) {
+    const updateResult = await postsCollection.updateOne(
+      { blogId },
+      {
+        $set: {
+          blogName,
+        },
+      },
+    );
+
+    return updateResult.matchedCount !== 0;
+  },
 };

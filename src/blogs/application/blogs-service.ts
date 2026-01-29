@@ -1,3 +1,4 @@
+import { postsRepository } from "../../posts/repository/posts-repository";
 import { blogsRepository } from "../repository/blogs-repository";
 import {
   BlogDbModel,
@@ -23,6 +24,16 @@ export const blogsService = {
   },
 
   async updateBlog(dto: UpdateBlogDtoModel): Promise<boolean> {
+    const blog = await blogsRepository.getBlogById(dto.blogId);
+
+    if (!blog) {
+      return false;
+    }
+
+    if (blog.name !== dto.name) {
+      await postsRepository.updateBlogNameForPost(dto.blogId, dto.name);
+    }
+
     return blogsRepository.updateBlog(dto);
   },
 
