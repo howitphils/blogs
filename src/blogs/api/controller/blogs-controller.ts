@@ -16,10 +16,13 @@ import {
 import { blogsService } from "../../application/blogs-service";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { matchedData } from "express-validator";
-import { PostViewModel } from "../../../posts/types/posts-types";
+import {
+  PostForBlogInputModel,
+  PostViewModel,
+} from "../../../posts/types/posts-types";
 import { BaseQueryParams } from "../../../core/types/query-params-types";
-
-// TODO: get post for blog + create post for blog endpoints
+import { postsQueryRepository } from "../../../posts/repository/posts-query-repository";
+import { postsService } from "../../../posts/application/posts-service";
 
 export const blogsController = {
   getAllBlogs: async (
@@ -50,15 +53,48 @@ export const blogsController = {
     return;
   },
 
-  getPostForBlog: async (
+  getPostsForBlog: async (
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
-    res: PaginationType<PostViewModel>,
-  ) => {},
+    res: Response<PaginationType<PostViewModel>>,
+  ) => {
+    const blogId = req.params.id;
+    const queryParams = matchedData<BaseQueryParams>(req);
+
+    const posts = await postsQueryRepository.getPosts(queryParams, blogId);
+
+    res.status(HttpStatus.OK).json(posts);
+
+    return;
+  },
 
   createPostForBlog: async (
-    req: RequestWithParamsIdAndBody<>, // TODO: Type for postforblog body 
-    res: PostViewModel,
-  ) => {},
+    req: RequestWithParamsIdAndBody<PostForBlogInputModel>,
+    res: Response<PostViewModel>,
+  ) => {
+    const blogId = req.params.id;
+    const { content, shortDescription, title } = req.body;
+
+    const newPostId = await postsService.createPost({
+      blogId,
+      content,
+      shortDescription,
+      title,
+    });
+
+    if (!newPostId) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
+    const newPost = await postsQueryRepository.getPostById(newPostId);
+
+    if (!newPost) {
+      res.sendStatus(HttpStatus.NOT_FOUND);
+      return;
+    }
+
+    res.status(HttpStatus.CREATED).json(newPost);
+  },
 
   createBlog: async (
     req: RequestWithBody<BlogInputModel>,

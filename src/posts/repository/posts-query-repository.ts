@@ -7,19 +7,22 @@ import { BaseQueryParams } from "../../core/types/query-params-types";
 export const postsQueryRepository = {
   async getPosts(
     params: BaseQueryParams,
+    blogId?: string,
   ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
 
     const skip = (pageNumber - 1) * pageSize;
 
+    const filter = blogId ? { blogId } : {};
+
     const posts = await postsCollection
-      .find()
+      .find(filter)
       .skip(skip)
       .limit(pageSize)
       .sort({ [sortBy]: sortDirection })
       .toArray();
 
-    const totalCount = await postsCollection.countDocuments();
+    const totalCount = await postsCollection.countDocuments(filter);
 
     return {
       page: pageNumber,

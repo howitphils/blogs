@@ -31,3 +31,9 @@ export type PostDbModel = {
   blogName: string;
   createdAt: string;
 };
+
+export type PostForBlogInputModel = {
+  title: string; // max length 30
+  shortDescription: string; // max length 100
+  content: string; // max length 1000
+};
