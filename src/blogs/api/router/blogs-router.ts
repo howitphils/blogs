@@ -42,9 +42,10 @@ blogsRouter.post(
 blogsRouter.post(
   "/:id/posts",
   basicAuthGuard,
+  validateParamsId,
   validatePostForBlogBody,
   validationChainResult,
-  blogsController.createBlog,
+  blogsController.createPostForBlog,
 );
 
 blogsRouter.put(

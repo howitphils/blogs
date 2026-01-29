@@ -12,6 +12,7 @@ import {
   BlogViewModel,
   BlogInputModel,
   BlogQueryParams,
+  UpdateBlogDtoModel,
 } from "../../types/blogs-types";
 import { blogsService } from "../../application/blogs-service";
 import { PaginationType } from "../../../core/types/pagination-types";
@@ -94,7 +95,7 @@ export const blogsController = {
     const newPost = await postsQueryRepository.getPostById(newPostId);
 
     if (!newPost) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
+      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
       return;
     }
 
@@ -124,7 +125,7 @@ export const blogsController = {
     res: Response,
   ) => {
     const blogId = req.params.id;
-    const blogDto = { ...req.body, blogId };
+    const blogDto: UpdateBlogDtoModel = { ...req.body, blogId };
 
     const updateResult = await blogsService.updateBlog(blogDto);
 
