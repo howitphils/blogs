@@ -17,7 +17,7 @@ export const postsController = {
   getAllPosts: async (
     req: RequestWithQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
-  ) => {
+  ): Promise<Response> => {
     const sortParams = matchedData<BaseQueryParams>(req);
 
     const posts = await postsQueryRepository.getPosts(sortParams);
@@ -28,7 +28,7 @@ export const postsController = {
   getPostById: async (
     req: RequestWithParamsId,
     res: Response<PostViewModel>,
-  ) => {
+  ): Promise<Response> => {
     const postId = req.params.id;
     const post = await postsQueryRepository.getPostByIdOrFail(postId);
 
@@ -38,7 +38,7 @@ export const postsController = {
   createPost: async (
     req: RequestWithBody<PostInputModel>,
     res: Response<PostViewModel>,
-  ) => {
+  ): Promise<Response> => {
     const dto = req.body;
 
     const newPostId = await postsService.createPost(dto);
@@ -51,7 +51,7 @@ export const postsController = {
   updatePost: async (
     req: RequestWithParamsIdAndBody<PostInputModel>,
     res: Response,
-  ) => {
+  ): Promise<Response> => {
     const postId = req.params.id;
     const dto = req.body;
 
@@ -63,7 +63,10 @@ export const postsController = {
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 
-  deletePost: async (req: RequestWithParamsId, res: Response) => {
+  deletePost: async (
+    req: RequestWithParamsId,
+    res: Response,
+  ): Promise<Response> => {
     const postId = req.params.id;
 
     await postsService.deletePost(postId);

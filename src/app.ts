@@ -15,5 +15,4 @@ app.use(appConfig.PATHS.BLOGS, blogsRouter);
 app.use(appConfig.PATHS.POSTS, postsRouter);
 app.use(appConfig.PATHS.TESTING, testingRouter);
 
-// TODO: ADD ERROR HANDLER
 app.use(errorHandler);

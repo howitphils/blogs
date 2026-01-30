@@ -74,7 +74,7 @@ export const blogsController = {
       title,
     });
 
-    const newPost = await postsQueryRepository.getPostByIdOrFail(newPostId);
+    const newPost = await postsQueryRepository.getCreatedPost(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
   },

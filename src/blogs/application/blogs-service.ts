@@ -5,7 +5,10 @@ import {
   BlogInputModel,
   UpdateBlogDtoModel,
 } from "../types/blogs-types";
-import { BlogNotFoundError } from "./errors/blogs-errors";
+import {
+  BlogNotFoundError,
+  BlogNotFoundInternalError,
+} from "./errors/blogs-errors";
 
 export const blogsService = {
   async createBlog(dto: BlogInputModel): Promise<string> {
@@ -30,7 +33,7 @@ export const blogsService = {
     const updateResult = await blogsRepository.updateBlog(dto);
 
     if (!updateResult) {
-      throw new BlogNotFoundError();
+      throw new BlogNotFoundInternalError();
     }
   },
 
