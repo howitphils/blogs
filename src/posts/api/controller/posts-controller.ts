@@ -37,7 +37,7 @@ export const postsController = {
     res: Response<PostViewModel>,
   ) => {
     const postId = req.params.id;
-    const post = await postsQueryRepository.getPostById(postId);
+    const post = await postsQueryRepository.getPostByIdOrFail(postId);
 
     if (!post) {
       res.sendStatus(HttpStatus.NOT_FOUND);
@@ -61,7 +61,7 @@ export const postsController = {
       return;
     }
 
-    const newPost = await postsQueryRepository.getPostById(newPostId);
+    const newPost = await postsQueryRepository.getPostByIdOrFail(newPostId);
 
     if (!newPost) {
       res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);

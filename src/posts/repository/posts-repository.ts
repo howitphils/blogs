@@ -6,21 +6,19 @@ import {
   UpdatePostDtoModel,
 } from "../types/posts-types";
 import { ObjectId } from "mongodb";
+import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
+import { HttpStatus } from "../../core/types/http-status-types";
 
 export const postsRepository = {
-  async createPost(dto: PostInputModel): Promise<string | null> {
-    const blog = await blogsRepository.getBlogById(dto.blogId);
-
-    if (!blog) {
-      return null;
-    }
+  async createPost(dto: PostInputModel): Promise<string> {
+    const blog = await blogsRepository.getBlogByIdOrFail(dto.blogId);
 
     const newPost: PostDbModel = {
       title: dto.title,
       content: dto.content,
       shortDescription: dto.shortDescription,
       blogId: dto.blogId,
-      blogName: blog.name || "Unknown Blog", // TODO: check for blog name,
+      blogName: blog.name || "Unknown Blog",
       createdAt: new Date().toISOString(),
     };
 
@@ -29,8 +27,17 @@ export const postsRepository = {
     return insertedId.toString();
   },
 
-  async getPostById(postId: string): Promise<PostDbModel | null> {
-    return postsCollection.findOne({ _id: new ObjectId(postId) });
+  async getPostByIdOrFail(postId: string): Promise<PostDbModel> {
+    const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
+
+    if (!post) {
+      throw new ErrorResponseWithMessage(
+        "Post was not found",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return post;
   },
 
   async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {

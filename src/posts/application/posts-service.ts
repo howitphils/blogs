@@ -7,16 +7,14 @@ import {
 } from "../types/posts-types";
 
 export const postsService = {
-  async getPostById(id: string): Promise<PostDbModel | null> {
-    return postsRepository.getPostById(id);
+  async getPostById(id: string): Promise<PostDbModel> {
+    const post = await postsRepository.getPostByIdOrFail(id);
+
+    return post;
   },
 
-  async createPost(dto: PostInputModel): Promise<string | null> {
-    const blog = await blogsRepository.getBlogById(dto.blogId);
-
-    if (!blog) {
-      return null;
-    }
+  async createPost(dto: PostInputModel): Promise<string> {
+    const blog = await blogsRepository.getBlogByIdOrFail(dto.blogId);
 
     const newPost: PostDbModel = {
       title: dto.title,

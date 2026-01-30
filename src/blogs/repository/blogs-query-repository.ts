@@ -53,6 +53,19 @@ export const blogsQueryRepository = {
     return blogsQueryRepository.mapFromDbToView(dbBlog);
   },
 
+  async getCreatedBlogOrFail(id: string): Promise<BlogViewModel> {
+    const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!dbBlog) {
+      throw new ErrorResponseWithMessage(
+        "Blog was not found",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return blogsQueryRepository.mapFromDbToView(dbBlog);
+  },
+
   mapFromDbToView(blog: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blog._id.toString(),

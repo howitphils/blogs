@@ -57,10 +57,6 @@ export const blogsController = {
 
     const posts = await postsQueryRepository.getPosts(queryParams, blogId);
 
-    if (!posts) {
-      return res.sendStatus(HttpStatus.NOT_FOUND);
-    }
-
     return res.status(HttpStatus.OK).json(posts);
   },
 
@@ -78,15 +74,7 @@ export const blogsController = {
       title,
     });
 
-    if (!newPostId) {
-      return res.sendStatus(HttpStatus.NOT_FOUND);
-    }
-
-    const newPost = await postsQueryRepository.getPostById(newPostId);
-
-    if (!newPost) {
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const newPost = await postsQueryRepository.getPostByIdOrFail(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
   },
@@ -97,11 +85,7 @@ export const blogsController = {
   ): Promise<Response> => {
     const newBlogId = await blogsService.createBlog(req.body);
 
-    const newBlog = await blogsQueryRepository.getBlogByIdOrFail(newBlogId);
-
-    if (!newBlog) {
-      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const newBlog = await blogsQueryRepository.getCreatedBlogOrFail(newBlogId);
 
     return res.status(HttpStatus.CREATED).json(newBlog);
   },
@@ -113,11 +97,7 @@ export const blogsController = {
     const blogId = req.params.id;
     const blogDto: UpdateBlogDtoModel = { ...req.body, blogId };
 
-    const updateResult = await blogsService.updateBlog(blogDto);
-
-    if (!updateResult) {
-      return res.sendStatus(HttpStatus.NOT_FOUND);
-    }
+    await blogsService.updateBlog(blogDto);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
@@ -128,11 +108,7 @@ export const blogsController = {
   ): Promise<Response> => {
     const blogId = req.params.id;
 
-    const isDeleted = await blogsService.deleteBlog(blogId);
-
-    if (!isDeleted) {
-      return res.sendStatus(HttpStatus.NOT_FOUND);
-    }
+    await blogsService.deleteBlog(blogId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },

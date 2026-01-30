@@ -4,22 +4,20 @@ import { PostDbModel, PostViewModel } from "../types/posts-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
 import { blogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
+import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
+import { HttpStatus } from "../../core/types/http-status-types";
 
 export const postsQueryRepository = {
   async getPosts(
     params: BaseQueryParams,
     blogId?: string,
-  ): Promise<PaginationType<PostViewModel> | null> {
+  ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
 
     let filter = {};
 
     if (blogId) {
-      const blog = await blogsQueryRepository.getBlogByIdOrFail(blogId);
-
-      if (!blog) {
-        return null;
-      }
+      await blogsQueryRepository.getBlogByIdOrFail(blogId);
 
       filter = { blogId };
     }
@@ -44,11 +42,14 @@ export const postsQueryRepository = {
     };
   },
 
-  async getPostById(id: string): Promise<PostViewModel | null> {
+  async getPostByIdOrFail(id: string): Promise<PostViewModel> {
     const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!dbPost) {
-      return null;
+      throw new ErrorResponseWithMessage(
+        "Post was not found",
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return postsQueryRepository.mapFromDbToView(dbPost);

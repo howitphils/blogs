@@ -29,7 +29,7 @@ export const errorHandler: ErrorRequestHandler = (
   err: any,
   req: Request,
   res: Response,
-): Response => {
+) => {
   if (err instanceof ErrorResponseWithMessage) {
     return res.status(err.status).json({ message: err.message });
   }
@@ -46,7 +46,7 @@ export const errorHandler: ErrorRequestHandler = (
       .json({ message: "Database error" });
   }
 
-  console.error(err);
+  // console.error(err);
 
   return res
     .status(HttpStatus.INTERNAL_SERVER_ERROR)

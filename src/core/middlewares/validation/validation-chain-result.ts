@@ -33,12 +33,10 @@ export const validationChainResult = (
     .array({ onlyFirstError: true });
 
   if (formatedErrors.length > 0) {
-    res.status(HttpStatus.BAD_REQUEST).json({ errorsMessages: formatedErrors });
-    return;
-    // throw new ErrorResponseWithObject(HttpStatus.BAD_REQUEST, {
-    //   errorsMessages: formatedErrors,
-    // });
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ errorsMessages: formatedErrors });
   }
 
-  next();
+  return next();
 };
