@@ -6,6 +6,8 @@ import {
 } from "../types/blogs-types";
 import { blogsCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
+import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
+import { HttpStatus } from "../../core/types/http-status-types";
 
 export const blogsQueryRepository = {
   async getBlogs(
@@ -38,11 +40,14 @@ export const blogsQueryRepository = {
     };
   },
 
-  async getBlogById(id: string): Promise<BlogViewModel | null> {
+  async getBlogByIdOrFail(id: string): Promise<BlogViewModel> {
     const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!dbBlog) {
-      return null;
+      throw new ErrorResponseWithMessage(
+        "Blog was not found",
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return blogsQueryRepository.mapFromDbToView(dbBlog);

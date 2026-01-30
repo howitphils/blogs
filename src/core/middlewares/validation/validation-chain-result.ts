@@ -6,6 +6,7 @@ import {
 } from "express-validator";
 import { FieldError } from "../../types/error-response-types";
 import { HttpStatus } from "../../types/http-status-types";
+// import { ErrorResponseWithObject } from "../error-handling/error-handler";
 
 const errorFormatter = (error: ValidationError): FieldError => {
   if (error.type === "field") {
@@ -34,6 +35,9 @@ export const validationChainResult = (
   if (formatedErrors.length > 0) {
     res.status(HttpStatus.BAD_REQUEST).json({ errorsMessages: formatedErrors });
     return;
+    // throw new ErrorResponseWithObject(HttpStatus.BAD_REQUEST, {
+    //   errorsMessages: formatedErrors,
+    // });
   }
 
   next();

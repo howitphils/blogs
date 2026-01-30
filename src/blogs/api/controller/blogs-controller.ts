@@ -29,54 +29,45 @@ export const blogsController = {
   getAllBlogs: async (
     req: RequestWithQuery<BlogQueryParams>,
     res: Response<PaginationType<BlogViewModel>>,
-  ) => {
+  ): Promise<Response> => {
     const sortParams = matchedData<BlogQueryParams>(req);
 
     const blogs = await blogsQueryRepository.getBlogs(sortParams);
 
-    res.status(HttpStatus.OK).json(blogs);
-    return;
+    return res.status(HttpStatus.OK).json(blogs);
   },
 
   getBlogById: async (
     req: RequestWithParamsId,
     res: Response<BlogViewModel>,
-  ) => {
+  ): Promise<Response> => {
     const blogId = req.params.id;
-    const blog = await blogsQueryRepository.getBlogById(blogId);
 
-    if (!blog) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.status(HttpStatus.OK).json(blog);
-    }
+    const blog = await blogsQueryRepository.getBlogByIdOrFail(blogId);
 
-    return;
+    return res.status(HttpStatus.OK).json(blog);
   },
 
   getPostsForBlog: async (
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
-  ) => {
+  ): Promise<Response> => {
     const blogId = req.params.id;
     const queryParams = matchedData<BaseQueryParams>(req);
 
     const posts = await postsQueryRepository.getPosts(queryParams, blogId);
 
     if (!posts) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
+      return res.sendStatus(HttpStatus.NOT_FOUND);
     }
 
-    res.status(HttpStatus.OK).json(posts);
-
-    return;
+    return res.status(HttpStatus.OK).json(posts);
   },
 
   createPostForBlog: async (
     req: RequestWithParamsIdAndBody<PostForBlogInputModel>,
     res: Response<PostViewModel>,
-  ) => {
+  ): Promise<Response> => {
     const blogId = req.params.id;
     const { content, shortDescription, title } = req.body;
 
@@ -88,67 +79,61 @@ export const blogsController = {
     });
 
     if (!newPostId) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
+      return res.sendStatus(HttpStatus.NOT_FOUND);
     }
 
     const newPost = await postsQueryRepository.getPostById(newPostId);
 
     if (!newPost) {
-      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-      return;
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    res.status(HttpStatus.CREATED).json(newPost);
+    return res.status(HttpStatus.CREATED).json(newPost);
   },
 
   createBlog: async (
     req: RequestWithBody<BlogInputModel>,
     res: Response<BlogViewModel>,
-  ) => {
+  ): Promise<Response> => {
     const newBlogId = await blogsService.createBlog(req.body);
 
-    const newBlog = await blogsQueryRepository.getBlogById(newBlogId);
+    const newBlog = await blogsQueryRepository.getBlogByIdOrFail(newBlogId);
 
     if (!newBlog) {
-      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-      return;
+      return res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    res.status(HttpStatus.CREATED).json(newBlog);
-
-    return;
+    return res.status(HttpStatus.CREATED).json(newBlog);
   },
 
   updateBlog: async (
     req: RequestWithParamsIdAndBody<BlogInputModel>,
     res: Response,
-  ) => {
+  ): Promise<Response> => {
     const blogId = req.params.id;
     const blogDto: UpdateBlogDtoModel = { ...req.body, blogId };
 
     const updateResult = await blogsService.updateBlog(blogDto);
 
     if (!updateResult) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.sendStatus(HttpStatus.NO_CONTENT);
+      return res.sendStatus(HttpStatus.NOT_FOUND);
     }
 
-    return;
+    return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 
-  deleteBlog: async (req: RequestWithParamsId, res: Response) => {
+  deleteBlog: async (
+    req: RequestWithParamsId,
+    res: Response,
+  ): Promise<Response> => {
     const blogId = req.params.id;
 
     const isDeleted = await blogsService.deleteBlog(blogId);
 
     if (!isDeleted) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.sendStatus(HttpStatus.NO_CONTENT);
+      return res.sendStatus(HttpStatus.NOT_FOUND);
     }
 
-    return;
+    return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 };

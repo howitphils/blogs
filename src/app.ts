@@ -4,6 +4,7 @@ import { appConfig } from "./app-config";
 import { testingRouter } from "./testing/router/testing-router";
 import { blogsRouter } from "./blogs/api/router/blogs-router";
 import { postsRouter } from "./posts/api/router/posts-router";
+import { errorHandler } from "./core/middlewares/error-handling/error-handler";
 
 export const app = express();
 
@@ -15,3 +16,4 @@ app.use(appConfig.PATHS.POSTS, postsRouter);
 app.use(appConfig.PATHS.TESTING, testingRouter);
 
 // TODO: ADD ERROR HANDLER
+app.use(errorHandler);

@@ -15,7 +15,7 @@ export const postsQueryRepository = {
     let filter = {};
 
     if (blogId) {
-      const blog = await blogsQueryRepository.getBlogById(blogId);
+      const blog = await blogsQueryRepository.getBlogByIdOrFail(blogId);
 
       if (!blog) {
         return null;
