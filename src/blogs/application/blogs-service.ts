@@ -1,5 +1,3 @@
-import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
-import { HttpStatus } from "../../core/types/http-status-types";
 import { postsRepository } from "../../posts/repository/posts-repository";
 import { blogsRepository } from "../repository/blogs-repository";
 import {
@@ -7,13 +5,10 @@ import {
   BlogInputModel,
   UpdateBlogDtoModel,
 } from "../types/blogs-types";
+import { BlogNotFoundError } from "./errors/blogs-errors";
 
 export const blogsService = {
-  async getBlogById(id: string) {
-    return blogsRepository.getBlogByIdOrFail(id);
-  },
-
-  async createBlog(dto: BlogInputModel) {
+  async createBlog(dto: BlogInputModel): Promise<string> {
     const newBlog: BlogDbModel = {
       name: dto.name,
       description: dto.description,
@@ -35,10 +30,7 @@ export const blogsService = {
     const updateResult = await blogsRepository.updateBlog(dto);
 
     if (!updateResult) {
-      throw new ErrorResponseWithMessage(
-        "Blog was not found",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new BlogNotFoundError();
     }
   },
 
@@ -46,10 +38,7 @@ export const blogsService = {
     const result = await blogsRepository.deleteBlog(blogId);
 
     if (!result) {
-      throw new ErrorResponseWithMessage(
-        "Blog was not found",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new BlogNotFoundError();
     }
   },
 };

@@ -85,7 +85,7 @@ export const blogsController = {
   ): Promise<Response> => {
     const newBlogId = await blogsService.createBlog(req.body);
 
-    const newBlog = await blogsQueryRepository.getCreatedBlogOrFail(newBlogId);
+    const newBlog = await blogsQueryRepository.getCreatedBlog(newBlogId);
 
     return res.status(HttpStatus.CREATED).json(newBlog);
   },

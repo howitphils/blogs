@@ -16,7 +16,6 @@ export const runDb = async (url: string, dbName: string) => {
 
   try {
     await mongoClient.connect();
-    console.log("Sucessfully connected to db");
   } catch (e) {
     await mongoClient.close();
     throw new Error(`❌ Database not connected: ${e}`);

@@ -22,14 +22,7 @@ export const postsController = {
 
     const posts = await postsQueryRepository.getPosts(sortParams);
 
-    if (!posts) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
-    }
-
-    res.status(HttpStatus.OK).json(posts);
-
-    return;
+    return res.status(HttpStatus.OK).json(posts);
   },
 
   getPostById: async (
@@ -39,13 +32,7 @@ export const postsController = {
     const postId = req.params.id;
     const post = await postsQueryRepository.getPostByIdOrFail(postId);
 
-    if (!post) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.status(HttpStatus.OK).json(post);
-    }
-
-    return;
+    return res.status(HttpStatus.OK).json(post);
   },
 
   createPost: async (
@@ -56,20 +43,9 @@ export const postsController = {
 
     const newPostId = await postsService.createPost(dto);
 
-    if (!newPostId) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-      return;
-    }
+    const newPost = await postsQueryRepository.getCreatedPost(newPostId);
 
-    const newPost = await postsQueryRepository.getPostByIdOrFail(newPostId);
-
-    if (!newPost) {
-      res.sendStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-      return;
-    }
-
-    res.status(HttpStatus.CREATED).json(newPost);
-    return;
+    return res.status(HttpStatus.CREATED).json(newPost);
   },
 
   updatePost: async (
@@ -79,31 +55,19 @@ export const postsController = {
     const postId = req.params.id;
     const dto = req.body;
 
-    const isUpdated = await postsService.updatePost({
+    await postsService.updatePost({
       id: postId,
       ...dto,
     });
 
-    if (!isUpdated) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.sendStatus(HttpStatus.NO_CONTENT);
-    }
-
-    return;
+    return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 
   deletePost: async (req: RequestWithParamsId, res: Response) => {
     const postId = req.params.id;
 
-    const isDeleted = await postsService.deletePost(postId);
+    await postsService.deletePost(postId);
 
-    if (!isDeleted) {
-      res.sendStatus(HttpStatus.NOT_FOUND);
-    } else {
-      res.sendStatus(HttpStatus.NO_CONTENT);
-    }
-
-    return;
+    return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 };

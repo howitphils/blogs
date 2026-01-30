@@ -1,22 +1,14 @@
 import { ObjectId } from "mongodb";
 import { blogsCollection } from "../../db/mongodb";
 import { BlogDbModel, UpdateBlogDtoModel } from "../types/blogs-types";
-import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
-import { HttpStatus } from "../../core/types/http-status-types";
+import { BlogNotFoundError } from "../application/errors/blogs-errors";
 
 export const blogsRepository = {
-  async getAllBlogs(): Promise<BlogDbModel[]> {
-    return blogsCollection.find({}).toArray();
-  },
-
   async getBlogByIdOrFail(blogId: string): Promise<BlogDbModel> {
     const blog = await blogsCollection.findOne({ _id: new ObjectId(blogId) });
 
     if (!blog) {
-      throw new ErrorResponseWithMessage(
-        "Blog was not found",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new BlogNotFoundError();
     }
 
     return blog;

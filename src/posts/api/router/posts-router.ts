@@ -3,7 +3,7 @@ import { postsController } from "../controller/posts-controller";
 import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth-guard";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
-import { validatePostBody } from "../../validations/posts-body-validations";
+import { validatePostBody } from "../validations/posts-body-validations";
 import { validateQueryParams } from "../../../core/middlewares/validation/base-query-validations";
 
 export const postsRouter = Router();

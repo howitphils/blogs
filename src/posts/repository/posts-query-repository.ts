@@ -4,8 +4,10 @@ import { PostDbModel, PostViewModel } from "../types/posts-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
 import { blogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
-import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
-import { HttpStatus } from "../../core/types/http-status-types";
+import {
+  PostNotFoundError,
+  PostNotFoundInternalError,
+} from "../application/errors/posts-errors";
 
 export const postsQueryRepository = {
   async getPosts(
@@ -46,10 +48,17 @@ export const postsQueryRepository = {
     const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!dbPost) {
-      throw new ErrorResponseWithMessage(
-        "Post was not found",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new PostNotFoundError();
+    }
+
+    return postsQueryRepository.mapFromDbToView(dbPost);
+  },
+
+  async getCreatedPost(id: string): Promise<PostViewModel> {
+    const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!dbPost) {
+      throw new PostNotFoundInternalError();
     }
 
     return postsQueryRepository.mapFromDbToView(dbPost);

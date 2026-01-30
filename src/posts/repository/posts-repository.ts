@@ -6,8 +6,7 @@ import {
   UpdatePostDtoModel,
 } from "../types/posts-types";
 import { ObjectId } from "mongodb";
-import { ErrorResponseWithMessage } from "../../core/middlewares/error-handling/error-handler";
-import { HttpStatus } from "../../core/types/http-status-types";
+import { PostNotFoundError } from "../application/errors/posts-errors";
 
 export const postsRepository = {
   async createPost(dto: PostInputModel): Promise<string> {
@@ -31,10 +30,7 @@ export const postsRepository = {
     const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
 
     if (!post) {
-      throw new ErrorResponseWithMessage(
-        "Post was not found",
-        HttpStatus.NOT_FOUND,
-      );
+      throw new PostNotFoundError();
     }
 
     return post;
@@ -64,8 +60,8 @@ export const postsRepository = {
     return deleteResult.deletedCount !== 0;
   },
 
-  async updateBlogNameForPost(blogId: string, blogName: string) {
-    const updateResult = await postsCollection.updateMany(
+  async updateBlogNameForPost(blogId: string, blogName: string): Promise<void> {
+    await postsCollection.updateMany(
       { blogId },
       {
         $set: {
@@ -73,7 +69,5 @@ export const postsRepository = {
         },
       },
     );
-
-    return updateResult.matchedCount !== 0;
   },
 };

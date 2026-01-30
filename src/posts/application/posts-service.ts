@@ -5,14 +5,9 @@ import {
   PostInputModel,
   UpdatePostDtoModel,
 } from "../types/posts-types";
+import { PostNotFoundError } from "./errors/posts-errors";
 
 export const postsService = {
-  async getPostById(id: string): Promise<PostDbModel> {
-    const post = await postsRepository.getPostByIdOrFail(id);
-
-    return post;
-  },
-
   async createPost(dto: PostInputModel): Promise<string> {
     const blog = await blogsRepository.getBlogByIdOrFail(dto.blogId);
 
@@ -28,11 +23,19 @@ export const postsService = {
     return postsRepository.createPost(newPost);
   },
 
-  async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {
-    return postsRepository.updatePost(dto);
+  async updatePost(dto: UpdatePostDtoModel): Promise<void> {
+    const updateResult = await postsRepository.updatePost(dto);
+
+    if (!updateResult) {
+      throw new PostNotFoundError();
+    }
   },
 
-  async deletePost(blogId: string): Promise<boolean> {
-    return postsRepository.deletePost(blogId);
+  async deletePost(postId: string): Promise<void> {
+    const deleteResult = await postsRepository.deletePost(postId);
+
+    if (!deleteResult) {
+      throw new PostNotFoundError();
+    }
   },
 };

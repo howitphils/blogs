@@ -3,6 +3,7 @@ import { SortByOptions, SortDirections } from "./core/types/query-params-types";
 
 configDotenv({
   path: ["./.env.dev", "./.env.production"],
+  quiet: true,
 });
 
 export const appConfig = {
