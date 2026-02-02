@@ -15,7 +15,7 @@ export const validateUserBody = [
       max: userInputRestrictions.login.maxLength,
     })
     .withMessage(
-      `Name must be between ${userInputRestrictions.login.minLength} and ${userInputRestrictions.login.maxLength} characters`,
+      `Login must be between ${userInputRestrictions.login.minLength} and ${userInputRestrictions.login.maxLength} characters`,
     ),
 
   body("email")
@@ -24,6 +24,12 @@ export const validateUserBody = [
     .isString()
     .withMessage("Email must be a string")
     .trim()
+    .notEmpty()
+    .withMessage("Email must be not empty")
+    .isLength({
+      max: userInputRestrictions.email.maxLength,
+    })
+    .withMessage(`Email is too long`)
     .isEmail()
     .withMessage("Incorrect email"),
 

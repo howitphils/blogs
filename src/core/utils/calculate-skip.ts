@@ -1,3 +1,2 @@
-export const calculateSkip = (pageNumber: number, pageSize: number) => {
-  return (pageNumber - 1) * pageSize;
-};
+export const calculateSkip = (pageNumber: number, pageSize: number) =>
+  (pageNumber - 1) * pageSize;

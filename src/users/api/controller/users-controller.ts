@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { HttpStatus } from "../../../core/types/http-status-types";
 import {
   RequestWithParamsId,
@@ -30,12 +30,14 @@ export const usersController = {
   createUser: async (
     req: RequestWithBody<UserInputModel>,
     res: Response<UserViewModel>,
-  ): Promise<Response> => {
+    next: NextFunction,
+  ) => {
     const newUserId = await usersService.createUser(req.body);
 
     const newUser = await usersQueryRepository.getCreatedUser(newUserId);
 
-    return res.status(HttpStatus.CREATED).json(newUser);
+    res.status(HttpStatus.CREATED).json(newUser);
+    return;
   },
 
   deleteUser: async (

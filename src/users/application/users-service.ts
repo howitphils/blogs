@@ -1,5 +1,9 @@
 import { usersRepository } from "../repository/users-repository";
-import { UserDbModel, UserInputModel } from "../types/users-types";
+import {
+  LoginInputModel,
+  UserDbModel,
+  UserInputModel,
+} from "../types/users-types";
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "./services/password-service";
 
@@ -13,7 +17,7 @@ export const usersService = {
       login: dto.login,
       email: dto.email,
       passwordHash,
-      createAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
     return usersRepository.createUser(newUser);
@@ -26,6 +30,9 @@ export const usersService = {
       throw new UserNotFoundError();
     }
   },
+
+  //TODO
+  async loginUser(dto: LoginInputModel) {},
 
   async checkUnique(login: string, email: string): Promise<void> {
     const existingUser = await usersRepository.getUserByLoginOrEmail(

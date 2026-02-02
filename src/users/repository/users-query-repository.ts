@@ -59,7 +59,7 @@ export const usersQueryRepository = {
       id: user._id.toString(),
       email: user.email,
       login: user.login,
-      createdAt: user.createAt,
+      createdAt: user.createdAt,
     };
   },
 };

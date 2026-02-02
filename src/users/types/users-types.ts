@@ -17,7 +17,7 @@ export type UserDbModel = {
   login: string;
   passwordHash: string;
   email: string;
-  createAt: string;
+  createdAt: string;
 };
 
 export interface UserQueryParams extends BaseQueryParams {

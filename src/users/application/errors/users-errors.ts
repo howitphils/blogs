@@ -17,13 +17,14 @@ export class UserNotFoundInternalError extends HttpError {
 }
 
 export class NotUniqueUserError extends HttpError {
-  errorObj: ErrorResponse;
+  public errorResponse: ErrorResponse;
 
   constructor(field: string) {
     super("", HttpStatus.BAD_REQUEST);
 
-    this.errorObj = {
+    this.errorResponse = {
       errorsMessages: [{ field, message: `${field} should be unique` }],
     };
+    this.name = "NotUniqueUserError";
   }
 }
