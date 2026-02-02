@@ -1,19 +1,36 @@
 import { usersRepository } from "../repository/users-repository";
 import { UserDbModel, UserInputModel } from "../types/users-types";
-import { BlogNotFoundError } from "./errors/users-errors";
+import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 
 export const usersService = {
   async createUser(dto: UserInputModel): Promise<string> {
+    //TODO: passhash + unique check
+
+    await usersService.checkUnique(dto.login, dto.email);
+
     const newUser: UserDbModel = {};
 
     return usersRepository.createUser(newUser);
   },
 
   async deleteUser(blogId: string): Promise<void> {
-    const result = await usersRepository.deleteUser(blogId);
+    const isDeleted = await usersRepository.deleteUser(blogId);
 
-    if (!result) {
-      throw new BlogNotFoundError();
+    if (!isDeleted) {
+      throw new UserNotFoundError();
+    }
+  },
+
+  async checkUnique(login: string, email: string): Promise<void> {
+    const existingUser = await usersRepository.getUserByLoginOrEmail(
+      login,
+      email,
+    );
+
+    if (existingUser) {
+      const field = existingUser.email === email ? "email" : "login";
+
+      throw new NotUniqueUserError(field);
     }
   },
 };

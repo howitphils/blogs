@@ -22,9 +22,9 @@ export const usersController = {
   ): Promise<Response> => {
     const sortParams = matchedData<UserQueryParams>(req);
 
-    const blogs = await usersQueryRepository.getUsers(sortParams);
+    const users = await usersQueryRepository.getUsers(sortParams);
 
-    return res.status(HttpStatus.OK).json(blogs);
+    return res.status(HttpStatus.OK).json(users);
   },
 
   createUser: async (
@@ -42,9 +42,9 @@ export const usersController = {
     req: RequestWithParamsId,
     res: Response,
   ): Promise<Response> => {
-    const blogId = req.params.id;
+    const userId = req.params.id;
 
-    await usersService.deleteUser(blogId);
+    await usersService.deleteUser(userId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
