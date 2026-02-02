@@ -1,30 +1,43 @@
 import { body } from "express-validator";
+import { userInputRestrictions } from "./users-input-restricitions";
 
-export const validateBlogBody = [
-  body("name")
+export const validateUserBody = [
+  body("login")
     .exists()
-    .withMessage("Name is required")
+    .withMessage("Login is required")
     .isString()
     .trim()
-    .withMessage("Name must be a string")
-    .isLength({ min: 1, max: 15 })
-    .withMessage("Name must be between 1 and 15 characters"),
-  body("description")
+    .withMessage("Login must be a string")
+    .matches(userInputRestrictions.login.pattern)
+    .withMessage("Incorrect symbols were used")
+    .isLength({
+      min: userInputRestrictions.login.minLength,
+      max: userInputRestrictions.login.maxLength,
+    })
+    .withMessage(
+      `Name must be between ${userInputRestrictions.login.minLength} and ${userInputRestrictions.login.maxLength} characters`,
+    ),
+
+  body("email")
     .exists()
-    .withMessage("Description is required")
+    .withMessage("Email is required")
     .isString()
-    .withMessage("Description must be a string")
+    .withMessage("Email must be a string")
     .trim()
-    .isLength({ min: 1, max: 500 })
-    .withMessage("Description must be between 1 and 500 characters"),
-  body("websiteUrl")
+    .isEmail()
+    .withMessage("Incorrect email"),
+
+  body("password")
     .exists()
-    .withMessage("Website URL is required")
+    .withMessage("Password is required")
     .isString()
-    .withMessage("Website URL must be a string")
+    .withMessage("Password must be a string")
     .trim()
-    .isLength({ min: 1, max: 100 })
-    .withMessage("Website URL must be between 1 and 100 characters")
-    .isURL()
-    .withMessage("Website URL must be a valid URL"),
+    .isLength({
+      min: userInputRestrictions.password.minLength,
+      max: userInputRestrictions.password.maxLength,
+    })
+    .withMessage(
+      `Password must be between ${userInputRestrictions.password.minLength} and ${userInputRestrictions.password.maxLength} characters`,
+    ),
 ];

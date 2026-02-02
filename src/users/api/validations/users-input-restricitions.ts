@@ -1,14 +1,14 @@
-export const blogInputRestrictions = {
-  name: {
-    minLength: 1,
-    maxLength: 15,
+export const userInputRestrictions = {
+  login: {
+    minLength: 3,
+    maxLength: 10,
+    pattern: /^[a-zA-Z0-9_-]*$/,
   },
-  description: {
-    minLength: 1,
-    maxLength: 500,
+  password: {
+    minLength: 6,
+    maxLength: 20,
   },
-  websiteUrl: {
-    minLength: 1,
-    maxLength: 100,
+  email: {
+    pattern: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
   },
 };
