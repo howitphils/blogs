@@ -5,6 +5,8 @@ import { testingRouter } from "./testing/router/testing-router";
 import { blogsRouter } from "./blogs/api/router/blogs-router";
 import { postsRouter } from "./posts/api/router/posts-router";
 import { errorHandler } from "./core/middlewares/error-handling/error-handler";
+import { usersRouter } from "./users/api/router/users-router";
+import { basicAuthGuard } from "./core/middlewares/authentication/basic-auth-guard";
 
 export const app = express();
 
@@ -13,6 +15,7 @@ app.use(cors()); // Enable CORS for reaching the API from different origins
 
 app.use(appConfig.PATHS.BLOGS, blogsRouter);
 app.use(appConfig.PATHS.POSTS, postsRouter);
+app.use(appConfig.PATHS.USERS, basicAuthGuard, usersRouter);
 app.use(appConfig.PATHS.TESTING, testingRouter);
 
 app.use(errorHandler);

@@ -1,28 +1,28 @@
 import { Router } from "express";
-import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth-guard";
 import { usersController } from "../controller/users-controller";
+import { validateUserQueryParams } from "../validations/users-query-validation";
+import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
+import { validateUserBody } from "../validations/users-body-validation";
+import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 
 export const usersRouter = Router();
 
 usersRouter.get(
   "/",
-  basicAuthGuard,
-  validateBlogQueryParams,
+  validateUserQueryParams,
   validationChainResult,
   usersController.getUsers,
 );
 
 usersRouter.post(
   "/",
-  basicAuthGuard,
-  validateBlogBody,
+  validateUserBody,
   validationChainResult,
   usersController.createUser,
 );
 
 usersRouter.delete(
   "/:id",
-  basicAuthGuard,
   validateParamsId,
   validationChainResult,
   usersController.deleteUser,

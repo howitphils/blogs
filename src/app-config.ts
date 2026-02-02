@@ -11,6 +11,7 @@ export const appConfig = {
   PATHS: {
     BLOGS: "/blogs",
     POSTS: "/posts",
+    USERS: "/users",
     TESTING: "/testing",
   },
   ADMIN_CREDENTIALS: {
