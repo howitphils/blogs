@@ -24,3 +24,8 @@ export interface UserQueryParams extends BaseQueryParams {
   searchLoginTerm: string | null;
   searchEmailTerm: string | null;
 }
+
+export type LoginInputModel = {
+  loginOrEmail: string;
+  password: string;
+};

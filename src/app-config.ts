@@ -12,6 +12,7 @@ export const appConfig = {
     BLOGS: "/blogs",
     POSTS: "/posts",
     USERS: "/users",
+    AUTH: "/auth",
     TESTING: "/testing",
   },
   ADMIN_CREDENTIALS: {
