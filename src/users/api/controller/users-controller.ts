@@ -31,11 +31,11 @@ export const usersController = {
     req: RequestWithBody<UserInputModel>,
     res: Response<UserViewModel>,
   ): Promise<Response> => {
-    const newBlogId = await usersService.createUser(req.body);
+    const newUserId = await usersService.createUser(req.body);
 
-    const newBlog = await usersQueryRepository.getUserByIdOrFail(newBlogId);
+    const newUser = await usersQueryRepository.getCreatedUser(newUserId);
 
-    return res.status(HttpStatus.CREATED).json(newBlog);
+    return res.status(HttpStatus.CREATED).json(newUser);
   },
 
   deleteUser: async (

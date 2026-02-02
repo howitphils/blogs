@@ -1,16 +1,16 @@
 import { HttpError } from "../../../core/middlewares/error-handling/custom-errors/http-error";
 import { HttpStatus } from "../../../core/types/http-status-types";
 
-export class BlogNotFoundError extends HttpError {
+export class UserNotFoundError extends HttpError {
   constructor() {
-    super("Blog was not found", HttpStatus.NOT_FOUND);
-    this.name = "BlogNotFoundError";
+    super("User was not found", HttpStatus.NOT_FOUND);
+    this.name = "UserNotFoundError";
   }
 }
 
-export class BlogNotFoundInternalError extends HttpError {
+export class UserNotFoundInternalError extends HttpError {
   constructor() {
-    super("Blog was not found", HttpStatus.INTERNAL_SERVER_ERROR);
-    this.name = "BlogNotFoundInternalError";
+    super("User was not found", HttpStatus.INTERNAL_SERVER_ERROR);
+    this.name = "UserNotFoundInternalError";
   }
 }
