@@ -6,7 +6,8 @@ import {
   UserInputModel,
 } from "../types/users-types";
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
-import { passwordService } from "./services/password-service";
+import { passwordService } from "../../core/services/password-service";
+import { tokenService } from "../../core/services/token-service";
 
 export const usersService = {
   async createUser(dto: UserInputModel): Promise<string> {
@@ -32,7 +33,7 @@ export const usersService = {
     }
   },
 
-  async loginUser(dto: LoginInputModel): Promise<void> {
+  async loginUser(dto: LoginInputModel): Promise<{ accessToken: string }> {
     const user = await usersRepository.getUserByLoginOrEmail(dto.loginOrEmail);
 
     if (!user) {
@@ -47,6 +48,10 @@ export const usersService = {
     if (!isVerified) {
       throw new UnauthorizedError("User is not verified");
     }
+
+    const accessToken = tokenService.createAccessToken(user._id.toString());
+
+    return { accessToken };
   },
 
   async checkUnique(login: string, email: string): Promise<void> {

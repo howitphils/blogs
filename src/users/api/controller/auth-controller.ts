@@ -6,8 +6,8 @@ import { HttpStatus } from "../../../core/types/http-status-types";
 
 export const authController = {
   async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
-    await usersService.loginUser(req.body);
+    const token = await usersService.loginUser(req.body);
 
-    return res.sendStatus(HttpStatus.NO_CONTENT);
+    return res.status(HttpStatus.NO_CONTENT).json(token);
   },
 };
