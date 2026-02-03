@@ -18,13 +18,24 @@ export const usersRepository = {
     return deleteResult.deletedCount !== 0;
   },
 
-  async getUserByLoginOrEmail(login: string, email: string) {
+  async getUniqueUser(login: string, email: string) {
     return usersCollection.findOne({
       $or: [
         {
           login: { $regex: `^${safeRegex(login)}$`, $options: "i" }, // ^ - start of the string, $ - end of the string
         },
         { email: { $regex: `^${safeRegex(email)}$`, $options: "i" } },
+      ],
+    });
+  },
+
+  async getUserByLoginOrEmail(loginOrEmail: string) {
+    return usersCollection.findOne({
+      $or: [
+        {
+          login: { $regex: `^${safeRegex(loginOrEmail)}$`, $options: "i" },
+        },
+        { email: { $regex: `^${safeRegex(loginOrEmail)}$`, $options: "i" } },
       ],
     });
   },

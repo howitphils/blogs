@@ -3,7 +3,7 @@ import { BlogDbModel } from "../blogs/types/blogs-types";
 import { PostDbModel } from "../posts/types/posts-types";
 import { UserDbModel } from "../users/types/users-types";
 
-export let db: Db; // Export for tests. It will contain db name, that was up and running after runDb function
+export let db: Db; // Export for tests (TESTING API). It will contain db name, that was up and running after runDb function
 
 export let blogsCollection: Collection<BlogDbModel>;
 export let postsCollection: Collection<PostDbModel>;

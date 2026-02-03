@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "../../types/http-status-types";
 import { appConfig } from "../../../app-config";
+import { UnauthorizedError } from "../error-handling/custom-errors/unauthorized-error";
 
 export const basicAuthGuard = (
   req: Request,
@@ -10,8 +10,7 @@ export const basicAuthGuard = (
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Basic ")) {
-    res.status(HttpStatus.UNAUTHORIZED).send("Authentication required.");
-    return;
+    throw new UnauthorizedError("Authorization required");
   }
 
   const base64Credentials = authHeader.split(" ")[1] as string;
@@ -26,8 +25,7 @@ export const basicAuthGuard = (
   const validPassword = appConfig.ADMIN_CREDENTIALS.PASSWORD;
 
   if (username !== validUserName || password !== validPassword) {
-    res.status(HttpStatus.UNAUTHORIZED).send("Invalid credentials.");
-    return;
+    throw new UnauthorizedError("Invalid credentials");
   }
 
   next();

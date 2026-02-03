@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "../../core/middlewares/error-handling/custom-errors/unauthorized-error";
 import { usersRepository } from "../repository/users-repository";
 import {
   LoginInputModel,
@@ -31,14 +32,25 @@ export const usersService = {
     }
   },
 
-  //TODO
-  async loginUser(dto: LoginInputModel) {},
+  async loginUser(dto: LoginInputModel): Promise<void> {
+    const user = await usersRepository.getUserByLoginOrEmail(dto.loginOrEmail);
+
+    if (!user) {
+      throw new UnauthorizedError("User was not found");
+    }
+
+    const isVerified = await passwordService.verifyHash(
+      user.passwordHash,
+      dto.password,
+    );
+
+    if (!isVerified) {
+      throw new UnauthorizedError("User is not verified");
+    }
+  },
 
   async checkUnique(login: string, email: string): Promise<void> {
-    const existingUser = await usersRepository.getUserByLoginOrEmail(
-      login,
-      email,
-    );
+    const existingUser = await usersRepository.getUniqueUser(login, email);
 
     if (existingUser) {
       const field = existingUser.email === email ? "email" : "login";
