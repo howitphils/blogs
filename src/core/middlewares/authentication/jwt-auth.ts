@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction, Request } from "express";
 import { tokenService } from "../../services/token-service";
 import { UnauthorizedError } from "../error-handling/custom-errors/unauthorized-error";
 
@@ -21,11 +21,7 @@ export const jwtAuthGuard = (
 
   const payload = tokenService.verifyToken(token);
 
-  //TODO:ADD user to request
-
-  if (!payload || typeof payload !== "object" || !("userId" in payload)) {
-    res.sendStatus(401);
-  }
+  req.user = payload.user;
 
   next();
 };

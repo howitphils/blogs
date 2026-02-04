@@ -1,4 +1,4 @@
-import { sign, verify } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
 
@@ -13,7 +13,7 @@ export const tokenService = {
 
   verifyToken(token: string) {
     try {
-      const payload = verify(token, appConfig.JWT_SECRET);
+      const payload = verify(token, appConfig.JWT_SECRET) as JwtPayload;
       return payload;
     } catch (error: any) {
       throw new UnauthorizedError(error.message);

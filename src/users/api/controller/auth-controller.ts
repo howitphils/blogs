@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { RequestWithBody } from "../../../core/types/request-types";
 import { LoginInputModel } from "../../types/users-types";
 import { usersService } from "../../application/users-service";
@@ -9,5 +9,9 @@ export const authController = {
     const token = await usersService.loginUser(req.body);
 
     return res.status(HttpStatus.NO_CONTENT).json(token);
+  },
+
+  async getMyInfo(req: Request, res: Response) {
+    const user = req.user;
   },
 };
