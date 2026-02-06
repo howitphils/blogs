@@ -2,14 +2,16 @@ import { ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
 import {
+  MeInfoViewModel,
   UserDbModel,
   UserQueryParams,
   UserViewModel,
 } from "../types/users-types";
 import { calculateSkip } from "../../core/utils/calculate-skip";
-import { UserNotFoundInternalError } from "../application/errors/users-errors";
 import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 import { createUserFilter } from "../utils/create-user-filter";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { UserNotFoundError } from "../application/errors/users-errors";
 
 export const usersQueryRepository = {
   async getUsers(
@@ -48,10 +50,24 @@ export const usersQueryRepository = {
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
 
     if (!user) {
-      throw new UserNotFoundInternalError();
+      throw new ServerError("Created user is not found");
     }
 
     return usersQueryRepository.mapFromDbToView(user);
+  },
+
+  async getMyInfo(userId: string): Promise<MeInfoViewModel> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    return {
+      login: user.login,
+      email: user.email,
+      userId: user._id.toString(),
+    };
   },
 
   mapFromDbToView(user: WithId<UserDbModel>): UserViewModel {

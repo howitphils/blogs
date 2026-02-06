@@ -6,10 +6,8 @@ import {
 } from "../types/blogs-types";
 import { blogsCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
-import {
-  BlogNotFoundError,
-  BlogNotFoundInternalError,
-} from "../application/errors/blogs-errors";
+import { BlogNotFoundError } from "../application/errors/blogs-errors";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 
 export const blogsQueryRepository = {
   async getBlogs(
@@ -56,7 +54,7 @@ export const blogsQueryRepository = {
     const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
 
     if (!dbBlog) {
-      throw new BlogNotFoundInternalError();
+      throw new ServerError("Created blog was not found");
     }
 
     return blogsQueryRepository.mapFromDbToView(dbBlog);

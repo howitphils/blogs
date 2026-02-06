@@ -1,3 +1,4 @@
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { postsRepository } from "../../posts/repository/posts-repository";
 import { blogsRepository } from "../repository/blogs-repository";
 import {
@@ -5,10 +6,7 @@ import {
   BlogInputModel,
   UpdateBlogDtoModel,
 } from "../types/blogs-types";
-import {
-  BlogNotFoundError,
-  BlogNotFoundInternalError,
-} from "./errors/blogs-errors";
+import { BlogNotFoundError } from "./errors/blogs-errors";
 
 export const blogsService = {
   async createBlog(dto: BlogInputModel): Promise<string> {
@@ -33,7 +31,7 @@ export const blogsService = {
     const updateResult = await blogsRepository.updateBlog(dto);
 
     if (!updateResult) {
-      throw new BlogNotFoundInternalError();
+      throw new ServerError("Blog was not updated");
     }
   },
 

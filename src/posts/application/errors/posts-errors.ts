@@ -7,10 +7,3 @@ export class PostNotFoundError extends HttpError {
     this.name = "PostNotFoundError";
   }
 }
-
-export class PostNotFoundInternalError extends HttpError {
-  constructor() {
-    super("Post was not found", HttpStatus.INTERNAL_SERVER_ERROR);
-    this.name = "PostNotFoundInternalError";
-  }
-}
