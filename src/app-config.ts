@@ -29,4 +29,5 @@ export const appConfig = {
     DEFAULT_SORT_DIRECTION: SortDirections.DESC,
   },
   JWT_SECRET: process.env.JWT_SECRET as string,
+  ACCESS_JWT_EXP: Number(process.env.ACCESS_JWT_EXP),
 };
