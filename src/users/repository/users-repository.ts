@@ -1,9 +1,20 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../db/mongodb";
 import { UserDbModel } from "../types/users-types";
 import { safeRegex } from "../utils/safe-regex";
+import { UserNotFoundError } from "../application/errors/users-errors";
 
 export const usersRepository = {
+  async getUserByIdOrFail(id: string): Promise<WithId<UserDbModel>> {
+    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    return user;
+  },
+
   async createUser(userDto: UserDbModel): Promise<string> {
     const { insertedId } = await usersCollection.insertOne(userDto);
 
@@ -18,7 +29,7 @@ export const usersRepository = {
     return deleteResult.deletedCount !== 0;
   },
 
-  async getUniqueUser(login: string, email: string) {
+  async getExistingUser(login: string, email: string) {
     return usersCollection.findOne({
       $or: [
         {

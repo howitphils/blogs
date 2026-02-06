@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 
 // DON'T ACCESS USER PROPERTY OF REQ IN ENDPOINTS WITH NO JWTAUTH PROTECTION ADDED
 

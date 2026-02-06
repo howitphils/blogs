@@ -1,27 +1,11 @@
 import { postsCollection } from "./../../db/mongodb";
-import { blogsRepository } from "../../blogs/repository/blogs-repository";
-import {
-  PostDbModel,
-  PostInputModel,
-  UpdatePostDtoModel,
-} from "../types/posts-types";
+import { PostDbModel, UpdatePostDtoModel } from "../types/posts-types";
 import { ObjectId } from "mongodb";
 import { PostNotFoundError } from "../application/errors/posts-errors";
 
 export const postsRepository = {
-  async createPost(dto: PostInputModel): Promise<string> {
-    const blog = await blogsRepository.getBlogByIdOrFail(dto.blogId);
-
-    const newPost: PostDbModel = {
-      title: dto.title,
-      content: dto.content,
-      shortDescription: dto.shortDescription,
-      blogId: dto.blogId,
-      blogName: blog.name || "Unknown Blog",
-      createdAt: new Date().toISOString(),
-    };
-
-    const { insertedId } = await postsCollection.insertOne(newPost);
+  async createPost(dto: PostDbModel): Promise<string> {
+    const { insertedId } = await postsCollection.insertOne(dto);
 
     return insertedId.toString();
   },

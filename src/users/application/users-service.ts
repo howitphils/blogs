@@ -2,6 +2,7 @@ import { UnauthorizedError } from "../../core/middlewares/error-handling/custom-
 import { usersRepository } from "../repository/users-repository";
 import {
   LoginInputModel,
+  LoginOutput,
   UserDbModel,
   UserInputModel,
 } from "../types/users-types";
@@ -33,7 +34,7 @@ export const usersService = {
     }
   },
 
-  async loginUser(dto: LoginInputModel): Promise<{ accessToken: string }> {
+  async loginUser(dto: LoginInputModel): Promise<LoginOutput> {
     const user = await usersRepository.getUserByLoginOrEmail(dto.loginOrEmail);
 
     if (!user) {
@@ -55,7 +56,7 @@ export const usersService = {
   },
 
   async checkUnique(login: string, email: string): Promise<void> {
-    const existingUser = await usersRepository.getUniqueUser(login, email);
+    const existingUser = await usersRepository.getExistingUser(login, email);
 
     if (existingUser) {
       const field = existingUser.email === email ? "email" : "login";

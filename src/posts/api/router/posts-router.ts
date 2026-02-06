@@ -5,6 +5,9 @@ import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-a
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { validatePostBody } from "../validations/posts-body-validations";
 import { validateQueryParams } from "../../../core/middlewares/validation/base-query-validations";
+import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth";
+import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
+import { validateCommentBody } from "../../../comments/api/validations/comment-body-validations";
 
 export const postsRouter = Router();
 
@@ -41,4 +44,21 @@ postsRouter.delete(
   validateParamsId,
   validationChainResult,
   postsController.deletePost,
+);
+
+postsRouter.get(
+  "/:id/comments",
+  validateQueryParams,
+  validateParamsId,
+  validationChainResult,
+  postsController.getAllComments,
+);
+postsRouter.post(
+  "/:id/comments",
+  jwtAuthGuard,
+  checkUserInReq,
+  validateParamsId,
+  validateCommentBody,
+  validationChainResult,
+  postsController.createComment,
 );

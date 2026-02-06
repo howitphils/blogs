@@ -8,6 +8,7 @@ import { errorHandler } from "./core/middlewares/error-handling/error-handler";
 import { usersRouter } from "./users/api/router/users-router";
 import { authRouter } from "./users/api/router/auth-router";
 import { basicAuthGuard } from "./core/middlewares/authentication/basic-auth";
+import { commentsRouter } from "./comments/api/router/comments-router";
 
 export const app = express();
 
@@ -18,6 +19,7 @@ app.use(appConfig.PATHS.BLOGS, blogsRouter);
 app.use(appConfig.PATHS.POSTS, postsRouter);
 app.use(appConfig.PATHS.USERS, basicAuthGuard, usersRouter);
 app.use(appConfig.PATHS.AUTH, authRouter);
+app.use(appConfig.PATHS.COMMENTS, commentsRouter);
 app.use(appConfig.PATHS.TESTING, testingRouter);
 
 app.use(errorHandler);

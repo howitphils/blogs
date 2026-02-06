@@ -35,3 +35,7 @@ export type MeInfoViewModel = {
   login: string;
   userId: string;
 };
+
+export type LoginOutput = {
+  accessToken: string;
+};

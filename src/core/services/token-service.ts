@@ -1,4 +1,4 @@
-import { JwtPayload, sign, verify } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
 import { JwtPayloadWithUser } from "../types/jwt-payload-type";

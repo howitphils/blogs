@@ -9,13 +9,6 @@ export class UserNotFoundError extends HttpError {
   }
 }
 
-export class UserNotFoundInternalError extends HttpError {
-  constructor() {
-    super("User was not found", HttpStatus.INTERNAL_SERVER_ERROR);
-    this.name = "UserNotFoundInternalError";
-  }
-}
-
 export class NotUniqueUserError extends HttpError {
   public errorResponse: ErrorResponse;
 

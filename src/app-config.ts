@@ -13,6 +13,7 @@ export const appConfig = {
     POSTS: "/posts",
     USERS: "/users",
     AUTH: "/auth",
+    COMMENTS: "/comments",
     TESTING: "/testing",
   },
   ADMIN_CREDENTIALS: {
