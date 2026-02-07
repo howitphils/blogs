@@ -31,4 +31,7 @@ export const appConfig = {
   },
   JWT_SECRET: process.env.JWT_SECRET as string,
   ACCESS_JWT_EXP: Number(process.env.ACCESS_JWT_EXP),
+  NODEMAILER_HOST: process.env.NODEMAILER_HOST,
+  NODEMAILER_SENDER_USERNAME: process.env.NODEMAILER_SENDER_USERNAME,
+  NODEMAILER_SENDER_PASSWORD: process.env.NODEMAILER_SENDER_PASSWORD,
 };

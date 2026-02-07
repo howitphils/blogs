@@ -49,8 +49,8 @@ postsRouter.delete(
 
 postsRouter.get(
   "/:id/comments",
-  validateQueryParams,
   validateParamsId,
+  validateQueryParams,
   validationChainResult,
   commentsController.getAllComments,
 );

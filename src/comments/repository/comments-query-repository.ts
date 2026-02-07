@@ -7,21 +7,18 @@ import { postsRepository } from "../../posts/repository/posts-repository";
 import { calculateSkip } from "../../core/utils/calculate-skip";
 import { commentsCollection } from "../../db/mongodb";
 import { CommentNotFoundError } from "../application/errors/comments-errors";
+import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 
 export const commentsQueryRepository = {
   async getComments(
     params: BaseQueryParams,
     postId: string,
   ): Promise<PaginationType<CommentViewModel>> {
+    await postsRepository.getPostByIdOrFail(postId);
+
     const { pageNumber, pageSize, sortBy, sortDirection } = params;
 
-    let filter = {};
-
-    if (postId) {
-      await postsRepository.getPostByIdOrFail(postId);
-
-      filter = { postId };
-    }
+    const filter = { postId };
 
     const comments = await commentsCollection
       .find(filter)
@@ -34,7 +31,7 @@ export const commentsQueryRepository = {
 
     return {
       page: pageNumber,
-      pagesCount: Math.ceil(totalCount / pageSize),
+      pagesCount: calculatePagesCount(totalCount, pageSize),
       pageSize,
       totalCount,
       items: comments.map(commentsQueryRepository.mapFromDbToView),
