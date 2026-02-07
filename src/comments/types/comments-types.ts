@@ -16,6 +16,7 @@ export type CommentatorInfo = {
 export type UpdateCommentDto = {
   id: string;
   content: string;
+  userId: string;
 };
 
 export type CommentViewModel = {

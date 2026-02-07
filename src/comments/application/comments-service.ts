@@ -1,3 +1,5 @@
+import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { postsRepository } from "../../posts/repository/posts-repository";
 import { usersRepository } from "../../users/repository/users-repository";
 import { commentsRepository } from "../repository/comments-repository";
@@ -6,7 +8,6 @@ import {
   CreateCommentDto,
   UpdateCommentDto,
 } from "../types/comments-types";
-import { CommentNotFoundError } from "./errors/comments-errors";
 
 export const commentsService = {
   async createComment(dto: CreateCommentDto): Promise<string> {
@@ -25,20 +26,31 @@ export const commentsService = {
     return commentsRepository.createComment(newComment);
   },
 
-  //TODO: 403 check
   async updateComment(dto: UpdateCommentDto): Promise<void> {
+    const comment = await commentsRepository.getCommentByIdOrFail(dto.id);
+
+    if (comment.userId !== dto.userId) {
+      throw new ForbiddenError("Forbidden action for this user");
+    }
+
     const updateResult = await commentsRepository.updateComment(dto);
 
     if (!updateResult) {
-      throw new CommentNotFoundError();
+      throw new ServerError("Comment was not updated");
     }
   },
 
-  async deleteComment(id: string): Promise<void> {
+  async deleteComment(id: string, userId: string): Promise<void> {
+    const comment = await commentsRepository.getCommentByIdOrFail(id);
+
+    if (comment.userId !== userId) {
+      throw new ForbiddenError("Forbidden action for this user");
+    }
+
     const deleteResult = await commentsRepository.deleteComment(id);
 
     if (!deleteResult) {
-      throw new CommentNotFoundError();
+      throw new ServerError("Comment was not deleted");
     }
   },
 };

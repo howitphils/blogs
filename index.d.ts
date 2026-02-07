@@ -1,6 +1,6 @@
 import express from "express";
 
-// DON'T ACCESS USER PROPERTY OF REQ IN ENDPOINTS WITH NO JWTAUTH PROTECTION ADDED
+// DON'T ACCESS req.user IN ENDPOINTS WITH NO JWTAUTH PROTECTION ADDED
 
 declare global {
   namespace Express {

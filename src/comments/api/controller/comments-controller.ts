@@ -38,6 +38,7 @@ export const commentsController = {
     res: Response<CommentViewModel>,
   ): Promise<Response> => {
     const commentId = req.params.id;
+
     const comment =
       await commentsQueryRepository.getCommentByIdOrFail(commentId);
 
@@ -67,8 +68,9 @@ export const commentsController = {
     res: Response,
   ): Promise<Response> => {
     const updateCommendDto: UpdateCommentDto = {
-      content: req.body.content,
       id: req.params.id,
+      content: req.body.content,
+      userId: req.user.userId,
     };
 
     await commentsService.updateComment(updateCommendDto);
@@ -82,7 +84,7 @@ export const commentsController = {
   ): Promise<Response> => {
     const commentId = req.params.id;
 
-    await commentsService.deleteComment(commentId);
+    await commentsService.deleteComment(commentId, req.user.userId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
