@@ -32,7 +32,7 @@ export const usersController = {
     res: Response<UserViewModel>,
     next: NextFunction,
   ) => {
-    const newUserId = await usersService.createUser(req.body);
+    const newUserId = await usersService.addUser(req.body);
 
     const newUser = await usersQueryRepository.getCreatedUser(newUserId);
 
