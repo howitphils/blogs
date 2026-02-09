@@ -9,8 +9,10 @@
     "test": "jest --runInBand --detectOpenHandles --watchAll"
   },
   "dependencies": {
+    "@types/date-fns": "^2.6.3",
     "argon2": "^0.44.0",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",

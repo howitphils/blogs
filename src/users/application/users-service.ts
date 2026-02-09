@@ -1,16 +1,30 @@
 import { UnauthorizedError } from "../../core/middlewares/error-handling/custom-errors/unauthorized-error";
 import { usersRepository } from "../repository/users-repository";
-import { UserDbModel, UserInputModel } from "../types/users-types";
+import {
+  CreateUserDtoType,
+  UserDbModel,
+  UserInputModel,
+} from "../types/users-types";
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
 import { LoginInputModel, LoginOutputModel } from "../types/auth-types";
+import { randomUUID } from "crypto";
+import { addHours } from "date-fns";
+import { emailService } from "../../core/services/email-service";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
-    await usersService.checkUnique(dto.login, dto.email);
+    await usersService._checkUnique(dto.login, dto.email);
 
-    const user = await usersService.createUser(dto);
+    const createUserDto: CreateUserDtoType = {
+      email: dto.email,
+      login: dto.login,
+      password: dto.password,
+      isConfirmed: true,
+    };
+
+    const user = await usersService._userFactory(createUserDto);
 
     return usersRepository.createUser(user);
   },
@@ -31,7 +45,7 @@ export const usersService = {
     }
 
     const isVerified = await passwordService.verifyHash(
-      user.passwordHash,
+      user.accountData.passwordHash,
       dto.password,
     );
 
@@ -45,32 +59,51 @@ export const usersService = {
   },
 
   async registerUser(dto: UserInputModel) {
-    await usersService.checkUnique(dto.login, dto.email);
+    await usersService._checkUnique(dto.login, dto.email);
 
-    const user = await usersService.createUser(dto);
+    const createUserDto: CreateUserDtoType = {
+      login: dto.login,
+      email: dto.email,
+      password: dto.password,
+      isConfirmed: false,
+    };
 
-    //TODO:send email
+    const user = await usersService._userFactory(createUserDto);
+
+    await usersRepository.createUser(user);
+
+    emailService.sendRegistrationEmail(
+      dto.email,
+      user.emailConfirmation.confirmationCode,
+    );
   },
 
-  async checkUnique(login: string, email: string): Promise<void> {
+  async _checkUnique(login: string, email: string): Promise<void> {
     const existingUser = await usersRepository.getExistingUser(login, email);
 
     if (existingUser) {
-      const field = existingUser.email === email ? "email" : "login";
+      const field =
+        existingUser.accountData.email === email ? "email" : "login";
 
       throw new NotUniqueUserError(field);
     }
   },
 
-  async createUser(dto: UserInputModel) {
+  async _userFactory(dto: CreateUserDtoType): Promise<UserDbModel> {
     const passwordHash = await passwordService.generateHash(dto.password);
 
-    //TODO: add email confirmation fields
     const newUser: UserDbModel = {
-      login: dto.login,
-      email: dto.email,
-      passwordHash,
-      createdAt: new Date().toISOString(),
+      accountData: {
+        login: dto.login,
+        email: dto.email,
+        passwordHash,
+        createdAt: new Date().toISOString(),
+      },
+      emailConfirmation: {
+        confirmationCode: randomUUID(),
+        expDate: addHours(new Date(), 2),
+        isConfirmed: dto.isConfirmed,
+      },
     };
 
     return newUser;

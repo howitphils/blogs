@@ -34,6 +34,8 @@ export const authController = {
   ) {
     const userDto = req.body;
 
+    await usersService.registerUser(userDto);
+
     res.sendStatus(HttpStatus.NO_CONTENT);
   },
 };

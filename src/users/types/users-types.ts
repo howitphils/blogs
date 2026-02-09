@@ -14,6 +14,24 @@ export type UserViewModel = {
 };
 
 export type UserDbModel = {
+  accountData: AccountDataType;
+  emailConfirmation: EmailConfirmationType;
+};
+
+export type CreateUserDtoType = {
+  login: string;
+  password: string;
+  email: string;
+  isConfirmed: boolean;
+};
+
+type EmailConfirmationType = {
+  confirmationCode: string;
+  expDate: Date;
+  isConfirmed: boolean;
+};
+
+type AccountDataType = {
   login: string;
   passwordHash: string;
   email: string;
