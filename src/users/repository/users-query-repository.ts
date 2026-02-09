@@ -2,7 +2,6 @@ import { ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
 import {
-  MeInfoViewModel,
   UserDbModel,
   UserQueryParams,
   UserViewModel,
@@ -12,6 +11,7 @@ import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 import { createUserFilter } from "../utils/create-user-filter";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { UserNotFoundError } from "../application/errors/users-errors";
+import { MeInfoViewModel } from "../types/auth-types";
 
 export const usersQueryRepository = {
   async getUsers(
@@ -64,8 +64,8 @@ export const usersQueryRepository = {
     }
 
     return {
-      login: user.login,
-      email: user.email,
+      login: user.accountData.login,
+      email: user.accountData.email,
       userId: user._id.toString(),
     };
   },
@@ -73,9 +73,9 @@ export const usersQueryRepository = {
   mapFromDbToView(user: WithId<UserDbModel>): UserViewModel {
     return {
       id: user._id.toString(),
-      email: user.email,
-      login: user.login,
-      createdAt: user.createdAt,
+      email: user.accountData.email,
+      login: user.accountData.login,
+      createdAt: user.accountData.createdAt,
     };
   },
 };

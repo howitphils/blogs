@@ -19,7 +19,7 @@ export const commentsService = {
       content: dto.content,
       postId: dto.postId,
       userId: dto.userId,
-      userLogin: user.login,
+      userLogin: user.accountData.login,
       createdAt: new Date().toISOString(),
     };
 
