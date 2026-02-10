@@ -10,8 +10,8 @@ import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
 import { LoginInputModel, LoginOutputModel } from "../types/auth-types";
 import { randomUUID } from "crypto";
-import { addHours } from "date-fns";
 import { emailService } from "../../core/services/email-service";
+import { dateService } from "../../core/services/date-service";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
@@ -101,7 +101,7 @@ export const usersService = {
       },
       emailConfirmation: {
         confirmationCode: randomUUID(),
-        expDate: addHours(new Date(), 2),
+        expDate: dateService.addHours(2),
         isConfirmed: dto.isConfirmed,
       },
     };

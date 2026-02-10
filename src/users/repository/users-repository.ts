@@ -33,9 +33,17 @@ export const usersRepository = {
     return usersCollection.findOne({
       $or: [
         {
-          login: { $regex: `^${safeRegex(login)}$`, $options: "i" }, // ^ - start of the string, $ - end of the string
+          "accountData.login": {
+            $regex: `^${safeRegex(login)}$`,
+            $options: "i",
+          }, // ^ - start of the string, $ - end of the string
         },
-        { email: { $regex: `^${safeRegex(email)}$`, $options: "i" } },
+        {
+          "accountData.email": {
+            $regex: `^${safeRegex(email)}$`,
+            $options: "i",
+          },
+        },
       ],
     });
   },
@@ -44,9 +52,17 @@ export const usersRepository = {
     return usersCollection.findOne({
       $or: [
         {
-          login: { $regex: `^${safeRegex(loginOrEmail)}$`, $options: "i" },
+          "accountData.login": {
+            $regex: `^${safeRegex(loginOrEmail)}$`,
+            $options: "i",
+          },
         },
-        { email: { $regex: `^${safeRegex(loginOrEmail)}$`, $options: "i" } },
+        {
+          "accountData.email": {
+            $regex: `^${safeRegex(loginOrEmail)}$`,
+            $options: "i",
+          },
+        },
       ],
     });
   },

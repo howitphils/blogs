@@ -32,9 +32,8 @@ export const usersQueryRepository = {
       .find(filter)
       .skip(calculateSkip(pageNumber, pageSize))
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection })
+      .sort({ [`accountData.${sortBy}`]: sortDirection })
       .toArray();
-
     const totalCount = await usersCollection.countDocuments(filter);
 
     return {
