@@ -5,6 +5,7 @@ import { usersService } from "../../application/users-service";
 import { HttpStatus } from "../../../core/types/http-status-types";
 import { usersQueryRepository } from "../../repository/users-query-repository";
 import {
+  ConfirmEmailBody,
   LoginInputModel,
   LoginOutputModel,
   MeInfoViewModel,
@@ -37,5 +38,16 @@ export const authController = {
     await usersService.registerUser(userDto);
 
     res.sendStatus(HttpStatus.NO_CONTENT);
+  },
+
+  async confirmEmail(
+    req: RequestWithBody<ConfirmEmailBody>,
+    res: Response<void>,
+  ) {
+    const code = req.body.code;
+
+    await usersService.confirmEmail(code);
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 };

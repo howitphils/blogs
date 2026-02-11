@@ -5,12 +5,20 @@ import { validationChainResult } from "../../../core/middlewares/validation/vali
 import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth";
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
 import { validateUserBody } from "../validations/users-body-validation";
+import { validateConfirmEmailBody } from "../validations/confirm-email-body-validations";
 
 export const authRouter = Router();
 
 authRouter.post(
   "/login",
   validateLoginBody,
+  validationChainResult,
+  authController.loginUser,
+);
+
+authRouter.post(
+  "/registration-confirmation",
+  validateConfirmEmailBody,
   validationChainResult,
   authController.loginUser,
 );

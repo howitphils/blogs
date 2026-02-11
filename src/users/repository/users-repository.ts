@@ -29,7 +29,10 @@ export const usersRepository = {
     return deleteResult.deletedCount !== 0;
   },
 
-  async getExistingUser(login: string, email: string) {
+  async getExistingUser(
+    login: string,
+    email: string,
+  ): Promise<WithId<UserDbModel> | null> {
     return usersCollection.findOne({
       $or: [
         {
@@ -48,7 +51,9 @@ export const usersRepository = {
     });
   },
 
-  async getUserByLoginOrEmail(loginOrEmail: string) {
+  async getUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<WithId<UserDbModel> | null> {
     return usersCollection.findOne({
       $or: [
         {
@@ -65,5 +70,28 @@ export const usersRepository = {
         },
       ],
     });
+  },
+
+  async getUserByConfirmationCode(
+    code: string,
+  ): Promise<WithId<UserDbModel> | null> {
+    return usersCollection.findOne({
+      "emailConfirmation.confirmationCode": code,
+    });
+  },
+
+  async confirmEmail(code: string) {
+    const updateResult = await usersCollection.updateOne(
+      {
+        "accountData.confirmationCode": code,
+      },
+      {
+        $set: {
+          "accountData.isConfirmed": true,
+        },
+      },
+    );
+
+    return updateResult.matchedCount !== 0;
   },
 };

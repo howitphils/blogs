@@ -12,3 +12,7 @@ export type MeInfoViewModel = {
 export type LoginOutputModel = {
   accessToken: string;
 };
+
+export type ConfirmEmailBody = {
+  code: string;
+};

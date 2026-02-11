@@ -12,6 +12,8 @@ import { LoginInputModel, LoginOutputModel } from "../types/auth-types";
 import { randomUUID } from "crypto";
 import { emailService } from "../../core/services/email-service";
 import { dateService } from "../../core/services/date-service";
+import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
@@ -76,6 +78,28 @@ export const usersService = {
       dto.email,
       user.emailConfirmation.confirmationCode,
     );
+  },
+
+  async confirmEmail(code: string) {
+    const user = await usersRepository.getUserByConfirmationCode(code);
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    if (user.emailConfirmation.expDate < new Date()) {
+      throw new BadRequestError("Confirmation code is already expired");
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      throw new BadRequestError("Email already confirmed");
+    }
+
+    const updateResult = await usersRepository.confirmEmail(code);
+
+    if (!updateResult) {
+      throw new ServerError("User was not updated");
+    }
   },
 
   async _checkUnique(login: string, email: string): Promise<void> {
