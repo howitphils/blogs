@@ -9,7 +9,6 @@ import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
 import { LoginInputModel, LoginOutputModel } from "../types/auth-types";
-import { randomUUID } from "crypto";
 import { emailService } from "../../core/services/email-service";
 import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
@@ -60,7 +59,7 @@ export const usersService = {
     return { accessToken };
   },
 
-  async registerUser(dto: UserInputModel) {
+  async registerUser(dto: UserInputModel): Promise<void> {
     await usersService._checkUnique(dto.login, dto.email);
 
     const createUserDto: CreateUserDtoType = {
@@ -80,7 +79,7 @@ export const usersService = {
     );
   },
 
-  async confirmEmail(code: string) {
+  async confirmEmail(code: string): Promise<boolean> {
     const user = await usersRepository.getUserByConfirmationCode(code);
 
     if (!user) {
@@ -92,17 +91,19 @@ export const usersService = {
     }
 
     if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestError("Email already confirmed");
+      throw new BadRequestError("Email is already confirmed");
     }
 
-    const updateResult = await usersRepository.confirmEmail(code);
+    const updateResult = await usersRepository.updateIsConfirmed(code);
 
     if (!updateResult) {
       throw new ServerError("User was not updated");
     }
+
+    return updateResult;
   },
 
-  async emailResending(email: string) {
+  async emailResending(email: string): Promise<boolean> {
     const user = await usersRepository.getUserByLoginOrEmail(email);
 
     if (!user) {
@@ -113,7 +114,7 @@ export const usersService = {
       throw new BadRequestError("Email already confirmed");
     }
 
-    const newConfirmationCode = randomUUID();
+    const newConfirmationCode = tokenService.createRandomCode();
     const newExpDate = dateService.addHours(2);
 
     const updateResult = await usersRepository.updateConfirmationCodeAndExp(
@@ -129,6 +130,8 @@ export const usersService = {
     }
 
     emailService.sendRegistrationEmail(email, newConfirmationCode);
+
+    return updateResult;
   },
 
   async _checkUnique(login: string, email: string): Promise<void> {
@@ -153,7 +156,7 @@ export const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: randomUUID(),
+        confirmationCode: tokenService.createRandomCode(),
         expDate: dateService.addHours(2),
         isConfirmed: dto.isConfirmed,
       },

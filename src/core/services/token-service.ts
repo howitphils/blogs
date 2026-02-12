@@ -2,6 +2,7 @@ import { sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
 import { JwtPayloadWithUser } from "../types/jwt-payload-type";
+import { randomUUID } from "node:crypto";
 
 export const tokenService = {
   genereateToken(payload: any): string {
@@ -21,5 +22,9 @@ export const tokenService = {
     } catch (error: any) {
       throw new UnauthorizedError(error.message);
     }
+  },
+
+  createRandomCode(): string {
+    return randomUUID();
   },
 };

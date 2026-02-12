@@ -80,7 +80,7 @@ export const usersRepository = {
     });
   },
 
-  async confirmEmail(code: string) {
+  async updateIsConfirmed(code: string) {
     const updateResult = await usersCollection.updateOne(
       {
         "accountData.confirmationCode": code,
