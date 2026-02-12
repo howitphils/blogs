@@ -94,4 +94,24 @@ export const usersRepository = {
 
     return updateResult.matchedCount !== 0;
   },
+
+  async updateConfirmationCodeAndExp(
+    email: string,
+    code: string,
+    expDate: Date,
+  ) {
+    const updateResult = await usersCollection.updateOne(
+      {
+        "accountData.email": email,
+      },
+      {
+        $set: {
+          "emailConfirmation.confirmationCode": code,
+          "emailConfirmation.expDate": expDate,
+        },
+      },
+    );
+
+    return updateResult.matchedCount !== 0;
+  },
 };

@@ -16,3 +16,7 @@ export type LoginOutputModel = {
 export type ConfirmEmailBody = {
   code: string;
 };
+
+export type ResendEmailBody = {
+  email: string;
+};

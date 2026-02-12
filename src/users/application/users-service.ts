@@ -102,6 +102,35 @@ export const usersService = {
     }
   },
 
+  async emailResending(email: string) {
+    const user = await usersRepository.getUserByLoginOrEmail(email);
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      throw new BadRequestError("Email already confirmed");
+    }
+
+    const newConfirmationCode = randomUUID();
+    const newExpDate = dateService.addHours(2);
+
+    const updateResult = await usersRepository.updateConfirmationCodeAndExp(
+      email,
+      newConfirmationCode,
+      newExpDate,
+    );
+
+    if (!updateResult) {
+      throw new ServerError(
+        "User was not updated with new email resending values",
+      );
+    }
+
+    emailService.sendRegistrationEmail(email, newConfirmationCode);
+  },
+
   async _checkUnique(login: string, email: string): Promise<void> {
     const existingUser = await usersRepository.getExistingUser(login, email);
 

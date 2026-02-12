@@ -9,6 +9,7 @@ import {
   LoginInputModel,
   LoginOutputModel,
   MeInfoViewModel,
+  ResendEmailBody,
 } from "../../types/auth-types";
 
 export const authController = {
@@ -47,6 +48,17 @@ export const authController = {
     const code = req.body.code;
 
     await usersService.confirmEmail(code);
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  },
+
+  async resendEmail(
+    req: RequestWithBody<ResendEmailBody>,
+    res: Response<void>,
+  ) {
+    const email = req.body.email;
+
+    await usersService.emailResending(email);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },

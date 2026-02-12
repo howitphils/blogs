@@ -6,6 +6,7 @@ import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth"
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
 import { validateUserBody } from "../validations/users-body-validation";
 import { validateConfirmEmailBody } from "../validations/confirm-email-body-validations";
+import { validateResendEmailBody } from "../validations/resend-email-body-validations";
 
 export const authRouter = Router();
 
@@ -21,6 +22,13 @@ authRouter.post(
   validateConfirmEmailBody,
   validationChainResult,
   authController.loginUser,
+);
+
+authRouter.post(
+  "/registration-email-resending",
+  validateResendEmailBody,
+  validationChainResult,
+  authController.resendEmail,
 );
 
 authRouter.get("/me", jwtAuthGuard, checkUserInReq, authController.getMyInfo);
