@@ -86,12 +86,12 @@ export const usersService = {
       throw new UserNotFoundError();
     }
 
-    if (user.emailConfirmation.expDate < new Date()) {
-      throw new BadRequestError("Confirmation code is already expired");
-    }
-
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestError("Email is already confirmed");
+    }
+
+    if (user.emailConfirmation.expDate < new Date()) {
+      throw new BadRequestError("Confirmation code is already expired");
     }
 
     const updateResult = await usersRepository.updateIsConfirmed(code);

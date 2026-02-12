@@ -80,14 +80,15 @@ export const usersRepository = {
     });
   },
 
-  async updateIsConfirmed(code: string) {
+  async updateIsConfirmed(code: string): Promise<boolean> {
     const updateResult = await usersCollection.updateOne(
       {
-        "accountData.confirmationCode": code,
+        "emailConfirmation.confirmationCode": code,
       },
       {
         $set: {
-          "accountData.isConfirmed": true,
+          "emailConfirmation.isConfirmed": true,
+          "emailConfirmation.expDate": new Date(),
         },
       },
     );
@@ -99,7 +100,7 @@ export const usersRepository = {
     email: string,
     code: string,
     expDate: Date,
-  ) {
+  ): Promise<boolean> {
     const updateResult = await usersCollection.updateOne(
       {
         "accountData.email": email,
