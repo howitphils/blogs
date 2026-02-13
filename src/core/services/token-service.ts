@@ -5,23 +5,45 @@ import { JwtPayloadWithUser } from "../types/jwt-payload-type";
 import { randomUUID } from "node:crypto";
 
 export const tokenService = {
-  genereateToken(payload: any): string {
-    return sign(payload, appConfig.JWT_SECRET, {
-      expiresIn: appConfig.ACCESS_JWT_EXP,
+  genereateToken(payload: any, secretKey: string, exp: number): string {
+    return sign(payload, secretKey, {
+      expiresIn: exp,
     });
   },
-
-  createAccessToken(userId: string): string {
-    return tokenService.genereateToken({ userId });
-  },
-
-  verifyToken(token: string) {
+  verifyToken(token: string, secretKey: string) {
     try {
-      const payload = verify(token, appConfig.JWT_SECRET) as JwtPayloadWithUser;
+      const payload = verify(token, secretKey);
       return payload;
     } catch (error: any) {
       throw new UnauthorizedError(error.message);
     }
+  },
+
+  createAccessToken(userId: string): string {
+    return tokenService.genereateToken(
+      { userId },
+      appConfig.ACCESS_JWT_SECRET,
+      appConfig.ACCESS_JWT_EXP,
+    );
+  },
+
+  createRefreshToken(userId: string): string {
+    return tokenService.genereateToken(
+      { userId },
+      appConfig.REFRESH_JWT_SECRET,
+      appConfig.REFRESH_JWT_EXP,
+    );
+  },
+
+  verifyAccessToken(token: string) {
+    return tokenService.verifyToken(
+      token,
+      appConfig.ACCESS_JWT_SECRET,
+    ) as JwtPayloadWithUser;
+  },
+
+  verifyRefreshToken(token: string) {
+    return tokenService.verifyToken(token, appConfig.REFRESH_JWT_SECRET);
   },
 
   createRandomCode(): string {

@@ -11,6 +11,7 @@ export type MeInfoViewModel = {
 
 export type LoginOutputModel = {
   accessToken: string;
+  refreshToken: string;
 };
 
 export type ConfirmEmailBody = {

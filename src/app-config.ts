@@ -29,9 +29,12 @@ export const appConfig = {
     DEFAULT_SORT_BY: SortByOptions.CREATED_AT,
     DEFAULT_SORT_DIRECTION: SortDirections.DESC,
   },
-  JWT_SECRET: process.env.JWT_SECRET as string,
+  ACCESS_JWT_SECRET: process.env.ACCESS_JWT_SECRET as string,
+  REFRESH_JWT_SECRET: process.env.REFRESH_JWT_SECRET as string,
   ACCESS_JWT_EXP: Number(process.env.ACCESS_JWT_EXP),
+  REFRESH_JWT_EXP: Number(process.env.REFRESH_JWT_EXP),
   NODEMAILER_HOST: process.env.NODEMAILER_HOST,
   NODEMAILER_SENDER_USERNAME: process.env.NODEMAILER_SENDER_USERNAME,
   NODEMAILER_SENDER_PASS: process.env.NODEMAILER_SENDER_PASS,
+  REFRESH_COOKIE_NAME: "refresh_cookie",
 };

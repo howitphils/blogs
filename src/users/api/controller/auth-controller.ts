@@ -7,19 +7,29 @@ import { usersQueryRepository } from "../../repository/users-query-repository";
 import {
   ConfirmEmailBody,
   LoginInputModel,
-  LoginOutputModel,
   MeInfoViewModel,
   ResendEmailBody,
 } from "../../types/auth-types";
+import { appConfig } from "../../../app-config";
+import { CookieTTL } from "../../../core/types/cookie-ttl-enum";
 
 export const authController = {
   async loginUser(
     req: RequestWithBody<LoginInputModel>,
-    res: Response<LoginOutputModel>,
+    res: Response<{ accessToken: string }>,
   ) {
-    const token = await usersService.loginUser(req.body);
+    const { accessToken, refreshToken } = await usersService.loginUser(
+      req.body,
+    );
 
-    return res.status(HttpStatus.OK).json(token);
+    res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
+      secure: true,
+      httpOnly: true,
+      maxAge: CookieTTL.SEVEN_DAYS,
+      sameSite: "none",
+    });
+
+    return res.status(HttpStatus.OK).json({ accessToken });
   },
 
   async getMyInfo(req: Request, res: Response<MeInfoViewModel>) {

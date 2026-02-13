@@ -55,8 +55,9 @@ export const usersService = {
     }
 
     const accessToken = tokenService.createAccessToken(user._id.toString());
+    const refreshToken = tokenService.createRefreshToken(user._id.toString());
 
-    return { accessToken };
+    return { accessToken, refreshToken };
   },
 
   async registerUser(dto: UserInputModel): Promise<void> {
