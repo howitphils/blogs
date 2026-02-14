@@ -2,7 +2,6 @@ import { sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
 import { JwtPayloadWithUser } from "../types/jwt-payload-type";
-import { randomUUID } from "node:crypto";
 
 export const tokenService = {
   genereateToken(payload: any, secretKey: string, exp: number): string {
@@ -43,10 +42,9 @@ export const tokenService = {
   },
 
   verifyRefreshToken(token: string) {
-    return tokenService.verifyToken(token, appConfig.REFRESH_JWT_SECRET);
-  },
-
-  createRandomCode(): string {
-    return randomUUID();
+    return tokenService.verifyToken(
+      token,
+      appConfig.REFRESH_JWT_SECRET,
+    ) as JwtPayloadWithUser;
   },
 };

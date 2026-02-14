@@ -13,6 +13,7 @@ import { emailService } from "../../core/services/email-service";
 import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { randomUUID } from "node:crypto";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
@@ -72,7 +73,11 @@ export const usersService = {
 
     const user = await usersService._userFactory(createUserDto);
 
-    await usersRepository.createUser(user);
+    const userId = await usersRepository.createUser(user);
+
+    if (!userId) {
+      throw new ServerError("User was not added to db");
+    }
 
     emailService.sendRegistrationEmail(
       dto.email,
@@ -112,10 +117,10 @@ export const usersService = {
     }
 
     if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestError("Email already confirmed");
+      throw new BadRequestError("Email is already confirmed");
     }
 
-    const newConfirmationCode = tokenService.createRandomCode();
+    const newConfirmationCode = randomUUID();
     const newExpDate = dateService.addHours(2);
 
     const updateResult = await usersRepository.updateConfirmationCodeAndExp(
@@ -157,7 +162,7 @@ export const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: tokenService.createRandomCode(),
+        confirmationCode: randomUUID(),
         expDate: dateService.addHours(2),
         isConfirmed: dto.isConfirmed,
       },
