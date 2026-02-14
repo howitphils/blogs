@@ -43,6 +43,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "index.d.ts", "__tests__/auth/cookie-helper.ts"],
+  "include": ["src/**/*", "index.d.ts"],
   "exclude": ["node_modules", "dist", "__test__", "**/*.test.ts"]
 }

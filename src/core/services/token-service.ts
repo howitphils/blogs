@@ -1,4 +1,4 @@
-import { sign, verify } from "jsonwebtoken";
+import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
 import { JwtPayloadWithUser } from "../types/jwt-payload-type";
@@ -46,5 +46,9 @@ export const tokenService = {
       token,
       appConfig.REFRESH_JWT_SECRET,
     ) as JwtPayloadWithUser;
+  },
+
+  decodeToken(token: string) {
+    return decode(token) as JwtPayload;
   },
 };

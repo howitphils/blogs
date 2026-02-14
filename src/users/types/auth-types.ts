@@ -9,7 +9,7 @@ export type MeInfoViewModel = {
   userId: string;
 };
 
-export type LoginOutputModel = {
+export type TokenPairModel = {
   accessToken: string;
   refreshToken: string;
 };

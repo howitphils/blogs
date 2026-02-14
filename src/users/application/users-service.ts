@@ -8,7 +8,7 @@ import {
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
-import { LoginInputModel, LoginOutputModel } from "../types/auth-types";
+import { LoginInputModel, TokenPairModel } from "../types/auth-types";
 import { emailService } from "../../core/services/email-service";
 import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
@@ -39,7 +39,7 @@ export const usersService = {
     }
   },
 
-  async loginUser(dto: LoginInputModel): Promise<LoginOutputModel> {
+  async loginUser(dto: LoginInputModel): Promise<TokenPairModel> {
     const user = await usersRepository.getUserByLoginOrEmail(dto.loginOrEmail);
 
     if (!user) {
@@ -57,6 +57,15 @@ export const usersService = {
 
     const accessToken = tokenService.createAccessToken(user._id.toString());
     const refreshToken = tokenService.createRefreshToken(user._id.toString());
+
+    return { accessToken, refreshToken };
+  },
+
+  async refreshTokens(userId: string): Promise<TokenPairModel> {
+    const accessToken = tokenService.createAccessToken(userId);
+    const refreshToken = tokenService.createRefreshToken(userId);
+
+    const { iat: issuedAt } = tokenService.decodeToken(refreshToken);
 
     return { accessToken, refreshToken };
   },
@@ -165,6 +174,9 @@ export const usersService = {
         confirmationCode: randomUUID(),
         expDate: dateService.addHours(2),
         isConfirmed: dto.isConfirmed,
+      },
+      tokenInfo: {
+        issuedAt: null,
       },
     };
 

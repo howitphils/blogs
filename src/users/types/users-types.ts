@@ -16,6 +16,7 @@ export type UserViewModel = {
 export type UserDbModel = {
   accountData: AccountDataType;
   emailConfirmation: EmailConfirmationType;
+  tokenInfo: TokenInfoType;
 };
 
 export type CreateUserDtoType = {
@@ -36,6 +37,10 @@ type AccountDataType = {
   passwordHash: string;
   email: string;
   createdAt: string;
+};
+
+type TokenInfoType = {
+  issuedAt: number | null;
 };
 
 export interface UserQueryParams extends BaseQueryParams {

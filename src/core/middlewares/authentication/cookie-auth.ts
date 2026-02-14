@@ -2,8 +2,9 @@ import { Response, NextFunction, Request } from "express";
 import { tokenService } from "../../services/token-service";
 import { UnauthorizedError } from "../error-handling/custom-errors/unauthorized-error";
 import { appConfig } from "../../../app-config";
+import { usersRepository } from "../../../users/repository/users-repository";
 
-export const cookieAuthGuard = (
+export const cookieAuthGuard = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -18,7 +19,12 @@ export const cookieAuthGuard = (
 
   const payload = tokenService.verifyRefreshToken(refreshToken as string);
 
-  // CASTING PAYLOAD TYPE TO USER REQUEST GLOBAL TYPE (NO ERROR FOR NOW)
+  const user = await usersRepository.getUserByIdOrFail(payload.userId);
+
+  if (user.tokenInfo.issuedAt !== payload.iat) {
+    throw new UnauthorizedError("Token is not valid");
+  }
+
   req.user = payload;
 
   next();
