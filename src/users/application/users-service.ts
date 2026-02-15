@@ -58,6 +58,14 @@ export const usersService = {
     const accessToken = tokenService.createAccessToken(user._id.toString());
     const refreshToken = tokenService.createRefreshToken(user._id.toString());
 
+    const { iat } = tokenService.decodeToken(refreshToken);
+
+    if (!iat) {
+      throw new ServerError("token issuedAt is not available");
+    }
+
+    await usersRepository.updateTokenInfo(user._id.toString(), iat);
+
     return { accessToken, refreshToken };
   },
 
@@ -65,7 +73,13 @@ export const usersService = {
     const accessToken = tokenService.createAccessToken(userId);
     const refreshToken = tokenService.createRefreshToken(userId);
 
-    const { iat: issuedAt } = tokenService.decodeToken(refreshToken);
+    const { iat } = tokenService.decodeToken(refreshToken);
+
+    if (!iat) {
+      throw new ServerError("token issuedAt is not available");
+    }
+
+    await usersRepository.updateTokenInfo(userId, iat);
 
     return { accessToken, refreshToken };
   },

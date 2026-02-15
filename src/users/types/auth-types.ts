@@ -14,6 +14,10 @@ export type TokenPairModel = {
   refreshToken: string;
 };
 
+export type AccessTokenOutput = {
+  accessToken: string;
+};
+
 export type ConfirmEmailBody = {
   code: string;
 };

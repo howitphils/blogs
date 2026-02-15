@@ -5,6 +5,7 @@ import { usersService } from "../../application/users-service";
 import { HttpStatus } from "../../../core/types/http-status-types";
 import { usersQueryRepository } from "../../repository/users-query-repository";
 import {
+  AccessTokenOutput,
   ConfirmEmailBody,
   LoginInputModel,
   MeInfoViewModel,
@@ -16,11 +17,27 @@ import { CookieTTL } from "../../../core/types/cookie-ttl-enum";
 export const authController = {
   async loginUser(
     req: RequestWithBody<LoginInputModel>,
-    res: Response<{ accessToken: string }>,
+    res: Response<AccessTokenOutput>,
   ) {
     const { accessToken, refreshToken } = await usersService.loginUser(
       req.body,
     );
+
+    res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
+      secure: true,
+      httpOnly: true,
+      maxAge: CookieTTL.SEVEN_DAYS,
+      sameSite: "none",
+    });
+
+    return res.status(HttpStatus.OK).json({ accessToken });
+  },
+
+  async refreshTokens(req: Request, res: Response<AccessTokenOutput>) {
+    const userId = req.user.userId;
+
+    const { accessToken, refreshToken } =
+      await usersService.refreshTokens(userId);
 
     res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
       secure: true,

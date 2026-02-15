@@ -11,13 +11,17 @@ export const cookieAuthGuard = async (
 ) => {
   console.log(req.cookies);
 
+  if (!req.cookies) {
+    throw new UnauthorizedError("Cookies not found");
+  }
+
   const refreshToken = req.cookies[appConfig.REFRESH_COOKIE_NAME];
 
   if (!refreshToken) {
-    throw new UnauthorizedError("Cookie is not found");
+    throw new UnauthorizedError("Token is not found");
   }
 
-  const payload = tokenService.verifyRefreshToken(refreshToken as string);
+  const payload = tokenService.verifyRefreshToken(refreshToken);
 
   const user = await usersRepository.getUserByIdOrFail(payload.userId);
 

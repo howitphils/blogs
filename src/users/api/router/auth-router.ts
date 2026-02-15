@@ -7,6 +7,7 @@ import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user
 import { validateUserBody } from "../validations/users-body-validation";
 import { validateConfirmEmailBody } from "../validations/confirm-email-body-validations";
 import { validateResendEmailBody } from "../validations/resend-email-body-validations";
+import { cookieAuthGuard } from "../../../core/middlewares/authentication/cookie-auth";
 
 export const authRouter = Router();
 
@@ -14,6 +15,13 @@ authRouter.post(
   "/login",
   validateLoginBody,
   validationChainResult,
+  authController.loginUser,
+);
+
+authRouter.post(
+  "/refresh-token",
+  cookieAuthGuard,
+  checkUserInReq,
   authController.loginUser,
 );
 

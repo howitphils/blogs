@@ -28,7 +28,7 @@ export const tokenService = {
 
   createRefreshToken(userId: string): string {
     return tokenService.genereateToken(
-      { userId },
+      { userId, type: "refresh" },
       appConfig.REFRESH_JWT_SECRET,
       appConfig.REFRESH_JWT_EXP,
     );
