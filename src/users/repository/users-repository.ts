@@ -117,7 +117,7 @@ export const usersRepository = {
     return updateResult.matchedCount !== 0;
   },
 
-  async updateTokenInfo(userId: string, iat: number) {
+  async updateTokenInfo(userId: string, iat: number | null): Promise<void> {
     const updateResult = await usersCollection.updateOne(
       {
         _id: new ObjectId(userId),

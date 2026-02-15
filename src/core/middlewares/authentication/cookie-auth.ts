@@ -9,8 +9,6 @@ export const cookieAuthGuard = async (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log(req.cookies);
-
   if (!req.cookies) {
     throw new UnauthorizedError("Cookies not found");
   }

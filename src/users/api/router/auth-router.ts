@@ -22,7 +22,14 @@ authRouter.post(
   "/refresh-token",
   cookieAuthGuard,
   checkUserInReq,
-  authController.loginUser,
+  authController.refreshTokens,
+);
+
+authRouter.post(
+  "/logout",
+  cookieAuthGuard,
+  checkUserInReq,
+  authController.logout,
 );
 
 authRouter.post(

@@ -108,6 +108,10 @@ export const usersService = {
     );
   },
 
+  async logout(userId: string) {
+    await usersRepository.updateTokenInfo(userId, null);
+  },
+
   async confirmEmail(code: string): Promise<boolean> {
     const user = await usersRepository.getUserByConfirmationCode(code);
 

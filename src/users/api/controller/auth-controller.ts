@@ -49,6 +49,20 @@ export const authController = {
     return res.status(HttpStatus.OK).json({ accessToken });
   },
 
+  async logout(req: Request, res: Response<void>) {
+    const userId = req.user.userId;
+
+    await usersService.logout(userId);
+
+    res.clearCookie(appConfig.REFRESH_COOKIE_NAME, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  },
+
   async getMyInfo(req: Request, res: Response<MeInfoViewModel>) {
     const userId = req.user.userId;
 
