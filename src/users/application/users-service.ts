@@ -69,21 +69,6 @@ export const usersService = {
     return { accessToken, refreshToken };
   },
 
-  async refreshTokens(userId: string): Promise<TokenPairModel> {
-    const accessToken = tokenService.createAccessToken(userId);
-    const refreshToken = tokenService.createRefreshToken(userId);
-
-    const { iat } = tokenService.decodeToken(refreshToken);
-
-    if (!iat) {
-      throw new ServerError("token issuedAt is not available");
-    }
-
-    await usersRepository.updateTokenInfo(userId, iat);
-
-    return { accessToken, refreshToken };
-  },
-
   async registerUser(dto: UserInputModel): Promise<void> {
     await usersService._checkUnique(dto.login, dto.email);
 
@@ -108,7 +93,22 @@ export const usersService = {
     );
   },
 
-  async logout(userId: string) {
+  async refreshTokens(userId: string): Promise<TokenPairModel> {
+    const accessToken = tokenService.createAccessToken(userId);
+    const refreshToken = tokenService.createRefreshToken(userId);
+
+    const { iat } = tokenService.decodeToken(refreshToken);
+
+    if (!iat) {
+      throw new ServerError("token issuedAt is not available");
+    }
+
+    await usersRepository.updateTokenInfo(userId, iat);
+
+    return { accessToken, refreshToken };
+  },
+
+  async logout(userId: string): Promise<void> {
     await usersRepository.updateTokenInfo(userId, null);
   },
 

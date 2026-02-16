@@ -14,7 +14,7 @@ export const tokenService = {
       const payload = verify(token, secretKey);
       return payload;
     } catch (error: any) {
-      throw new UnauthorizedError(error.message);
+      throw new UnauthorizedError("Token is not verified");
     }
   },
 

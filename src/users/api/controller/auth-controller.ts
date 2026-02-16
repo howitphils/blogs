@@ -13,6 +13,7 @@ import {
 } from "../../types/auth-types";
 import { appConfig } from "../../../app-config";
 import { CookieTTL } from "../../../core/types/cookie-ttl-enum";
+import { authCookieOptions } from "./cookie-options/auth-cookie-options";
 
 export const authController = {
   async loginUser(
@@ -40,10 +41,8 @@ export const authController = {
       await usersService.refreshTokens(userId);
 
     res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
-      secure: true,
-      httpOnly: true,
-      maxAge: CookieTTL.SEVEN_DAYS,
-      sameSite: "none",
+      ...authCookieOptions,
+      maxAge: CookieTTL.ONE_DAY,
     });
 
     return res.status(HttpStatus.OK).json({ accessToken });
@@ -54,11 +53,7 @@ export const authController = {
 
     await usersService.logout(userId);
 
-    res.clearCookie(appConfig.REFRESH_COOKIE_NAME, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+    res.clearCookie(appConfig.REFRESH_COOKIE_NAME, authCookieOptions);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
