@@ -9,7 +9,7 @@ import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
 import { LoginInputModel, TokenPairModel } from "../types/auth-types";
-import { emailService } from "../../core/services/email-service";
+import { emailService } from "../../core/services/email-service/email-service";
 import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
