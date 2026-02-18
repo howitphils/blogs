@@ -3,6 +3,7 @@ import { BlogDbModel } from "../blogs/types/blogs-types";
 import { PostDbModel } from "../posts/types/posts-types";
 import { UserDbModel } from "../users/types/users-types";
 import { CommentDbModel } from "../comments/types/comments-types";
+import { SessionDbModel } from "../users/types/sessions-types";
 
 export let db: Db; // Export for tests (TESTING API). It will contain db name, that was up and running after runDb function
 
@@ -10,6 +11,7 @@ export let blogsCollection: Collection<BlogDbModel>;
 export let postsCollection: Collection<PostDbModel>;
 export let usersCollection: Collection<UserDbModel>;
 export let commentsCollection: Collection<CommentDbModel>;
+export let sessionsCollection: Collection<SessionDbModel>;
 
 export const runDb = async (url: string, dbName: string) => {
   const mongoClient = new MongoClient(url);
@@ -19,6 +21,7 @@ export const runDb = async (url: string, dbName: string) => {
   postsCollection = db.collection("postsCollection");
   usersCollection = db.collection("usersCollection");
   commentsCollection = db.collection("commentsCollection");
+  sessionsCollection = db.collection("sessionsCollection");
 
   try {
     await mongoClient.connect();

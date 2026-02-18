@@ -1,5 +1,5 @@
 import { ObjectId, WithId } from "mongodb";
-import { usersCollection } from "../../db/mongodb";
+import { sessionsCollection, usersCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
 import {
   UserDbModel,
@@ -12,6 +12,7 @@ import { createUserFilter } from "../utils/create-user-filter";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { UserNotFoundError } from "../application/errors/users-errors";
 import { MeInfoViewModel } from "../types/auth-types";
+import { SessionViewModel } from "../types/sessions-types";
 
 export const usersQueryRepository = {
   async getUsers(
@@ -67,6 +68,17 @@ export const usersQueryRepository = {
       email: user.accountData.email,
       userId: user._id.toString(),
     };
+  },
+
+  async getUsersSessions(userId: string): Promise<SessionViewModel[]> {
+    const sessions = await sessionsCollection.find({ userId }).toArray();
+
+    return sessions.map((session) => ({
+      ip: session.ip,
+      deviceId: session.deviceId,
+      lastActiveDate: session.iat,
+      title: session.deviceName,
+    }));
   },
 
   mapFromDbToView(user: WithId<UserDbModel>): UserViewModel {

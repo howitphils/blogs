@@ -6,7 +6,6 @@ import {
   BlogInputModel,
   UpdateBlogDtoModel,
 } from "../types/blogs-types";
-import { BlogNotFoundError } from "./errors/blogs-errors";
 
 export const blogsService = {
   async createBlog(dto: BlogInputModel): Promise<string> {
@@ -36,10 +35,12 @@ export const blogsService = {
   },
 
   async deleteBlog(blogId: string): Promise<void> {
+    await blogsRepository.getBlogByIdOrFail(blogId);
+
     const result = await blogsRepository.deleteBlog(blogId);
 
     if (!result) {
-      throw new BlogNotFoundError();
+      throw new ServerError("Blog was not deleted");
     }
   },
 };
