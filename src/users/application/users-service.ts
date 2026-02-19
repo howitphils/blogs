@@ -14,6 +14,8 @@ import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { randomUUID } from "node:crypto";
+import { sessionsRepository } from "../repository/sessions-repository";
+import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
@@ -55,8 +57,16 @@ export const usersService = {
       throw new UnauthorizedError("User is not verified");
     }
 
-    const accessToken = tokenService.createAccessToken(user._id.toString());
-    const refreshToken = tokenService.createRefreshToken(user._id.toString());
+    const deviceId = tokenService.createRandomCode();
+
+    const accessToken = tokenService.createAccessToken(
+      user._id.toString(),
+      deviceId,
+    );
+    const refreshToken = tokenService.createRefreshToken(
+      user._id.toString(),
+      deviceId,
+    );
 
     const { iat } = tokenService.decodeToken(refreshToken);
 
@@ -64,6 +74,7 @@ export const usersService = {
       throw new ServerError("token issuedAt is not available");
     }
 
+    //TODO: CREATE SESSION
     await usersRepository.updateTokenInfo(user._id.toString(), iat);
 
     return { accessToken, refreshToken };
@@ -93,9 +104,12 @@ export const usersService = {
     );
   },
 
-  async refreshTokens(userId: string): Promise<TokenPairModel> {
-    const accessToken = tokenService.createAccessToken(userId);
-    const refreshToken = tokenService.createRefreshToken(userId);
+  async refreshTokens(
+    userId: string,
+    deviceId: string,
+  ): Promise<TokenPairModel> {
+    const accessToken = tokenService.createAccessToken(userId, deviceId);
+    const refreshToken = tokenService.createRefreshToken(userId, deviceId);
 
     const { iat } = tokenService.decodeToken(refreshToken);
 
@@ -165,6 +179,20 @@ export const usersService = {
     emailService.sendRegistrationEmail(email, newConfirmationCode);
 
     return updateResult;
+  },
+
+  async deleteUsersSession(deviceId: string, userId: string): Promise<void> {
+    const session =
+      await sessionsRepository.getSessionByDeviceIdOrFail(deviceId);
+
+    if (session.userId !== userId) {
+      throw new ForbiddenError("Session does not belong to the user");
+    }
+
+    await sessionsRepository.deleteSession(deviceId);
+  },
+  async deleteAllUsersSession(userId: string, deviceId: string): Promise<void> {
+    await sessionsRepository.deleteAllSessions(userId, deviceId);
   },
 
   async _checkUnique(login: string, email: string): Promise<void> {

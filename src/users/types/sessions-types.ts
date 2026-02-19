@@ -1,6 +1,6 @@
 export type SessionDbModel = {
   userId: string;
-  iat: string;
+  iat: number;
   deviceId: string;
   deviceName: string;
   ip: string;

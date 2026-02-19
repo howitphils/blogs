@@ -1,6 +1,7 @@
-import { ObjectId } from "mongodb";
 import { sessionsCollection } from "../../db/mongodb";
 import { SessionDbModel } from "../types/sessions-types";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { NotFoundError } from "../../core/middlewares/error-handling/custom-errors/not-found-error";
 
 export const sessionsRepository = {
   async createSession(session: SessionDbModel): Promise<string> {
@@ -9,19 +10,49 @@ export const sessionsRepository = {
     return insertedId.toString();
   },
 
-  async deleteSession(id: string) {
+  async deleteSession(deviceId: string) {
     const deleteResult = await sessionsCollection.deleteOne({
-      _id: new ObjectId(id),
+      deviceId,
+    });
+
+    if (deleteResult.deletedCount !== 0) {
+      throw new ServerError("Session was not deleted");
+    }
+  },
+
+  async deleteAllSessions(userId: string, deviceId: string) {
+    const deleteResult = await sessionsCollection.deleteMany({
+      $and: [{ userId: { $ne: userId } }, { deviceId: { $ne: deviceId } }],
     });
 
     return deleteResult.deletedCount !== 0;
   },
 
-  async deleteAllSessions(id: string) {
-    const deleteResult = await sessionsCollection.deleteMany({
-      _id: { $ne: new ObjectId(id) },
+  async getSessionByUserIdAndDeviceId(
+    userId: string,
+    deviceId: string,
+  ): Promise<SessionDbModel> {
+    const session = await sessionsCollection.findOne({
+      userId,
+      deviceId,
     });
 
-    return deleteResult.deletedCount !== 0;
+    if (!session) {
+      throw new NotFoundError("Session was not found");
+    }
+
+    return session;
+  },
+
+  async getSessionByDeviceIdOrFail(deviceId: string): Promise<SessionDbModel> {
+    const session = await sessionsCollection.findOne({
+      deviceId,
+    });
+
+    if (!session) {
+      throw new NotFoundError("Session was not found");
+    }
+
+    return session;
   },
 };

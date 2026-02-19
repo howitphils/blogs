@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import { appConfig } from "./app-config";
 import { testingRouter } from "./testing/router/testing-router";
 import { blogsRouter } from "./blogs/api/router/blogs-router";
 import { postsRouter } from "./posts/api/router/posts-router";
@@ -10,6 +9,8 @@ import { authRouter } from "./users/api/router/auth-router";
 import { basicAuthGuard } from "./core/middlewares/authentication/basic-auth";
 import { commentsRouter } from "./comments/api/router/comments-router";
 import cookieParser from "cookie-parser";
+import { sessionRouter } from "./users/api/router/session-router";
+import { appSettings } from "./app-settings";
 
 export const app = express();
 
@@ -17,11 +18,12 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); // Enable CORS for reaching the API from different origins
 app.use(cookieParser());
 
-app.use(appConfig.PATHS.BLOGS, blogsRouter);
-app.use(appConfig.PATHS.POSTS, postsRouter);
-app.use(appConfig.PATHS.USERS, basicAuthGuard, usersRouter);
-app.use(appConfig.PATHS.AUTH, authRouter);
-app.use(appConfig.PATHS.COMMENTS, commentsRouter);
-app.use(appConfig.PATHS.TESTING, testingRouter);
+app.use(appSettings.mainPaths.BLOGS, blogsRouter);
+app.use(appSettings.mainPaths.POSTS, postsRouter);
+app.use(appSettings.mainPaths.USERS, basicAuthGuard, usersRouter);
+app.use(appSettings.mainPaths.AUTH, authRouter);
+app.use(appSettings.mainPaths.COMMENTS, commentsRouter);
+app.use(appSettings.mainPaths.DEVICES, sessionRouter);
+app.use(appSettings.mainPaths.TESTING, testingRouter);
 
 app.use(errorHandler);

@@ -8,14 +8,6 @@ configDotenv({
 
 export const appConfig = {
   PORT: process.env.PORT,
-  PATHS: {
-    BLOGS: "/blogs",
-    POSTS: "/posts",
-    USERS: "/users",
-    AUTH: "/auth",
-    COMMENTS: "/comments",
-    TESTING: "/testing",
-  },
   ADMIN_CREDENTIALS: {
     USERNAME: process.env.BASIC_AUTH_USERNAME,
     PASSWORD: process.env.BASIC_AUTH_PASSWORD,
