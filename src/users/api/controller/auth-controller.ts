@@ -7,6 +7,7 @@ import { usersQueryRepository } from "../../repository/users-query-repository";
 import {
   AccessTokenOutput,
   ConfirmEmailBody,
+  LoginInfo,
   LoginInputModel,
   MeInfoViewModel,
   ResendEmailBody,
@@ -20,25 +21,34 @@ export const authController = {
     req: RequestWithBody<LoginInputModel>,
     res: Response<AccessTokenOutput>,
   ) {
-    const { accessToken, refreshToken } = await usersService.loginUser(
-      req.body,
-    );
+    const deviceName = req.headers["user-agent"] || "Unknown device";
+    const ip = req.ip as string;
+
+    const loginInfoDto: LoginInfo = {
+      loginOrEmail: req.body.loginOrEmail,
+      password: req.body.password,
+      ip,
+      deviceName,
+    };
+
+    const { accessToken, refreshToken } =
+      await usersService.loginUser(loginInfoDto);
 
     res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
-      secure: true,
-      httpOnly: true,
+      ...authCookieOptions,
       maxAge: CookieTTL.SEVEN_DAYS,
-      sameSite: "none",
     });
 
     return res.status(HttpStatus.OK).json({ accessToken });
   },
 
   async refreshTokens(req: Request, res: Response<AccessTokenOutput>) {
-    const userId = req.user.userId;
+    const { userId, deviceId } = req.user;
 
-    const { accessToken, refreshToken } =
-      await usersService.refreshTokens(userId);
+    const { accessToken, refreshToken } = await usersService.refreshTokens(
+      userId,
+      deviceId,
+    );
 
     res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
       ...authCookieOptions,
@@ -49,9 +59,9 @@ export const authController = {
   },
 
   async logout(req: Request, res: Response<void>) {
-    const userId = req.user.userId;
+    const { userId, deviceId } = req.user;
 
-    await usersService.logout(userId);
+    await usersService.logout(userId, deviceId);
 
     res.clearCookie(appConfig.REFRESH_COOKIE_NAME, authCookieOptions);
 

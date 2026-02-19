@@ -3,7 +3,6 @@ import { usersCollection } from "../../db/mongodb";
 import { UserDbModel } from "../types/users-types";
 import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 
 export const usersRepository = {
   async getUserByIdOrFail(id: string): Promise<WithId<UserDbModel>> {
@@ -115,22 +114,5 @@ export const usersRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
-
-  async updateTokenInfo(userId: string, iat: number | null): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
-      {
-        _id: new ObjectId(userId),
-      },
-      {
-        $set: {
-          "tokenInfo.issuedAt": iat,
-        },
-      },
-    );
-
-    if (updateResult.matchedCount === 0) {
-      throw new ServerError("Token info was not updated");
-    }
   },
 };

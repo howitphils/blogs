@@ -10,8 +10,9 @@ export const sessionsRepository = {
     return insertedId.toString();
   },
 
-  async deleteSession(deviceId: string) {
+  async deleteSession(userId: string, deviceId: string) {
     const deleteResult = await sessionsCollection.deleteOne({
+      userId,
       deviceId,
     });
 
@@ -28,22 +29,6 @@ export const sessionsRepository = {
     return deleteResult.deletedCount !== 0;
   },
 
-  async getSessionByUserIdAndDeviceId(
-    userId: string,
-    deviceId: string,
-  ): Promise<SessionDbModel> {
-    const session = await sessionsCollection.findOne({
-      userId,
-      deviceId,
-    });
-
-    if (!session) {
-      throw new NotFoundError("Session was not found");
-    }
-
-    return session;
-  },
-
   async getSessionByDeviceIdOrFail(deviceId: string): Promise<SessionDbModel> {
     const session = await sessionsCollection.findOne({
       deviceId,
@@ -54,5 +39,20 @@ export const sessionsRepository = {
     }
 
     return session;
+  },
+
+  async updateSessionIatAndExp(
+    deviceId: string,
+    iat: number,
+    exp: number,
+  ): Promise<void> {
+    const updateResult = await sessionsCollection.updateOne(
+      { deviceId },
+      { $set: { iat, exp } },
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      throw new ServerError("Session was not updated");
+    }
   },
 };

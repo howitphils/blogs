@@ -8,7 +8,7 @@ import {
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
-import { LoginInputModel, TokenPairModel } from "../types/auth-types";
+import { LoginInfo, TokenPairModel } from "../types/auth-types";
 import { emailService } from "../../core/services/email-service/email-service";
 import { dateService } from "../../core/services/date-service";
 import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
@@ -16,6 +16,7 @@ import { ServerError } from "../../core/middlewares/error-handling/custom-errors
 import { randomUUID } from "node:crypto";
 import { sessionsRepository } from "../repository/sessions-repository";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
+import { SessionDbModel } from "../types/sessions-types";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
@@ -41,7 +42,7 @@ export const usersService = {
     }
   },
 
-  async loginUser(dto: LoginInputModel): Promise<TokenPairModel> {
+  async loginUser(dto: LoginInfo): Promise<TokenPairModel> {
     const user = await usersRepository.getUserByLoginOrEmail(dto.loginOrEmail);
 
     if (!user) {
@@ -58,24 +59,27 @@ export const usersService = {
     }
 
     const deviceId = tokenService.createRandomCode();
+    const userId = user._id.toString();
 
-    const accessToken = tokenService.createAccessToken(
-      user._id.toString(),
-      deviceId,
-    );
-    const refreshToken = tokenService.createRefreshToken(
-      user._id.toString(),
-      deviceId,
-    );
+    const accessToken = tokenService.createAccessToken(userId, deviceId);
+    const refreshToken = tokenService.createRefreshToken(userId, deviceId);
 
-    const { iat } = tokenService.decodeToken(refreshToken);
+    const { iat, exp } = tokenService.decodeToken(refreshToken);
 
-    if (!iat) {
-      throw new ServerError("token issuedAt is not available");
+    if (!iat || !exp) {
+      throw new ServerError("token issuedAt or exp is not available");
     }
 
-    //TODO: CREATE SESSION
-    await usersRepository.updateTokenInfo(user._id.toString(), iat);
+    const newSession: SessionDbModel = {
+      userId,
+      deviceId,
+      iat,
+      exp,
+      deviceName: dto.deviceName,
+      ip: dto.ip,
+    };
+
+    await sessionsRepository.createSession(newSession);
 
     return { accessToken, refreshToken };
   },
@@ -111,19 +115,19 @@ export const usersService = {
     const accessToken = tokenService.createAccessToken(userId, deviceId);
     const refreshToken = tokenService.createRefreshToken(userId, deviceId);
 
-    const { iat } = tokenService.decodeToken(refreshToken);
+    const { iat, exp } = tokenService.decodeToken(refreshToken);
 
-    if (!iat) {
-      throw new ServerError("token issuedAt is not available");
-    }
-
-    await usersRepository.updateTokenInfo(userId, iat);
+    await sessionsRepository.updateSessionIatAndExp(
+      deviceId,
+      iat as number,
+      exp as number,
+    );
 
     return { accessToken, refreshToken };
   },
 
-  async logout(userId: string): Promise<void> {
-    await usersRepository.updateTokenInfo(userId, null);
+  async logout(userId: string, deviceId: string): Promise<void> {
+    await sessionsRepository.deleteSession(userId, deviceId);
   },
 
   async confirmEmail(code: string): Promise<boolean> {
@@ -189,7 +193,7 @@ export const usersService = {
       throw new ForbiddenError("Session does not belong to the user");
     }
 
-    await sessionsRepository.deleteSession(deviceId);
+    await sessionsRepository.deleteSession(userId, deviceId);
   },
   async deleteAllUsersSession(userId: string, deviceId: string): Promise<void> {
     await sessionsRepository.deleteAllSessions(userId, deviceId);

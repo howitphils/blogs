@@ -3,6 +3,13 @@ export type LoginInputModel = {
   password: string;
 };
 
+export type LoginInfo = {
+  loginOrEmail: string;
+  password: string;
+  ip: string;
+  deviceName: string;
+};
+
 export type MeInfoViewModel = {
   email: string;
   login: string;

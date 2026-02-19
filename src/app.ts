@@ -14,6 +14,8 @@ import { appSettings } from "./app-settings";
 
 export const app = express();
 
+app.set("trust proxy", true);
+
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use(cors()); // Enable CORS for reaching the API from different origins
 app.use(cookieParser());
