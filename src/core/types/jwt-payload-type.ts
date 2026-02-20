@@ -1,6 +1,10 @@
 import { JwtPayload } from "jsonwebtoken";
 
-export interface JwtPayloadWithUser extends JwtPayload {
+export interface JwtPayloadAccess extends JwtPayload {
+  userId: string;
+}
+
+export interface JwtPayloadRefresh extends JwtPayload {
   userId: string;
   deviceId: string;
 }

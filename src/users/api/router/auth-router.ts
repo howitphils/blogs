@@ -8,11 +8,13 @@ import { validateUserBody } from "../validations/users-body-validation";
 import { validateConfirmEmailBody } from "../validations/confirm-email-body-validations";
 import { validateResendEmailBody } from "../validations/resend-email-body-validations";
 import { cookieAuthGuard } from "../../../core/middlewares/authentication/cookie-auth";
+import { rateLimiter } from "../../../core/middlewares/rate-limiting/rate-limiter";
 
 export const authRouter = Router();
 
 authRouter.post(
   "/login",
+  rateLimiter,
   validateLoginBody,
   validationChainResult,
   authController.loginUser,
@@ -50,6 +52,7 @@ authRouter.get("/me", jwtAuthGuard, checkUserInReq, authController.getMyInfo);
 
 authRouter.post(
   "/registration",
+  rateLimiter,
   validateUserBody,
   validationChainResult,
   authController.registerUser,

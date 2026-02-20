@@ -61,10 +61,10 @@ export const usersService = {
     const deviceId = tokenService.createRandomCode();
     const userId = user._id.toString();
 
-    const accessToken = tokenService.createAccessToken(userId, deviceId);
+    const accessToken = tokenService.createAccessToken(userId);
     const refreshToken = tokenService.createRefreshToken(userId, deviceId);
 
-    const { iat, exp } = tokenService.decodeToken(refreshToken);
+    const { iat, exp } = tokenService.decodeRefreshToken(refreshToken);
 
     if (!iat || !exp) {
       throw new ServerError("token issuedAt or exp is not available");
@@ -112,10 +112,10 @@ export const usersService = {
     userId: string,
     deviceId: string,
   ): Promise<TokenPairModel> {
-    const accessToken = tokenService.createAccessToken(userId, deviceId);
+    const accessToken = tokenService.createAccessToken(userId);
     const refreshToken = tokenService.createRefreshToken(userId, deviceId);
 
-    const { iat, exp } = tokenService.decodeToken(refreshToken);
+    const { iat, exp } = tokenService.decodeRefreshToken(refreshToken);
 
     await sessionsRepository.updateSessionIatAndExp(
       deviceId,
@@ -224,9 +224,6 @@ export const usersService = {
         confirmationCode: randomUUID(),
         expDate: dateService.addHours(2),
         isConfirmed: dto.isConfirmed,
-      },
-      tokenInfo: {
-        issuedAt: null,
       },
     };
 

@@ -12,4 +12,9 @@ export const appSettings = {
     TESTING: "/testing",
     DEVICES: "/security",
   },
+  rateLimit: {
+    windowMs: 10 * 1000, // 10 seconds
+    requestLimit: 3,
+    errorMessage: "Too many requests",
+  },
 };

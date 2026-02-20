@@ -11,6 +11,7 @@ import { commentsRouter } from "./comments/api/router/comments-router";
 import cookieParser from "cookie-parser";
 import { sessionRouter } from "./users/api/router/session-router";
 import { appSettings } from "./app-settings";
+import { cookieAuthGuard } from "./core/middlewares/authentication/cookie-auth";
 
 export const app = express();
 
@@ -25,7 +26,7 @@ app.use(appSettings.mainPaths.POSTS, postsRouter);
 app.use(appSettings.mainPaths.USERS, basicAuthGuard, usersRouter);
 app.use(appSettings.mainPaths.AUTH, authRouter);
 app.use(appSettings.mainPaths.COMMENTS, commentsRouter);
-app.use(appSettings.mainPaths.DEVICES, sessionRouter);
+app.use(appSettings.mainPaths.DEVICES, cookieAuthGuard, sessionRouter);
 app.use(appSettings.mainPaths.TESTING, testingRouter);
 
 app.use(errorHandler);

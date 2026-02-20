@@ -1,8 +1,8 @@
-import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
+import { decode, sign, verify } from "jsonwebtoken";
 import { appConfig } from "../../app-config";
 import { UnauthorizedError } from "../middlewares/error-handling/custom-errors/unauthorized-error";
-import { JwtPayloadWithUser } from "../types/jwt-payload-type";
 import { randomUUID } from "node:crypto";
+import { JwtPayloadAccess, JwtPayloadRefresh } from "../types/jwt-payload-type";
 
 export const tokenService = {
   genereateToken(payload: any, secretKey: string, exp: number): string {
@@ -19,9 +19,9 @@ export const tokenService = {
     }
   },
 
-  createAccessToken(userId: string, deviceId: string): string {
+  createAccessToken(userId: string): string {
     return tokenService.genereateToken(
-      { userId, deviceId },
+      { userId },
       appConfig.ACCESS_JWT_SECRET,
       appConfig.ACCESS_JWT_EXP,
     );
@@ -39,18 +39,18 @@ export const tokenService = {
     return tokenService.verifyToken(
       token,
       appConfig.ACCESS_JWT_SECRET,
-    ) as JwtPayloadWithUser;
+    ) as JwtPayloadAccess;
   },
 
   verifyRefreshToken(token: string) {
     return tokenService.verifyToken(
       token,
       appConfig.REFRESH_JWT_SECRET,
-    ) as JwtPayloadWithUser;
+    ) as JwtPayloadRefresh;
   },
 
-  decodeToken(token: string) {
-    return decode(token) as JwtPayload;
+  decodeRefreshToken(token: string) {
+    return decode(token) as JwtPayloadRefresh;
   },
 
   createRandomCode() {

@@ -16,7 +16,7 @@ export const sessionsRepository = {
       deviceId,
     });
 
-    if (deleteResult.deletedCount !== 0) {
+    if (deleteResult.deletedCount === 0) {
       throw new ServerError("Session was not deleted");
     }
   },
@@ -51,7 +51,7 @@ export const sessionsRepository = {
       { $set: { iat, exp } },
     );
 
-    if (updateResult.modifiedCount === 0) {
+    if (updateResult.matchedCount === 0) {
       throw new ServerError("Session was not updated");
     }
   },
