@@ -1,5 +1,5 @@
 import { HttpError } from "../../../core/middlewares/error-handling/custom-errors/http-error";
-import { HttpStatus } from "../../../core/types/http-status-types";
+import { HttpStatus } from "../../../core/types/http-statuses";
 
 export class CommentNotFoundError extends HttpError {
   constructor() {

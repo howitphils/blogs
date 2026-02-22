@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { HttpStatus } from "../../types/http-status-types";
+import { HttpStatus } from "../../types/http-statuses";
 import { MongoError } from "mongodb";
 import { HttpError } from "./custom-errors/http-error";
 import { NotUniqueUserError } from "../../../users/application/errors/users-errors";

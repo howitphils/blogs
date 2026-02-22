@@ -1,6 +1,6 @@
 import { HttpError } from "../../../core/middlewares/error-handling/custom-errors/http-error";
 import { ErrorResponse } from "../../../core/types/error-response-types";
-import { HttpStatus } from "../../../core/types/http-status-types";
+import { HttpStatus } from "../../../core/types/http-statuses";
 
 export class UserNotFoundError extends HttpError {
   constructor() {

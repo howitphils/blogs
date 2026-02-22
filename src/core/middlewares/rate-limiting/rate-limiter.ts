@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import { HttpStatus } from "../../types/http-status-types";
+import { HttpStatus } from "../../types/http-statuses";
 import { appSettings } from "../../../app-settings";
 
 const whitelist = ["127.0.0.1", "::1", "::ffff:127.0.0.1"];

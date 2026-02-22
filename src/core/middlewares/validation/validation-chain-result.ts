@@ -5,7 +5,7 @@ import {
   ValidationError,
 } from "express-validator";
 import { FieldError } from "../../types/error-response-types";
-import { HttpStatus } from "../../types/http-status-types";
+import { HttpStatus } from "../../types/http-statuses";
 // import { ErrorResponseWithObject } from "../error-handling/error-handler";
 
 const errorFormatter = (error: ValidationError): FieldError => {

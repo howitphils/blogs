@@ -1,4 +1,4 @@
-import { HttpStatus } from "../../../types/http-status-types";
+import { HttpStatus } from "../../../types/http-statuses";
 
 export class HttpError extends Error {
   public status: HttpStatus;

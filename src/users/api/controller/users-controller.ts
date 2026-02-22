@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { HttpStatus } from "../../../core/types/http-status-types";
+import { HttpStatus } from "../../../core/types/http-statuses";
 import {
   RequestWithParamsId,
   RequestWithBody,

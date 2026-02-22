@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { HttpStatus } from "../../../core/types/http-status-types";
+import { HttpStatus } from "../../../core/types/http-statuses";
 import { usersQueryRepository } from "../../repository/users-query-repository";
 import { RequestWithParamsId } from "../../../core/types/request-types";
 import { SessionViewModel } from "../../types/sessions-types";

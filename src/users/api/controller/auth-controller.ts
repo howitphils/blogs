@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { RequestWithBody } from "../../../core/types/request-types";
 import { UserInputModel } from "../../types/users-types";
 import { usersService } from "../../application/users-service";
-import { HttpStatus } from "../../../core/types/http-status-types";
+import { HttpStatus } from "../../../core/types/http-statuses";
 import { usersQueryRepository } from "../../repository/users-query-repository";
 import {
   AccessTokenOutput,
@@ -41,6 +41,9 @@ export const authController = {
 
     return res.status(HttpStatus.OK).json({ accessToken });
   },
+
+  async recoverPassword(req: Request, res: Response) {},
+  async updatePassword(req: Request, res: Response) {},
 
   async refreshTokens(req: Request, res: Response<AccessTokenOutput>) {
     const { userId, deviceId } = req.user;

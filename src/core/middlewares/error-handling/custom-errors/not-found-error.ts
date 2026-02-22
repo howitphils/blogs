@@ -1,4 +1,4 @@
-import { HttpStatus } from "../../../types/http-status-types";
+import { HttpStatus } from "../../../types/http-statuses";
 import { HttpError } from "./http-error";
 
 export class NotFoundError extends HttpError {

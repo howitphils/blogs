@@ -4,6 +4,7 @@ import { PostDbModel } from "../posts/types/posts-types";
 import { UserDbModel } from "../users/types/users-types";
 import { CommentDbModel } from "../comments/types/comments-types";
 import { SessionDbModel } from "../users/types/sessions-types";
+import { ServerError } from "../core/middlewares/error-handling/custom-errors/server-error";
 
 export let db: Db; // Export for tests (TESTING API). It will contain db name, that was up and running after runDb function
 
@@ -27,7 +28,7 @@ export const runDb = async (url: string, dbName: string) => {
     await mongoClient.connect();
   } catch (e) {
     await mongoClient.close();
-    throw new Error(`❌ Database not connected: ${e}`);
+    throw new ServerError(`❌ Database not connected: ${e}`);
   }
 
   return mongoClient;

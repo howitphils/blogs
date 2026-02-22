@@ -21,6 +21,23 @@ authRouter.post(
 );
 
 authRouter.post(
+  "/password-recovery",
+  rateLimiter,
+  validateResendEmailBody,
+  validationChainResult,
+  authController.recoverPassword,
+);
+
+authRouter.post(
+  "/new-password",
+  rateLimiter,
+  //TODO: new password body
+  validateResendEmailBody,
+  validationChainResult,
+  authController.updatePassword,
+);
+
+authRouter.post(
   "/refresh-token",
   cookieAuthGuard,
   checkUserInReq,
@@ -36,6 +53,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
+  rateLimiter,
   validateConfirmEmailBody,
   validationChainResult,
   authController.loginUser,
@@ -43,6 +61,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-email-resending",
+  rateLimiter,
   validateResendEmailBody,
   validationChainResult,
   authController.resendEmail,
