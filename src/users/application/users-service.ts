@@ -195,7 +195,11 @@ export const usersService = {
 
     await sessionsRepository.deleteSession(userId, deviceId);
   },
-  async deleteAllUsersSession(userId: string, deviceId: string): Promise<void> {
+
+  async deleteAllUsersSessions(
+    userId: string,
+    deviceId: string,
+  ): Promise<void> {
     await sessionsRepository.deleteAllSessions(userId, deviceId);
   },
 

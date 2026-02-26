@@ -25,7 +25,10 @@ export const cookieAuthGuard = async (
     throw new UnauthorizedError("Token is not valid");
   }
 
-  req.user = payload;
+  req.user = {
+    userId: payload.userId,
+    deviceId: payload.deviceId,
+  };
 
   next();
 };

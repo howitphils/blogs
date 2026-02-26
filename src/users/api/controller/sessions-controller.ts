@@ -15,7 +15,7 @@ export const sessionsController = {
   },
 
   async deleteSession(req: RequestWithParamsId, res: Response) {
-    const { id: deviceId } = req.params;
+    const { id: deviceId } = req.params; // taking deviceId from params to be able to delete any user's session, not only current
     const { userId } = req.user;
 
     await usersService.deleteUsersSession(deviceId, userId);
@@ -26,7 +26,7 @@ export const sessionsController = {
   async deleteAllSessions(req: Request, res: Response) {
     const { userId, deviceId } = req.user;
 
-    await usersService.deleteAllUsersSession(userId, deviceId);
+    await usersService.deleteAllUsersSessions(userId, deviceId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },

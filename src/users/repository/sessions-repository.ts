@@ -23,10 +23,13 @@ export const sessionsRepository = {
 
   async deleteAllSessions(userId: string, deviceId: string) {
     const deleteResult = await sessionsCollection.deleteMany({
-      $and: [{ userId: { $ne: userId } }, { deviceId: { $ne: deviceId } }],
+      userId,
+      deviceId: { $ne: deviceId },
     });
 
-    return deleteResult.deletedCount !== 0;
+    if (deleteResult.deletedCount === 0) {
+      throw new ServerError("Sessions were not deleted");
+    }
   },
 
   async getSessionByDeviceIdOrFail(deviceId: string): Promise<SessionDbModel> {
