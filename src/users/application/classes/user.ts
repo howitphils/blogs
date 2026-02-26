@@ -15,7 +15,7 @@ export class User {
   };
   passwordRecovery: {
     recoveryCode: string | null;
-    expDate: Date | null;
+    expDate: Date;
   };
 
   constructor(
@@ -37,7 +37,7 @@ export class User {
     };
     this.passwordRecovery = {
       recoveryCode: null,
-      expDate: null,
+      expDate: new Date(),
     };
   }
 }

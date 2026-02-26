@@ -196,6 +196,26 @@ export const usersService = {
     });
   },
 
+  async updatePassword(
+    newPassword: string,
+    recoveryCode: string,
+  ): Promise<void> {
+    const user =
+      await usersRepository.getUserByRecoveryCodeOrFail(recoveryCode);
+
+    if (user.passwordRecovery.recoveryCode !== recoveryCode) {
+      throw new BadRequestError("Invalid recovery code");
+    }
+
+    if (user.passwordRecovery.expDate < new Date()) {
+      throw new BadRequestError("Recovery code is already expired");
+    }
+
+    const passwordHash = await passwordService.generateHash(newPassword);
+
+    await usersRepository.updatePasswordHash(user._id, passwordHash);
+  },
+
   async _checkUnique(login: string, email: string): Promise<void> {
     const existingUser = await usersRepository.getExistingUser(login, email);
 

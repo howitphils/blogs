@@ -1,11 +1,12 @@
 import { ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../db/mongodb";
-import { UserDbModel } from "../types/users-types";
 import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
+import { User } from "../application/classes/user";
+import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 
 export const usersRepository = {
-  async getUserByIdOrFail(id: string): Promise<WithId<UserDbModel>> {
+  async getUserByIdOrFail(id: string): Promise<WithId<User>> {
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
 
     if (!user) {
@@ -15,7 +16,7 @@ export const usersRepository = {
     return user;
   },
 
-  async createUser(userDto: UserDbModel): Promise<string> {
+  async createUser(userDto: User): Promise<string> {
     const { insertedId } = await usersCollection.insertOne(userDto);
 
     return insertedId.toString();
@@ -32,7 +33,7 @@ export const usersRepository = {
   async getExistingUser(
     login: string,
     email: string,
-  ): Promise<WithId<UserDbModel> | null> {
+  ): Promise<WithId<User> | null> {
     return usersCollection.findOne({
       $or: [
         {
@@ -53,7 +54,7 @@ export const usersRepository = {
 
   async getUserByLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<WithId<UserDbModel> | null> {
+  ): Promise<WithId<User> | null> {
     return usersCollection.findOne({
       $or: [
         {
@@ -72,9 +73,7 @@ export const usersRepository = {
     });
   },
 
-  async getUserByConfirmationCode(
-    code: string,
-  ): Promise<WithId<UserDbModel> | null> {
+  async getUserByConfirmationCode(code: string): Promise<WithId<User> | null> {
     return usersCollection.findOne({
       "emailConfirmation.confirmationCode": code,
     });
@@ -132,5 +131,39 @@ export const usersRepository = {
         },
       },
     );
+  },
+
+  async getUserByRecoveryCodeOrFail(
+    recoveryCode: string,
+  ): Promise<WithId<User>> {
+    const user = await usersCollection.findOne({
+      "passwordRecovery.recoveryCode": recoveryCode,
+    });
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    return user;
+  },
+
+  async updatePasswordHash(
+    userId: ObjectId,
+    passwordHash: string,
+  ): Promise<void> {
+    const updateResult = await usersCollection.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          "accountData.passwordHash": passwordHash,
+        },
+      },
+    );
+
+    if (updateResult.matchedCount === 0) {
+      throw new ServerError("User's password was not updated");
+    }
   },
 };

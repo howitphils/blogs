@@ -13,35 +13,11 @@ export type UserViewModel = {
   createdAt: string;
 };
 
-export type UserDbModel = {
-  accountData: AccountDataType;
-  emailConfirmation: EmailConfirmationType;
-  passwordRecovery: PasswordRecoveryType;
-};
-
 export type CreateUserDtoType = {
   login: string;
   password: string;
   email: string;
   isConfirmed: boolean;
-};
-
-type EmailConfirmationType = {
-  confirmationCode: string;
-  expDate: Date;
-  isConfirmed: boolean;
-};
-
-type PasswordRecoveryType = {
-  recoveryCode: string | null;
-  expDate: Date | null;
-};
-
-type AccountDataType = {
-  login: string;
-  passwordHash: string;
-  email: string;
-  createdAt: string;
 };
 
 export interface UserQueryParams extends BaseQueryParams {
