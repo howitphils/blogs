@@ -50,7 +50,7 @@ export const authController = {
 
     const { accessToken, refreshToken } = await usersService.refreshTokens(
       userId,
-      deviceId,
+      deviceId as string,
     );
 
     res.cookie(appConfig.REFRESH_COOKIE_NAME, refreshToken, {
@@ -64,7 +64,7 @@ export const authController = {
   async logout(req: Request, res: Response<void>) {
     const { userId, deviceId } = req.user;
 
-    await usersService.logout(userId, deviceId);
+    await usersService.logout(userId, deviceId as string);
 
     res.clearCookie(appConfig.REFRESH_COOKIE_NAME, authCookieOptions);
 

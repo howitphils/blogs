@@ -22,7 +22,9 @@ export const jwtAuthGuard = (
   const payload = tokenService.verifyAccessToken(token);
 
   // CASTING PAYLOAD TYPE TO USER REQUEST GLOBAL TYPE (NO ERROR FOR NOW)
-  req.user = payload;
+  req.user = {
+    userId: payload.userId,
+  };
 
   next();
 };

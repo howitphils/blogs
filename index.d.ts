@@ -7,7 +7,7 @@ declare global {
     export interface Request {
       user: {
         userId: string;
-        deviceId: string;
+        deviceId?: string;
       };
     }
   }

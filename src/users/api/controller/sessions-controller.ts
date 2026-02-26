@@ -26,7 +26,7 @@ export const sessionsController = {
   async deleteAllSessions(req: Request, res: Response) {
     const { userId, deviceId } = req.user;
 
-    await usersService.deleteAllUsersSessions(userId, deviceId);
+    await usersService.deleteAllUsersSessions(userId, deviceId as string);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
