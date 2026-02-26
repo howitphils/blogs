@@ -158,6 +158,8 @@ export const usersRepository = {
       {
         $set: {
           "accountData.passwordHash": passwordHash,
+          "passwordRecovery.recoveryCode": null,
+          "passwordRecovery.expDate": new Date(),
         },
       },
     );

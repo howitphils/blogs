@@ -203,10 +203,6 @@ export const usersService = {
     const user =
       await usersRepository.getUserByRecoveryCodeOrFail(recoveryCode);
 
-    if (user.passwordRecovery.recoveryCode !== recoveryCode) {
-      throw new BadRequestError("Invalid recovery code");
-    }
-
     if (user.passwordRecovery.expDate < new Date()) {
       throw new BadRequestError("Recovery code is already expired");
     }
