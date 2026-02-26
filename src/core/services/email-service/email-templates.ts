@@ -1,5 +1,5 @@
 export const emailTemplates = {
-  getRegistrationTemaplte(code: string) {
+  getRegistrationTemplate(code: string) {
     return `<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f0f2f5; padding: 40px 10px;">
     <tr>
       <td align="center">
@@ -70,7 +70,7 @@ export const emailTemplates = {
               <p style="font-size: 15px; color: #666666; line-height: 1.6; margin-bottom: 32px;">
                 Мы получили запрос на изменение пароля для вашего аккаунта. Нажмите на кнопку ниже, чтобы установить новый пароль. 
                 <br><br>
-                <strong style="color: #ff7675;">Ссылка активна в течение 24 часов.</strong>
+                <strong style="color: #ff7675;">Ссылка активна в течение 2 часов.</strong>
               </p>
               
               <!-- Кнопка -->

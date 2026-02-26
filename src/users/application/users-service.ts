@@ -186,6 +186,10 @@ export const usersService = {
   },
 
   async recoverPassword(email: string): Promise<void> {
+    const user = await usersRepository.getUserByLoginOrEmail(email);
+
+    if (!user) return;
+
     const recoveryCode = tokenService.createRandomCode();
     const expDate = dateService.addHours(2);
 

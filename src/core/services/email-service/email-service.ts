@@ -25,7 +25,7 @@ export const emailService = {
     emailService.sendEmail(
       email,
       appSettings.emailSubjects.registration,
-      emailTemplates.getRegistrationTemaplte(code),
+      emailTemplates.getRegistrationTemplate(code),
     );
   },
 
