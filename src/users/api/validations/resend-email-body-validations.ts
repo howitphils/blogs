@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-export const validateResendEmailBody = [
+export const validateEmailBody = [
   body("email")
     .exists()
     .withMessage("Email is required")

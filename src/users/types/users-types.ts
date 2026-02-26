@@ -16,6 +16,7 @@ export type UserViewModel = {
 export type UserDbModel = {
   accountData: AccountDataType;
   emailConfirmation: EmailConfirmationType;
+  passwordRecovery: PasswordRecoveryType;
 };
 
 export type CreateUserDtoType = {
@@ -29,6 +30,11 @@ type EmailConfirmationType = {
   confirmationCode: string;
   expDate: Date;
   isConfirmed: boolean;
+};
+
+type PasswordRecoveryType = {
+  recoveryCode: string | null;
+  expDate: Date | null;
 };
 
 type AccountDataType = {

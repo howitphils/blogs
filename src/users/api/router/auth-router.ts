@@ -6,9 +6,10 @@ import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth"
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
 import { validateUserBody } from "../validations/users-body-validation";
 import { validateConfirmEmailBody } from "../validations/confirm-email-body-validations";
-import { validateResendEmailBody } from "../validations/resend-email-body-validations";
+import { validateEmailBody } from "../validations/resend-email-body-validations";
 import { cookieAuthGuard } from "../../../core/middlewares/authentication/cookie-auth";
 import { rateLimiter } from "../../../core/middlewares/rate-limiting/rate-limiter";
+import { validateNewPasswordBody } from "../validations/new-password-body-validations";
 
 export const authRouter = Router();
 
@@ -23,7 +24,7 @@ authRouter.post(
 authRouter.post(
   "/password-recovery",
   rateLimiter,
-  validateResendEmailBody,
+  validateEmailBody,
   validationChainResult,
   authController.recoverPassword,
 );
@@ -31,8 +32,7 @@ authRouter.post(
 authRouter.post(
   "/new-password",
   rateLimiter,
-  //TODO: new password body
-  validateResendEmailBody,
+  validateNewPasswordBody,
   validationChainResult,
   authController.updatePassword,
 );
@@ -62,7 +62,7 @@ authRouter.post(
 authRouter.post(
   "/registration-email-resending",
   rateLimiter,
-  validateResendEmailBody,
+  validateEmailBody,
   validationChainResult,
   authController.resendEmail,
 );

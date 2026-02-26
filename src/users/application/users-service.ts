@@ -1,10 +1,6 @@
 import { UnauthorizedError } from "../../core/middlewares/error-handling/custom-errors/unauthorized-error";
 import { usersRepository } from "../repository/users-repository";
-import {
-  CreateUserDtoType,
-  UserDbModel,
-  UserInputModel,
-} from "../types/users-types";
+import { UserInputModel } from "../types/users-types";
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { passwordService } from "../../core/services/password-service";
 import { tokenService } from "../../core/services/token-service";
@@ -17,19 +13,14 @@ import { randomUUID } from "node:crypto";
 import { sessionsRepository } from "../repository/sessions-repository";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 import { SessionDbModel } from "../types/sessions-types";
+import { User } from "./classes/user";
 
 export const usersService = {
   async addUser(dto: UserInputModel): Promise<string> {
     await usersService._checkUnique(dto.login, dto.email);
 
-    const createUserDto: CreateUserDtoType = {
-      email: dto.email,
-      login: dto.login,
-      password: dto.password,
-      isConfirmed: true,
-    };
-
-    const user = await usersService._userFactory(createUserDto);
+    const passwordHash = await passwordService.generateHash(dto.password);
+    const user = new User(dto.login, dto.email, passwordHash, true);
 
     return usersRepository.createUser(user);
   },
@@ -87,20 +78,10 @@ export const usersService = {
   async registerUser(dto: UserInputModel): Promise<void> {
     await usersService._checkUnique(dto.login, dto.email);
 
-    const createUserDto: CreateUserDtoType = {
-      login: dto.login,
-      email: dto.email,
-      password: dto.password,
-      isConfirmed: false,
-    };
+    const passwordHash = await passwordService.generateHash(dto.password);
+    const user = new User(dto.login, dto.email, passwordHash, false);
 
-    const user = await usersService._userFactory(createUserDto);
-
-    const userId = await usersRepository.createUser(user);
-
-    if (!userId) {
-      throw new ServerError("User was not added to db");
-    }
+    await usersRepository.createUser(user);
 
     emailService.sendRegistrationEmail(
       dto.email,
@@ -212,25 +193,5 @@ export const usersService = {
 
       throw new NotUniqueUserError(field);
     }
-  },
-
-  async _userFactory(dto: CreateUserDtoType): Promise<UserDbModel> {
-    const passwordHash = await passwordService.generateHash(dto.password);
-
-    const newUser: UserDbModel = {
-      accountData: {
-        login: dto.login,
-        email: dto.email,
-        passwordHash,
-        createdAt: new Date().toISOString(),
-      },
-      emailConfirmation: {
-        confirmationCode: randomUUID(),
-        expDate: dateService.addHours(2),
-        isConfirmed: dto.isConfirmed,
-      },
-    };
-
-    return newUser;
   },
 };
