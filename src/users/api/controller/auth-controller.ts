@@ -10,7 +10,8 @@ import {
   LoginInfo,
   LoginInputModel,
   MeInfoViewModel,
-  ResendEmailBody,
+  NewPasswordBody,
+  EmailBody,
 } from "../../types/auth-types";
 import { appConfig } from "../../../app-config";
 import { CookieTTL } from "../../../core/types/cookie-ttl-enum";
@@ -42,8 +43,21 @@ export const authController = {
     return res.status(HttpStatus.OK).json({ accessToken });
   },
 
-  async recoverPassword(req: Request, res: Response) {},
-  async updatePassword(req: Request, res: Response) {},
+  async recoverPassword(req: RequestWithBody<EmailBody>, res: Response) {
+    const email = req.body.email;
+
+    await usersService.recoverPassword(email);
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  },
+
+  async updatePassword(req: RequestWithBody<NewPasswordBody>, res: Response) {
+    const { newPassword, recoveryCode } = req.body;
+
+    await usersService.updatePassword(newPassword, recoveryCode);
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  },
 
   async refreshTokens(req: Request, res: Response<AccessTokenOutput>) {
     const { userId, deviceId } = req.user;
@@ -101,10 +115,7 @@ export const authController = {
     return res.sendStatus(HttpStatus.NO_CONTENT);
   },
 
-  async resendEmail(
-    req: RequestWithBody<ResendEmailBody>,
-    res: Response<void>,
-  ) {
+  async resendEmail(req: RequestWithBody<EmailBody>, res: Response<void>) {
     const email = req.body.email;
 
     await usersService.emailResending(email);

@@ -83,10 +83,11 @@ export const usersService = {
 
     await usersRepository.createUser(user);
 
-    emailService.sendRegistrationEmail(
-      dto.email,
-      user.emailConfirmation.confirmationCode,
-    );
+    emailService
+      .sendRegistrationEmail(dto.email, user.emailConfirmation.confirmationCode)
+      .catch((err) => {
+        console.log("registration", err);
+      });
   },
 
   async refreshTokens(
@@ -182,6 +183,17 @@ export const usersService = {
     deviceId: string,
   ): Promise<void> {
     await sessionsRepository.deleteAllSessions(userId, deviceId);
+  },
+
+  async recoverPassword(email: string): Promise<void> {
+    const recoveryCode = tokenService.createRandomCode();
+    const expDate = dateService.addHours(2);
+
+    await usersRepository.updateRecoveryCode(email, recoveryCode, expDate);
+
+    emailService.sendPasswordRecoveryEmail(email, recoveryCode).catch((err) => {
+      console.log("password recovery", err);
+    });
   },
 
   async _checkUnique(login: string, email: string): Promise<void> {

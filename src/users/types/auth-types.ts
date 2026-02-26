@@ -29,6 +29,11 @@ export type ConfirmEmailBody = {
   code: string;
 };
 
-export type ResendEmailBody = {
+export type EmailBody = {
   email: string;
+};
+
+export type NewPasswordBody = {
+  newPassword: string;
+  recoveryCode: string;
 };

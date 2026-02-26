@@ -37,9 +37,9 @@ export const usersRepository = {
       $or: [
         {
           "accountData.login": {
-            $regex: `^${safeRegex(login)}$`,
+            $regex: `^${safeRegex(login)}$`, // ^ - start of the string, $ - end of the string
             $options: "i",
-          }, // ^ - start of the string, $ - end of the string
+          },
         },
         {
           "accountData.email": {
@@ -114,5 +114,23 @@ export const usersRepository = {
     );
 
     return updateResult.matchedCount !== 0;
+  },
+
+  async updateRecoveryCode(
+    email: string,
+    recoveryCode: string,
+    expDate: Date,
+  ): Promise<void> {
+    await usersCollection.updateOne(
+      {
+        "accountData.email": email,
+      },
+      {
+        $set: {
+          "passwordRecovery.recoveryCode": recoveryCode,
+          "passwordRecovery.expDate": expDate,
+        },
+      },
+    );
   },
 };
