@@ -29,4 +29,5 @@ export const appConfig = {
   NODEMAILER_SENDER_USERNAME: process.env.NODEMAILER_SENDER_USERNAME,
   NODEMAILER_SENDER_PASS: process.env.NODEMAILER_SENDER_PASS,
   REFRESH_COOKIE_NAME: "refresh_cookie",
+  REDIS_URL: process.env.REDIS_URL as string,
 };

@@ -56,7 +56,7 @@ authRouter.post(
   rateLimiter,
   validateConfirmEmailBody,
   validationChainResult,
-  authController.loginUser,
+  authController.confirmEmail,
 );
 
 authRouter.post(
