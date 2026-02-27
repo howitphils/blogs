@@ -14,7 +14,7 @@ export const appSettings = {
   },
   rateLimit: {
     windowMs: 10 * 1000, // 10 seconds
-    requestLimit: 3,
+    requestLimit: 5,
     errorMessage: "Too many requests",
   },
 };
