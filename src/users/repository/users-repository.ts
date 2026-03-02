@@ -4,8 +4,10 @@ import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
 import { User } from "../application/classes/user";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { injectable } from "inversify";
 
-export const usersRepository = {
+@injectable()
+export class UsersRepository {
   async getUserByIdOrFail(id: string): Promise<WithId<User>> {
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
 
@@ -14,13 +16,13 @@ export const usersRepository = {
     }
 
     return user;
-  },
+  }
 
   async createUser(userDto: User): Promise<string> {
     const { insertedId } = await usersCollection.insertOne(userDto);
 
     return insertedId.toString();
-  },
+  }
 
   async deleteUser(userId: string): Promise<boolean> {
     const deleteResult = await usersCollection.deleteOne({
@@ -28,7 +30,7 @@ export const usersRepository = {
     });
 
     return deleteResult.deletedCount !== 0;
-  },
+  }
 
   async getExistingUser(
     login: string,
@@ -50,7 +52,7 @@ export const usersRepository = {
         },
       ],
     });
-  },
+  }
 
   async getUserByLoginOrEmail(
     loginOrEmail: string,
@@ -71,13 +73,13 @@ export const usersRepository = {
         },
       ],
     });
-  },
+  }
 
   async getUserByConfirmationCode(code: string): Promise<WithId<User> | null> {
     return usersCollection.findOne({
       "emailConfirmation.confirmationCode": code,
     });
-  },
+  }
 
   async updateIsConfirmed(code: string): Promise<boolean> {
     const updateResult = await usersCollection.updateOne(
@@ -93,7 +95,7 @@ export const usersRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
+  }
 
   async updateConfirmationCodeAndExp(
     email: string,
@@ -113,7 +115,7 @@ export const usersRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
+  }
 
   async updateRecoveryCode(
     email: string,
@@ -131,7 +133,7 @@ export const usersRepository = {
         },
       },
     );
-  },
+  }
 
   async getUserByRecoveryCodeOrFail(
     recoveryCode: string,
@@ -145,7 +147,7 @@ export const usersRepository = {
     }
 
     return user;
-  },
+  }
 
   async updatePasswordHash(
     userId: ObjectId,
@@ -167,5 +169,5 @@ export const usersRepository = {
     if (updateResult.matchedCount === 0) {
       throw new ServerError("User's password was not updated");
     }
-  },
-};
+  }
+}

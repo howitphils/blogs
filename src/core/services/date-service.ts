@@ -1,10 +1,12 @@
 import { addHours, addSeconds } from "date-fns";
+import { injectable } from "inversify";
 
-export const dateService = {
+@injectable()
+export class DateService {
   addHours(hours: number) {
     return addHours(new Date(), hours);
-  },
+  }
   addSeconds(seconds: number) {
     return addSeconds(new Date(), seconds);
-  },
-};
+  }
+}

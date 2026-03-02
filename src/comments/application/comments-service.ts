@@ -1,7 +1,8 @@
+import { UsersRepository } from "./../../users/repository/users-repository";
+import { inject, injectable } from "inversify";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { postsRepository } from "../../posts/repository/posts-repository";
-import { usersRepository } from "../../users/repository/users-repository";
 import { commentsRepository } from "../repository/comments-repository";
 import {
   CommentDbModel,
@@ -9,11 +10,16 @@ import {
   UpdateCommentDto,
 } from "../types/comments-types";
 
-export const commentsService = {
+@injectable()
+export class CommentsService {
+  constructor(
+    @inject(UsersRepository) private usersRepository: UsersRepository,
+  ) {}
+
   async createComment(dto: CreateCommentDto): Promise<string> {
     await postsRepository.getPostByIdOrFail(dto.postId);
 
-    const user = await usersRepository.getUserByIdOrFail(dto.userId);
+    const user = await this.usersRepository.getUserByIdOrFail(dto.userId);
 
     const newComment: CommentDbModel = {
       content: dto.content,
@@ -24,7 +30,7 @@ export const commentsService = {
     };
 
     return commentsRepository.createComment(newComment);
-  },
+  }
 
   async updateComment(dto: UpdateCommentDto): Promise<void> {
     const comment = await commentsRepository.getCommentByIdOrFail(dto.id);
@@ -38,7 +44,7 @@ export const commentsService = {
     if (!updateResult) {
       throw new ServerError("Comment was not updated");
     }
-  },
+  }
 
   async deleteComment(id: string, userId: string): Promise<void> {
     const comment = await commentsRepository.getCommentByIdOrFail(id);
@@ -52,5 +58,5 @@ export const commentsService = {
     if (!deleteResult) {
       throw new ServerError("Comment was not deleted");
     }
-  },
-};
+  }
+}

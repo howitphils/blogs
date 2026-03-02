@@ -10,8 +10,10 @@ import { UserNotFoundError } from "../application/errors/users-errors";
 import { MeInfoViewModel } from "../types/auth-types";
 import { SessionViewModel } from "../types/sessions-types";
 import { User } from "../application/classes/user";
+import { injectable } from "inversify";
 
-export const usersQueryRepository = {
+@injectable()
+export class UsersQueryRepository {
   async getUsers(
     params: UserQueryParams,
   ): Promise<PaginationType<UserViewModel>> {
@@ -39,9 +41,9 @@ export const usersQueryRepository = {
       pagesCount: calculatePagesCount(totalCount, pageSize),
       pageSize,
       totalCount,
-      items: users.map(usersQueryRepository.mapFromDbToView),
+      items: users.map(this.mapFromDbToView),
     };
-  },
+  }
 
   async getCreatedUser(id: string): Promise<UserViewModel> {
     const user = await usersCollection.findOne({ _id: new ObjectId(id) });
@@ -50,8 +52,8 @@ export const usersQueryRepository = {
       throw new ServerError("Created user is not found");
     }
 
-    return usersQueryRepository.mapFromDbToView(user);
-  },
+    return this.mapFromDbToView(user);
+  }
 
   async getMyInfo(userId: string): Promise<MeInfoViewModel> {
     const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
@@ -65,7 +67,7 @@ export const usersQueryRepository = {
       email: user.accountData.email,
       userId: user._id.toString(),
     };
-  },
+  }
 
   async getUsersSessions(userId: string): Promise<SessionViewModel[]> {
     const sessions = await sessionsCollection.find({ userId }).toArray();
@@ -76,7 +78,7 @@ export const usersQueryRepository = {
       lastActiveDate: session.iat,
       title: session.deviceName,
     }));
-  },
+  }
 
   mapFromDbToView(user: WithId<User>): UserViewModel {
     return {
@@ -85,5 +87,5 @@ export const usersQueryRepository = {
       login: user.accountData.login,
       createdAt: user.accountData.createdAt,
     };
-  },
-};
+  }
+}

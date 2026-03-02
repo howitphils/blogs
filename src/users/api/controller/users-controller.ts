@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import {
   RequestWithParamsId,
@@ -10,44 +10,49 @@ import {
   UserViewModel,
   UserQueryParams,
 } from "../../types/users-types";
-import { usersService } from "../../application/users-service";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { matchedData } from "express-validator";
-import { usersQueryRepository } from "../../repository/users-query-repository";
+import { UsersService } from "../../application/users-service";
+import { UsersQueryRepository } from "../../repository/users-query-repository";
+import { inject, injectable } from "inversify";
 
-export const usersController = {
-  getUsers: async (
+@injectable()
+export class UsersController {
+  constructor(
+    @inject(UsersService)
+    private usersService: UsersService,
+
+    @inject(UsersQueryRepository)
+    private usersQueryRepository: UsersQueryRepository,
+  ) {}
+
+  async getUsers(
     req: RequestWithQuery<UserQueryParams>,
     res: Response<PaginationType<UserViewModel>>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const sortParams = matchedData<UserQueryParams>(req);
 
-    const users = await usersQueryRepository.getUsers(sortParams);
+    const users = await this.usersQueryRepository.getUsers(sortParams);
 
     return res.status(HttpStatus.OK).json(users);
-  },
+  }
 
-  createUser: async (
+  async createUser(
     req: RequestWithBody<UserInputModel>,
     res: Response<UserViewModel>,
-    next: NextFunction,
-  ) => {
-    const newUserId = await usersService.addUser(req.body);
+  ): Promise<Response> {
+    const newUserId = await this.usersService.addUser(req.body);
 
-    const newUser = await usersQueryRepository.getCreatedUser(newUserId);
+    const newUser = await this.usersQueryRepository.getCreatedUser(newUserId);
 
-    res.status(HttpStatus.CREATED).json(newUser);
-    return;
-  },
+    return res.status(HttpStatus.CREATED).json(newUser);
+  }
 
-  deleteUser: async (
-    req: RequestWithParamsId,
-    res: Response,
-  ): Promise<Response> => {
+  async deleteUser(req: RequestWithParamsId, res: Response): Promise<Response> {
     const userId = req.params.id;
 
-    await usersService.deleteUser(userId);
+    await this.usersService.deleteUser(userId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
-};
+  }
+}

@@ -1,14 +1,18 @@
 import { Response, NextFunction, Request } from "express";
-import { tokenService } from "../../services/token-service";
+import { TokenService } from "../../services/token-service";
 import { UnauthorizedError } from "../error-handling/custom-errors/unauthorized-error";
 import { appConfig } from "../../../app-config";
-import { sessionsRepository } from "../../../users/repository/sessions-repository";
+import { SessionsRepository } from "../../../users/repository/sessions-repository";
+import { container } from "../../../composition-root";
 
 export const cookieAuthGuard = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const sessionsRepository = container.get(SessionsRepository);
+  const tokenService = container.get(TokenService);
+
   const refreshToken = req.cookies[appConfig.REFRESH_COOKIE_NAME];
 
   if (!refreshToken) {

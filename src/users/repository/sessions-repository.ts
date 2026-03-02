@@ -2,13 +2,15 @@ import { sessionsCollection } from "../../db/mongodb";
 import { SessionDbModel } from "../types/sessions-types";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { NotFoundError } from "../../core/middlewares/error-handling/custom-errors/not-found-error";
+import { injectable } from "inversify";
 
-export const sessionsRepository = {
+@injectable()
+export class SessionsRepository {
   async createSession(session: SessionDbModel): Promise<string> {
     const { insertedId } = await sessionsCollection.insertOne(session);
 
     return insertedId.toString();
-  },
+  }
 
   async deleteSession(userId: string, deviceId: string) {
     const deleteResult = await sessionsCollection.deleteOne({
@@ -19,7 +21,7 @@ export const sessionsRepository = {
     if (deleteResult.deletedCount === 0) {
       throw new ServerError("Session was not deleted");
     }
-  },
+  }
 
   async deleteAllSessions(userId: string, deviceId: string) {
     const deleteResult = await sessionsCollection.deleteMany({
@@ -30,7 +32,7 @@ export const sessionsRepository = {
     if (deleteResult.deletedCount === 0) {
       throw new ServerError("Sessions were not deleted");
     }
-  },
+  }
 
   async getSessionByDeviceIdOrFail(deviceId: string): Promise<SessionDbModel> {
     const session = await sessionsCollection.findOne({
@@ -42,7 +44,7 @@ export const sessionsRepository = {
     }
 
     return session;
-  },
+  }
 
   async updateSessionIatAndExp(
     deviceId: string,
@@ -57,5 +59,5 @@ export const sessionsRepository = {
     if (updateResult.matchedCount === 0) {
       throw new ServerError("Session was not updated");
     }
-  },
-};
+  }
+}

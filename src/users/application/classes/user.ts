@@ -1,6 +1,3 @@
-import { dateService } from "../../../core/services/date-service";
-import { tokenService } from "../../../core/services/token-service";
-
 export class User {
   accountData: {
     login: string;

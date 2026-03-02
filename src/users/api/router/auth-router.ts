@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { authController } from "../controller/auth-controller";
 import { validateLoginBody } from "../validations/login-body-validations";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth";
@@ -10,15 +9,19 @@ import { validateEmailBody } from "../validations/resend-email-body-validations"
 import { cookieAuthGuard } from "../../../core/middlewares/authentication/cookie-auth";
 import { rateLimiter } from "../../../core/middlewares/rate-limiting/rate-limiter";
 import { validateNewPasswordBody } from "../validations/new-password-body-validations";
+import { container } from "../../../composition-root";
+import { AuthController } from "../controller/auth-controller";
 
 export const authRouter = Router();
+
+const authController = container.get(AuthController);
 
 authRouter.post(
   "/login",
   rateLimiter,
   validateLoginBody,
   validationChainResult,
-  authController.loginUser,
+  authController.loginUser.bind(authController),
 );
 
 authRouter.post(
@@ -26,7 +29,7 @@ authRouter.post(
   rateLimiter,
   validateEmailBody,
   validationChainResult,
-  authController.recoverPassword,
+  authController.recoverPassword.bind(authController),
 );
 
 authRouter.post(
@@ -34,21 +37,21 @@ authRouter.post(
   rateLimiter,
   validateNewPasswordBody,
   validationChainResult,
-  authController.updatePassword,
+  authController.updatePassword.bind(authController),
 );
 
 authRouter.post(
   "/refresh-token",
   cookieAuthGuard,
   checkUserInReq,
-  authController.refreshTokens,
+  authController.refreshTokens.bind(authController),
 );
 
 authRouter.post(
   "/logout",
   cookieAuthGuard,
   checkUserInReq,
-  authController.logout,
+  authController.logout.bind(authController),
 );
 
 authRouter.post(
@@ -56,7 +59,7 @@ authRouter.post(
   rateLimiter,
   validateConfirmEmailBody,
   validationChainResult,
-  authController.confirmEmail,
+  authController.confirmEmail.bind(authController),
 );
 
 authRouter.post(
@@ -64,15 +67,20 @@ authRouter.post(
   rateLimiter,
   validateEmailBody,
   validationChainResult,
-  authController.resendEmail,
+  authController.resendEmail.bind(authController),
 );
 
-authRouter.get("/me", jwtAuthGuard, checkUserInReq, authController.getMyInfo);
+authRouter.get(
+  "/me",
+  jwtAuthGuard,
+  checkUserInReq,
+  authController.getMyInfo.bind(authController),
+);
 
 authRouter.post(
   "/registration",
   rateLimiter,
   validateUserBody,
   validationChainResult,
-  authController.registerUser,
+  authController.registerUser.bind(authController),
 );
