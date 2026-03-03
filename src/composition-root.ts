@@ -12,6 +12,8 @@ import { DateService } from "./core/services/date-service";
 import { EmailService } from "./core/services/email-service/email-service";
 import { TokenService } from "./core/services/token-service";
 import { CommentsService } from "./comments/application/comments-service";
+import { CommentsController } from "./comments/api/controller/comments-controller";
+import { CommentsRepository } from "./comments/repository/comments-repository";
 
 export const container = new Container();
 
@@ -23,6 +25,7 @@ container.bind(DateService).to(DateService);
 container.bind(UsersRepository).to(UsersRepository);
 container.bind(SessionsRepository).to(SessionsRepository);
 container.bind(UsersQueryRepository).to(UsersQueryRepository);
+container.bind(CommentsRepository).to(CommentsRepository);
 
 container.bind(UsersService).to(UsersService);
 container.bind(CommentsService).to(CommentsService);
@@ -30,3 +33,4 @@ container.bind(CommentsService).to(CommentsService);
 container.bind(UsersController).to(UsersController);
 container.bind(SessionsController).to(SessionsController);
 container.bind(AuthController).to(AuthController);
+container.bind(CommentsController).to(CommentsController);

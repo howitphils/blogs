@@ -24,12 +24,14 @@ export class UsersRepository {
     return insertedId.toString();
   }
 
-  async deleteUser(userId: string): Promise<boolean> {
+  async deleteUser(userId: string): Promise<void> {
     const deleteResult = await usersCollection.deleteOne({
       _id: new ObjectId(userId),
     });
 
-    return deleteResult.deletedCount !== 0;
+    if (deleteResult.deletedCount === 0) {
+      throw new ServerError("User was not deleted");
+    }
   }
 
   async getExistingUser(
@@ -75,13 +77,19 @@ export class UsersRepository {
     });
   }
 
-  async getUserByConfirmationCode(code: string): Promise<WithId<User> | null> {
-    return usersCollection.findOne({
+  async getUserByConfirmationCodeOrFail(code: string): Promise<WithId<User>> {
+    const user = await usersCollection.findOne({
       "emailConfirmation.confirmationCode": code,
     });
+
+    if (!user) {
+      throw new UserNotFoundError();
+    }
+
+    return user;
   }
 
-  async updateIsConfirmed(code: string): Promise<boolean> {
+  async updateIsConfirmed(code: string): Promise<void> {
     const updateResult = await usersCollection.updateOne(
       {
         "emailConfirmation.confirmationCode": code,
@@ -94,14 +102,16 @@ export class UsersRepository {
       },
     );
 
-    return updateResult.matchedCount !== 0;
+    if (updateResult.matchedCount === 0) {
+      throw new ServerError("Confirmation status was not updated");
+    }
   }
 
   async updateConfirmationCodeAndExp(
     email: string,
     code: string,
     expDate: Date,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const updateResult = await usersCollection.updateOne(
       {
         "accountData.email": email,
@@ -114,7 +124,9 @@ export class UsersRepository {
       },
     );
 
-    return updateResult.matchedCount !== 0;
+    if (updateResult.matchedCount === 0) {
+      throw new ServerError("Confirmation code was not updated");
+    }
   }
 
   async updateRecoveryCode(
@@ -122,7 +134,7 @@ export class UsersRepository {
     recoveryCode: string,
     expDate: Date,
   ): Promise<void> {
-    await usersCollection.updateOne(
+    const updateResult = await usersCollection.updateOne(
       {
         "accountData.email": email,
       },
@@ -133,6 +145,10 @@ export class UsersRepository {
         },
       },
     );
+
+    if (updateResult.matchedCount === 0) {
+      throw new ServerError("User's recovery code was not updated");
+    }
   }
 
   async getUserByRecoveryCodeOrFail(

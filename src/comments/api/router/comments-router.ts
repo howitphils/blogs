@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
-import { commentsController } from "../controller/comments-controller";
 import { validateCommentBody } from "../validations/comment-body-validations";
 import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth";
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
+import { container } from "../../../composition-root";
+import { CommentsController } from "../controller/comments-controller";
+
+const commentsController = container.get(CommentsController);
 
 export const commentsRouter = Router();
 
@@ -12,8 +15,9 @@ commentsRouter.get(
   "/:id",
   validateParamsId,
   validationChainResult,
-  commentsController.getCommentById,
+  commentsController.getCommentById.bind(commentsController),
 );
+
 commentsRouter.put(
   "/:id",
   jwtAuthGuard,
@@ -21,13 +25,14 @@ commentsRouter.put(
   validateParamsId,
   validateCommentBody,
   validationChainResult,
-  commentsController.updateComment,
+  commentsController.updateComment.bind(commentsController),
 );
+
 commentsRouter.delete(
   "/:id",
   jwtAuthGuard,
   checkUserInReq,
   validateParamsId,
   validationChainResult,
-  commentsController.deleteComment,
+  commentsController.deleteComment.bind(commentsController),
 );

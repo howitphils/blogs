@@ -2,13 +2,15 @@ import { ObjectId, WithId } from "mongodb";
 import { CommentDbModel, UpdateCommentDto } from "../types/comments-types";
 import { commentsCollection } from "../../db/mongodb";
 import { CommentNotFoundError } from "../application/errors/comments-errors";
+import { injectable } from "inversify";
 
-export const commentsRepository = {
+@injectable()
+export class CommentsRepository {
   async createComment(dto: CommentDbModel): Promise<string> {
     const { insertedId } = await commentsCollection.insertOne(dto);
 
     return insertedId.toString();
-  },
+  }
 
   async getCommentByIdOrFail(
     CommentId: string,
@@ -22,7 +24,7 @@ export const commentsRepository = {
     }
 
     return comment;
-  },
+  }
 
   async updateComment(dto: UpdateCommentDto): Promise<boolean> {
     const updateResult = await commentsCollection.updateOne(
@@ -35,7 +37,7 @@ export const commentsRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
+  }
 
   async deleteComment(CommentId: string): Promise<boolean> {
     const deleteResult = await commentsCollection.deleteOne({
@@ -43,5 +45,5 @@ export const commentsRepository = {
     });
 
     return deleteResult.deletedCount !== 0;
-  },
-};
+  }
+}

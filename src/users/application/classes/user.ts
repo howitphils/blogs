@@ -19,6 +19,8 @@ export class User {
     login: string,
     email: string,
     passwordHash: string,
+    confirmationCode: string,
+    expDate: Date,
     isConfirmed: boolean,
   ) {
     this.accountData = {
@@ -28,8 +30,8 @@ export class User {
       createdAt: new Date().toISOString(),
     };
     this.emailConfirmation = {
-      confirmationCode: tokenService.createRandomCode(),
-      expDate: dateService.addHours(2),
+      confirmationCode,
+      expDate,
       isConfirmed,
     };
     this.passwordRecovery = {

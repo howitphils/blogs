@@ -8,7 +8,10 @@ import { validateQueryParams } from "../../../core/middlewares/validation/base-q
 import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth";
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
 import { validateCommentBody } from "../../../comments/api/validations/comment-body-validations";
-import { commentsController } from "../../../comments/api/controller/comments-controller";
+import { container } from "../../../composition-root";
+import { CommentsController } from "../../../comments/api/controller/comments-controller";
+
+const commentsController = container.get(CommentsController);
 
 export const postsRouter = Router();
 
@@ -52,7 +55,7 @@ postsRouter.get(
   validateParamsId,
   validateQueryParams,
   validationChainResult,
-  commentsController.getAllComments,
+  commentsController.getAllComments.bind(commentsController),
 );
 postsRouter.post(
   "/:id/comments",
@@ -61,5 +64,5 @@ postsRouter.post(
   validateParamsId,
   validateCommentBody,
   validationChainResult,
-  commentsController.createComment,
+  commentsController.createComment.bind(commentsController),
 );

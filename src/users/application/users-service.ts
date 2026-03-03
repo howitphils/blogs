@@ -14,6 +14,7 @@ import { DateService } from "../../core/services/date-service";
 import { PasswordService } from "../../core/services/password-service";
 import { SessionsRepository } from "../repository/sessions-repository";
 import { inject, injectable } from "inversify";
+import { appSettings } from "../../app-settings";
 
 @injectable()
 export class UsersService {
@@ -27,20 +28,16 @@ export class UsersService {
   ) {}
 
   async addUser(dto: UserInputModel): Promise<string> {
-    await this._checkUnique(dto.login, dto.email);
+    await this.checkUnique(dto.login, dto.email);
 
-    const passwordHash = await this.passwordService.generateHash(dto.password);
-    const user = new User(dto.login, dto.email, passwordHash, true);
+    const user = await this.userFactory(dto, true);
 
     return this.usersRepository.createUser(user);
   }
 
-  async deleteUser(blogId: string): Promise<void> {
-    const isDeleted = await this.usersRepository.deleteUser(blogId);
-
-    if (!isDeleted) {
-      throw new UserNotFoundError();
-    }
+  async deleteUser(id: string): Promise<void> {
+    await this.usersRepository.getUserByIdOrFail(id);
+    await this.usersRepository.deleteUser(id);
   }
 
   async loginUser(dto: LoginInfo): Promise<TokenPairModel> {
@@ -88,17 +85,16 @@ export class UsersService {
   }
 
   async registerUser(dto: UserInputModel): Promise<void> {
-    await this._checkUnique(dto.login, dto.email);
+    await this.checkUnique(dto.login, dto.email);
 
-    const passwordHash = await this.passwordService.generateHash(dto.password);
-    const user = new User(dto.login, dto.email, passwordHash, false);
+    const user = await this.userFactory(dto, false);
 
     await this.usersRepository.createUser(user);
 
     this.emailService
       .sendRegistrationEmail(dto.email, user.emailConfirmation.confirmationCode)
       .catch((err) => {
-        console.log("registration", err);
+        console.log(appSettings.emailSubjects.registration, err);
       });
   }
 
@@ -124,8 +120,9 @@ export class UsersService {
     await this.sessionsRepository.deleteSession(userId, deviceId);
   }
 
-  async confirmEmail(code: string): Promise<boolean> {
-    const user = await this.usersRepository.getUserByConfirmationCode(code);
+  async confirmEmail(code: string): Promise<void> {
+    const user =
+      await this.usersRepository.getUserByConfirmationCodeOrFail(code);
 
     if (!user) {
       throw new UserNotFoundError();
@@ -139,16 +136,10 @@ export class UsersService {
       throw new BadRequestError("Confirmation code is already expired");
     }
 
-    const updateResult = await this.usersRepository.updateIsConfirmed(code);
-
-    if (!updateResult) {
-      throw new ServerError("User was not updated");
-    }
-
-    return updateResult;
+    await this.usersRepository.updateIsConfirmed(code);
   }
 
-  async resendEmail(email: string): Promise<boolean> {
+  async resendEmail(email: string): Promise<void> {
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
 
     if (!user) {
@@ -162,22 +153,17 @@ export class UsersService {
     const newConfirmationCode = this.tokenService.createRandomCode();
     const newExpDate = this.dateService.addHours(2);
 
-    const updateResult =
-      await this.usersRepository.updateConfirmationCodeAndExp(
-        email,
-        newConfirmationCode,
-        newExpDate,
-      );
+    await this.usersRepository.updateConfirmationCodeAndExp(
+      email,
+      newConfirmationCode,
+      newExpDate,
+    );
 
-    if (!updateResult) {
-      throw new ServerError(
-        "User was not updated with new email resending values",
-      );
-    }
-
-    this.emailService.sendRegistrationEmail(email, newConfirmationCode);
-
-    return updateResult;
+    this.emailService
+      .sendRegistrationEmail(email, newConfirmationCode)
+      .catch((err) => {
+        console.log(appSettings.emailSubjects.registration, err);
+      });
   }
 
   async deleteUsersSession(deviceId: string, userId: string): Promise<void> {
@@ -211,7 +197,7 @@ export class UsersService {
     this.emailService
       .sendPasswordRecoveryEmail(email, recoveryCode)
       .catch((err) => {
-        console.log("password recovery", err);
+        console.log(appSettings.emailSubjects.passwordRecovery, err);
       });
   }
 
@@ -231,7 +217,7 @@ export class UsersService {
     await this.usersRepository.updatePasswordHash(user._id, passwordHash);
   }
 
-  async _checkUnique(login: string, email: string): Promise<void> {
+  private async checkUnique(login: string, email: string): Promise<void> {
     const existingUser = await this.usersRepository.getExistingUser(
       login,
       email,
@@ -243,5 +229,22 @@ export class UsersService {
 
       throw new NotUniqueUserError(field);
     }
+  }
+
+  private async userFactory(dto: UserInputModel, isConfirmed: boolean) {
+    const confirmationCode = this.tokenService.createRandomCode();
+    const expDate = this.dateService.addHours(2);
+    const passwordHash = await this.passwordService.generateHash(dto.password);
+
+    const user = new User(
+      dto.login,
+      dto.email,
+      passwordHash,
+      confirmationCode,
+      expDate,
+      isConfirmed,
+    );
+
+    return user;
   }
 }

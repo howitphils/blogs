@@ -1,3 +1,4 @@
+import { CommentsService } from "./../../application/comments-service";
 import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import {
@@ -15,13 +16,18 @@ import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { matchedData } from "express-validator";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { commentsQueryRepository } from "../../repository/comments-query-repository";
-import { commentsService } from "../../application/comments-service";
+import { inject, injectable } from "inversify";
 
-export const commentsController = {
-  getAllComments: async (
+@injectable()
+export class CommentsController {
+  constructor(
+    @inject(CommentsService) private commentsService: CommentsService,
+  ) {}
+
+  async getAllComments(
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
     res: Response<PaginationType<CommentViewModel>>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const postId = req.params.id;
     const sortParams = matchedData<BaseQueryParams>(req);
 
@@ -31,61 +37,62 @@ export const commentsController = {
     );
 
     return res.status(HttpStatus.OK).json(comments);
-  },
+  }
 
-  getCommentById: async (
+  async getCommentById(
     req: RequestWithParamsId,
     res: Response<CommentViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const commentId = req.params.id;
 
     const comment =
       await commentsQueryRepository.getCommentByIdOrFail(commentId);
 
     return res.status(HttpStatus.OK).json(comment);
-  },
+  }
 
-  createComment: async (
+  async createComment(
     req: RequestWithParamsIdAndBody<CommentInputModel>,
     res: Response<CommentViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const createCommentDto: CreateCommentDto = {
       content: req.body.content,
       postId: req.params.id,
       userId: req.user.userId,
     };
 
-    const newCommentId = await commentsService.createComment(createCommentDto);
+    const newCommentId =
+      await this.commentsService.createComment(createCommentDto);
 
     const newComment =
       await commentsQueryRepository.getCreatedComment(newCommentId);
 
     return res.status(HttpStatus.CREATED).json(newComment);
-  },
+  }
 
-  updateComment: async (
+  async updateComment(
     req: RequestWithParamsIdAndBody<CommentInputModel>,
     res: Response,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const updateCommendDto: UpdateCommentDto = {
       id: req.params.id,
       content: req.body.content,
       userId: req.user.userId,
     };
 
-    await commentsService.updateComment(updateCommendDto);
+    await this.commentsService.updateComment(updateCommendDto);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
+  }
 
-  deleteComment: async (
+  async deleteComment(
     req: RequestWithParamsId,
     res: Response,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const commentId = req.params.id;
 
-    await commentsService.deleteComment(commentId, req.user.userId);
+    await this.commentsService.deleteComment(commentId, req.user.userId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
-};
+  }
+}

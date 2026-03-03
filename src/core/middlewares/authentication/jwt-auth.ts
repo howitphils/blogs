@@ -1,12 +1,15 @@
 import { Response, NextFunction, Request } from "express";
-import { tokenService } from "../../services/token-service";
 import { UnauthorizedError } from "../error-handling/custom-errors/unauthorized-error";
+import { container } from "../../../composition-root";
+import { TokenService } from "../../services/token-service";
 
 export const jwtAuthGuard = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
+  const tokenService = container.get(TokenService);
+
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     throw new UnauthorizedError("Authorization header is required");
