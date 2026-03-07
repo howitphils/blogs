@@ -23,16 +23,16 @@ export class EmailService {
     });
   }
 
-  async sendRegistrationEmail(email: string, code: string) {
-    this.sendEmail(
+  async sendRegistrationEmail(email: string, code: string): Promise<void> {
+    return this.sendEmail(
       email,
       appSettings.emailSubjects.registration,
       emailTemplates.getRegistrationTemplate(code),
     );
   }
 
-  async sendPasswordRecoveryEmail(email: string, code: string) {
-    this.sendEmail(
+  async sendPasswordRecoveryEmail(email: string, code: string): Promise<void> {
+    return this.sendEmail(
       email,
       appSettings.emailSubjects.passwordRecovery,
       emailTemplates.getPasswordRecoveryTemplate(code),
