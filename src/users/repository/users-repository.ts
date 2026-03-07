@@ -5,11 +5,12 @@ import { UserNotFoundError } from "../application/errors/users-errors";
 import { User } from "../application/classes/user";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { injectable } from "inversify";
+import { UserDbDocumentType, UserModel } from "./schemas/user-schema";
 
 @injectable()
 export class UsersRepository {
-  async getUserByIdOrFail(id: string): Promise<WithId<User>> {
-    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
+  async getUserByIdOrFail(id: string): Promise<Promise<UserDbDocumentType>> {
+    const user = await UserModel.findById(id);
 
     if (!user) {
       throw new UserNotFoundError();
