@@ -1,5 +1,6 @@
-import { blogsRepository } from "../../blogs/repository/blogs-repository";
-import { postsRepository } from "../repository/posts-repository";
+import { PostsRepository } from "./../repository/posts-repository";
+import { inject, injectable } from "inversify";
+import { BlogsRepository } from "../../blogs/repository/blogs-repository";
 import {
   PostDbModel,
   PostInputModel,
@@ -7,9 +8,15 @@ import {
 } from "../types/posts-types";
 import { PostNotFoundError } from "./errors/posts-errors";
 
-export const postsService = {
+@injectable()
+export class PostsService {
+  constructor(
+    @inject(BlogsRepository) private blogsRepository: BlogsRepository,
+    @inject(PostsRepository) private postsRepository: PostsRepository,
+  ) {}
+
   async createPost(dto: PostInputModel): Promise<string> {
-    const blog = await blogsRepository.getBlogByIdOrFail(dto.blogId);
+    const blog = await this.blogsRepository.getBlogByIdOrFail(dto.blogId);
 
     const newPost: PostDbModel = {
       title: dto.title,
@@ -20,22 +27,22 @@ export const postsService = {
       shortDescription: dto.shortDescription,
     };
 
-    return postsRepository.createPost(newPost);
-  },
+    return this.postsRepository.createPost(newPost);
+  }
 
   async updatePost(dto: UpdatePostDtoModel): Promise<void> {
-    const updateResult = await postsRepository.updatePost(dto);
+    const updateResult = await this.postsRepository.updatePost(dto);
 
     if (!updateResult) {
       throw new PostNotFoundError();
     }
-  },
+  }
 
   async deletePost(postId: string): Promise<void> {
-    const deleteResult = await postsRepository.deletePost(postId);
+    const deleteResult = await this.postsRepository.deletePost(postId);
 
     if (!deleteResult) {
       throw new PostNotFoundError();
     }
-  },
-};
+  }
+}

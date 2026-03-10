@@ -3,11 +3,18 @@ import { postsCollection } from "../../db/mongodb";
 import { PostDbModel, PostViewModel } from "../types/posts-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
-import { blogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
 import { PostNotFoundError } from "../application/errors/posts-errors";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { BlogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
+import { inject, injectable } from "inversify";
 
-export const postsQueryRepository = {
+@injectable()
+export class PostsQueryRepository {
+  constructor(
+    @inject(BlogsQueryRepository)
+    private blogsQueryRepository: BlogsQueryRepository,
+  ) {}
+
   async getPosts(
     params: BaseQueryParams,
     blogId?: string,
@@ -17,7 +24,7 @@ export const postsQueryRepository = {
     let filter = {};
 
     if (blogId) {
-      await blogsQueryRepository.getBlogByIdOrFail(blogId);
+      await this.blogsQueryRepository.getBlogByIdOrFail(blogId);
 
       filter = { blogId };
     }
@@ -38,9 +45,9 @@ export const postsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize,
       totalCount,
-      items: posts.map(postsQueryRepository.mapFromDbToView),
+      items: posts.map(this.mapFromDbToView),
     };
-  },
+  }
 
   async getPostByIdOrFail(id: string): Promise<PostViewModel> {
     const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
@@ -49,8 +56,8 @@ export const postsQueryRepository = {
       throw new PostNotFoundError();
     }
 
-    return postsQueryRepository.mapFromDbToView(dbPost);
-  },
+    return this.mapFromDbToView(dbPost);
+  }
 
   async getCreatedPost(id: string): Promise<PostViewModel> {
     const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
@@ -59,10 +66,10 @@ export const postsQueryRepository = {
       throw new ServerError("Created post was not found");
     }
 
-    return postsQueryRepository.mapFromDbToView(dbPost);
-  },
+    return this.mapFromDbToView(dbPost);
+  }
 
-  mapFromDbToView(post: WithId<PostDbModel>): PostViewModel {
+  private mapFromDbToView(post: WithId<PostDbModel>): PostViewModel {
     return {
       id: post._id.toString(),
       blogId: post.blogId,
@@ -72,5 +79,5 @@ export const postsQueryRepository = {
       title: post.title,
       createdAt: post.createdAt,
     };
-  },
-};
+  }
+}

@@ -8,8 +8,10 @@ import { blogsCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BlogNotFoundError } from "../application/errors/blogs-errors";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
+import { injectable } from "inversify";
 
-export const blogsQueryRepository = {
+@injectable()
+export class BlogsQueryRepository {
   async getBlogs(
     params: BlogQueryParams,
   ): Promise<PaginationType<BlogViewModel>> {
@@ -36,9 +38,9 @@ export const blogsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize,
       totalCount,
-      items: blogs.map(blogsQueryRepository.mapFromDbToView),
+      items: blogs.map(this.mapFromDbToView),
     };
-  },
+  }
 
   async getBlogByIdOrFail(id: string): Promise<BlogViewModel> {
     const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
@@ -47,8 +49,8 @@ export const blogsQueryRepository = {
       throw new BlogNotFoundError();
     }
 
-    return blogsQueryRepository.mapFromDbToView(dbBlog);
-  },
+    return this.mapFromDbToView(dbBlog);
+  }
 
   async getCreatedBlog(id: string): Promise<BlogViewModel> {
     const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
@@ -57,10 +59,10 @@ export const blogsQueryRepository = {
       throw new ServerError("Created blog was not found");
     }
 
-    return blogsQueryRepository.mapFromDbToView(dbBlog);
-  },
+    return this.mapFromDbToView(dbBlog);
+  }
 
-  mapFromDbToView(blog: WithId<BlogDbModel>): BlogViewModel {
+  private mapFromDbToView(blog: WithId<BlogDbModel>): BlogViewModel {
     return {
       id: blog._id.toString(),
       description: blog.description,
@@ -69,5 +71,5 @@ export const blogsQueryRepository = {
       createdAt: blog.createdAt,
       isMemberShip: blog.isMemberShip,
     };
-  },
-};
+  }
+}

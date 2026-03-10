@@ -14,6 +14,14 @@ import { TokenService } from "./core/services/token-service";
 import { CommentsService } from "./comments/application/comments-service";
 import { CommentsController } from "./comments/api/controller/comments-controller";
 import { CommentsRepository } from "./comments/repository/comments-repository";
+import { BlogsController } from "./blogs/api/controller/blogs-controller";
+import { BlogsService } from "./blogs/application/blogs-service";
+import { BlogsRepository } from "./blogs/repository/blogs-repository";
+import { BlogsQueryRepository } from "./blogs/repository/blogs-query-repository";
+import { PostsRepository } from "./posts/repository/posts-repository";
+import { PostsQueryRepository } from "./posts/repository/posts-query-repository";
+import { PostsService } from "./posts/application/posts-service";
+import { PostsController } from "./posts/api/controller/posts-controller";
 
 export const container = new Container();
 
@@ -26,11 +34,19 @@ container.bind(UsersRepository).to(UsersRepository);
 container.bind(SessionsRepository).to(SessionsRepository);
 container.bind(UsersQueryRepository).to(UsersQueryRepository);
 container.bind(CommentsRepository).to(CommentsRepository);
+container.bind(BlogsRepository).to(BlogsRepository);
+container.bind(BlogsQueryRepository).to(BlogsQueryRepository);
+container.bind(PostsRepository).to(PostsRepository);
+container.bind(PostsQueryRepository).to(PostsQueryRepository);
 
 container.bind(UsersService).to(UsersService);
 container.bind(CommentsService).to(CommentsService);
+container.bind(BlogsService).to(BlogsService);
+container.bind(PostsService).to(PostsService);
 
 container.bind(UsersController).to(UsersController);
 container.bind(SessionsController).to(SessionsController);
 container.bind(AuthController).to(AuthController);
 container.bind(CommentsController).to(CommentsController);
+container.bind(BlogsController).to(BlogsController);
+container.bind(PostsController).to(PostsController);

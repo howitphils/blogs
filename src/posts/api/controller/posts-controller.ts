@@ -1,3 +1,4 @@
+import { PostsQueryRepository } from "./../../repository/posts-query-repository";
 import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
 import {
@@ -6,71 +7,77 @@ import {
   RequestWithParamsIdAndBody,
   RequestWithQuery,
 } from "../../../core/types/request-types";
-import { postsQueryRepository } from "../../repository/posts-query-repository";
 import { PostViewModel, PostInputModel } from "../../types/posts-types";
-import { postsService } from "../../application/posts-service";
 import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { matchedData } from "express-validator";
 import { PaginationType } from "../../../core/types/pagination-types";
+import { inject, injectable } from "inversify";
+import { PostsService } from "../../application/posts-service";
 
-export const postsController = {
-  getAllPosts: async (
+@injectable()
+export class PostsController {
+  constructor(
+    @inject(PostsService)
+    private postsService: PostsService,
+
+    @inject(PostsQueryRepository)
+    private postsQueryRepository: PostsQueryRepository,
+  ) {}
+
+  async getAllPosts(
     req: RequestWithQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const sortParams = matchedData<BaseQueryParams>(req);
 
-    const posts = await postsQueryRepository.getPosts(sortParams);
+    const posts = await this.postsQueryRepository.getPosts(sortParams);
 
     return res.status(HttpStatus.OK).json(posts);
-  },
+  }
 
-  getPostById: async (
+  async getPostById(
     req: RequestWithParamsId,
     res: Response<PostViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const postId = req.params.id;
-    const post = await postsQueryRepository.getPostByIdOrFail(postId);
+    const post = await this.postsQueryRepository.getPostByIdOrFail(postId);
 
     return res.status(HttpStatus.OK).json(post);
-  },
+  }
 
-  createPost: async (
+  async createPost(
     req: RequestWithBody<PostInputModel>,
     res: Response<PostViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const dto = req.body;
 
-    const newPostId = await postsService.createPost(dto);
+    const newPostId = await this.postsService.createPost(dto);
 
-    const newPost = await postsQueryRepository.getCreatedPost(newPostId);
+    const newPost = await this.postsQueryRepository.getCreatedPost(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
-  },
+  }
 
-  updatePost: async (
+  async updatePost(
     req: RequestWithParamsIdAndBody<PostInputModel>,
     res: Response,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const postId = req.params.id;
     const dto = req.body;
 
-    await postsService.updatePost({
+    await this.postsService.updatePost({
       id: postId,
       ...dto,
     });
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
+  }
 
-  deletePost: async (
-    req: RequestWithParamsId,
-    res: Response,
-  ): Promise<Response> => {
+  async deletePost(req: RequestWithParamsId, res: Response): Promise<Response> {
     const postId = req.params.id;
 
-    await postsService.deletePost(postId);
+    await this.postsService.deletePost(postId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
-};
+  }
+}

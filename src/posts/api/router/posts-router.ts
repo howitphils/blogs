@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { postsController } from "../controller/posts-controller";
+import { PostsController } from "../controller/posts-controller";
 import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
@@ -12,6 +12,7 @@ import { container } from "../../../composition-root";
 import { CommentsController } from "../../../comments/api/controller/comments-controller";
 
 const commentsController = container.get(CommentsController);
+const postsController = container.get(PostsController);
 
 export const postsRouter = Router();
 
@@ -19,20 +20,20 @@ postsRouter.get(
   "/",
   validateQueryParams,
   validationChainResult,
-  postsController.getAllPosts,
+  postsController.getAllPosts.bind(postsController),
 );
 postsRouter.get(
   "/:id",
   validateParamsId,
   validationChainResult,
-  postsController.getPostById,
+  postsController.getPostById.bind(postsController),
 );
 postsRouter.post(
   "/",
   basicAuthGuard,
   validatePostBody,
   validationChainResult,
-  postsController.createPost,
+  postsController.createPost.bind(postsController),
 );
 postsRouter.put(
   "/:id",
@@ -40,14 +41,14 @@ postsRouter.put(
   validateParamsId,
   validatePostBody,
   validationChainResult,
-  postsController.updatePost,
+  postsController.updatePost.bind(postsController),
 );
 postsRouter.delete(
   "/:id",
   basicAuthGuard,
   validateParamsId,
   validationChainResult,
-  postsController.deletePost,
+  postsController.deletePost.bind(postsController),
 );
 
 postsRouter.get(

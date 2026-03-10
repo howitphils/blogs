@@ -1,12 +1,15 @@
 import { validateQueryParams } from "./../../../core/middlewares/validation/base-query-validations";
 import { Router } from "express";
-import { blogsController } from "../controller/blogs-controller";
 import { validateBlogBody } from "../validations/blog-body-validation";
 import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth";
 import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { validateBlogQueryParams } from "../validations/blog-query-validation";
 import { validatePostForBlogBody } from "../validations/blog-post-body-validations";
+import { container } from "../../../composition-root";
+import { BlogsController } from "../controller/blogs-controller";
+
+const blogsController = container.get(BlogsController);
 
 export const blogsRouter = Router();
 
@@ -14,13 +17,13 @@ blogsRouter.get(
   "/",
   validateBlogQueryParams,
   validationChainResult,
-  blogsController.getAllBlogs,
+  blogsController.getAllBlogs.bind(blogsController),
 );
 blogsRouter.get(
   "/:id",
   validateParamsId,
   validationChainResult,
-  blogsController.getBlogById,
+  blogsController.getBlogById.bind(blogsController),
 );
 
 blogsRouter.get(
@@ -28,7 +31,7 @@ blogsRouter.get(
   validateParamsId,
   validateQueryParams,
   validationChainResult,
-  blogsController.getPostsForBlog,
+  blogsController.getPostsForBlog.bind(blogsController),
 );
 
 blogsRouter.post(
@@ -36,7 +39,7 @@ blogsRouter.post(
   basicAuthGuard,
   validateBlogBody,
   validationChainResult,
-  blogsController.createBlog,
+  blogsController.createBlog.bind(blogsController),
 );
 
 blogsRouter.post(
@@ -45,7 +48,7 @@ blogsRouter.post(
   validateParamsId,
   validatePostForBlogBody,
   validationChainResult,
-  blogsController.createPostForBlog,
+  blogsController.createPostForBlog.bind(blogsController),
 );
 
 blogsRouter.put(
@@ -54,12 +57,12 @@ blogsRouter.put(
   validateParamsId,
   validateBlogBody,
   validationChainResult,
-  blogsController.updateBlog,
+  blogsController.updateBlog.bind(blogsController),
 );
 blogsRouter.delete(
   "/:id",
   basicAuthGuard,
   validateParamsId,
   validationChainResult,
-  blogsController.deleteBlog,
+  blogsController.deleteBlog.bind(blogsController),
 );

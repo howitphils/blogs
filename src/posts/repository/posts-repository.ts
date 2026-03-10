@@ -2,13 +2,15 @@ import { postsCollection } from "./../../db/mongodb";
 import { PostDbModel, UpdatePostDtoModel } from "../types/posts-types";
 import { ObjectId } from "mongodb";
 import { PostNotFoundError } from "../application/errors/posts-errors";
+import { injectable } from "inversify";
 
-export const postsRepository = {
+@injectable()
+export class PostsRepository {
   async createPost(dto: PostDbModel): Promise<string> {
     const { insertedId } = await postsCollection.insertOne(dto);
 
     return insertedId.toString();
-  },
+  }
 
   async getPostByIdOrFail(postId: string): Promise<PostDbModel> {
     const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
@@ -18,7 +20,7 @@ export const postsRepository = {
     }
 
     return post;
-  },
+  }
 
   async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {
     const updateResult = await postsCollection.updateOne(
@@ -34,7 +36,7 @@ export const postsRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
+  }
 
   async deletePost(postId: string): Promise<boolean> {
     const deleteResult = await postsCollection.deleteOne({
@@ -42,7 +44,7 @@ export const postsRepository = {
     });
 
     return deleteResult.deletedCount !== 0;
-  },
+  }
 
   async updateBlogNameForPost(blogId: string, blogName: string): Promise<void> {
     await postsCollection.updateMany(
@@ -53,5 +55,5 @@ export const postsRepository = {
         },
       },
     );
-  },
-};
+  }
+}

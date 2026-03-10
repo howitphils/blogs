@@ -2,8 +2,10 @@ import { ObjectId } from "mongodb";
 import { blogsCollection } from "../../db/mongodb";
 import { BlogDbModel, UpdateBlogDtoModel } from "../types/blogs-types";
 import { BlogNotFoundError } from "../application/errors/blogs-errors";
+import { injectable } from "inversify";
 
-export const blogsRepository = {
+@injectable()
+export class BlogsRepository {
   async getBlogByIdOrFail(blogId: string): Promise<BlogDbModel> {
     const blog = await blogsCollection.findOne({ _id: new ObjectId(blogId) });
 
@@ -12,13 +14,13 @@ export const blogsRepository = {
     }
 
     return blog;
-  },
+  }
 
   async createBlog(blogDto: BlogDbModel): Promise<string> {
     const { insertedId } = await blogsCollection.insertOne(blogDto);
 
     return insertedId.toString();
-  },
+  }
 
   async updateBlog(dto: UpdateBlogDtoModel): Promise<boolean> {
     const updateResult = await blogsCollection.updateOne(
@@ -35,7 +37,7 @@ export const blogsRepository = {
     );
 
     return updateResult.matchedCount !== 0;
-  },
+  }
 
   async deleteBlog(blogId: string): Promise<boolean> {
     const deleteResult = await blogsCollection.deleteOne({
@@ -43,5 +45,5 @@ export const blogsRepository = {
     });
 
     return deleteResult.deletedCount !== 0;
-  },
-};
+  }
+}

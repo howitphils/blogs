@@ -7,14 +7,12 @@ import {
   RequestWithQuery,
   RequestWithParamsIdAndQuery,
 } from "../../../core/types/request-types";
-import { blogsQueryRepository } from "../../repository/blogs-query-repository";
 import {
   BlogViewModel,
   BlogInputModel,
   BlogQueryParams,
   UpdateBlogDtoModel,
 } from "../../types/blogs-types";
-import { blogsService } from "../../application/blogs-service";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { matchedData } from "express-validator";
 import {
@@ -24,46 +22,58 @@ import {
 import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { postsQueryRepository } from "../../../posts/repository/posts-query-repository";
 import { postsService } from "../../../posts/application/posts-service";
+import { BlogsService } from "../../application/blogs-service";
+import { inject, injectable } from "inversify";
+import { BlogsQueryRepository } from "../../repository/blogs-query-repository";
 
-export const blogsController = {
-  getAllBlogs: async (
+@injectable()
+export class BlogsController {
+  constructor(
+    @inject(BlogsService)
+    private blogsService: BlogsService,
+
+    @inject(BlogsQueryRepository)
+    private blogsQueryRepository: BlogsQueryRepository,
+  ) {}
+
+  async getAllBlogs(
     req: RequestWithQuery<BlogQueryParams>,
     res: Response<PaginationType<BlogViewModel>>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const sortParams = matchedData<BlogQueryParams>(req);
 
-    const blogs = await blogsQueryRepository.getBlogs(sortParams);
+    const blogs = await this.blogsQueryRepository.getBlogs(sortParams);
 
     return res.status(HttpStatus.OK).json(blogs);
-  },
+  }
 
-  getBlogById: async (
+  async getBlogById(
     req: RequestWithParamsId,
     res: Response<BlogViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const blogId = req.params.id;
 
-    const blog = await blogsQueryRepository.getBlogByIdOrFail(blogId);
+    const blog = await this.blogsQueryRepository.getBlogByIdOrFail(blogId);
 
     return res.status(HttpStatus.OK).json(blog);
-  },
+  }
 
-  getPostsForBlog: async (
+  async getPostsForBlog(
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const blogId = req.params.id;
     const queryParams = matchedData<BaseQueryParams>(req);
 
     const posts = await postsQueryRepository.getPosts(queryParams, blogId);
 
     return res.status(HttpStatus.OK).json(posts);
-  },
+  }
 
-  createPostForBlog: async (
+  async createPostForBlog(
     req: RequestWithParamsIdAndBody<PostForBlogInputModel>,
     res: Response<PostViewModel>,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const blogId = req.params.id;
     const { content, shortDescription, title } = req.body;
 
@@ -77,39 +87,36 @@ export const blogsController = {
     const newPost = await postsQueryRepository.getCreatedPost(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
-  },
+  }
 
-  createBlog: async (
+  async createBlog(
     req: RequestWithBody<BlogInputModel>,
     res: Response<BlogViewModel>,
-  ): Promise<Response> => {
-    const newBlogId = await blogsService.createBlog(req.body);
+  ): Promise<Response> {
+    const newBlogId = await this.blogsService.createBlog(req.body);
 
-    const newBlog = await blogsQueryRepository.getCreatedBlog(newBlogId);
+    const newBlog = await this.blogsQueryRepository.getCreatedBlog(newBlogId);
 
     return res.status(HttpStatus.CREATED).json(newBlog);
-  },
+  }
 
-  updateBlog: async (
+  async updateBlog(
     req: RequestWithParamsIdAndBody<BlogInputModel>,
     res: Response,
-  ): Promise<Response> => {
+  ): Promise<Response> {
     const blogId = req.params.id;
     const blogDto: UpdateBlogDtoModel = { ...req.body, blogId };
 
-    await blogsService.updateBlog(blogDto);
+    await this.blogsService.updateBlog(blogDto);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
+  }
 
-  deleteBlog: async (
-    req: RequestWithParamsId,
-    res: Response,
-  ): Promise<Response> => {
+  async deleteBlog(req: RequestWithParamsId, res: Response): Promise<Response> {
     const blogId = req.params.id;
 
-    await blogsService.deleteBlog(blogId);
+    await this.blogsService.deleteBlog(blogId);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
-  },
-};
+  }
+}
