@@ -20,11 +20,11 @@ import {
   PostViewModel,
 } from "../../../posts/types/posts-types";
 import { BaseQueryParams } from "../../../core/types/query-params-types";
-import { postsQueryRepository } from "../../../posts/repository/posts-query-repository";
-import { postsService } from "../../../posts/application/posts-service";
 import { BlogsService } from "../../application/blogs-service";
 import { inject, injectable } from "inversify";
 import { BlogsQueryRepository } from "../../repository/blogs-query-repository";
+import { PostsQueryRepository } from "../../../posts/repository/posts-query-repository";
+import { PostsService } from "../../../posts/application/posts-service";
 
 @injectable()
 export class BlogsController {
@@ -34,6 +34,12 @@ export class BlogsController {
 
     @inject(BlogsQueryRepository)
     private blogsQueryRepository: BlogsQueryRepository,
+
+    @inject(PostsQueryRepository)
+    private postsQueryRepository: PostsQueryRepository,
+
+    @inject(PostsService)
+    private postsService: PostsService,
   ) {}
 
   async getAllBlogs(
@@ -65,7 +71,7 @@ export class BlogsController {
     const blogId = req.params.id;
     const queryParams = matchedData<BaseQueryParams>(req);
 
-    const posts = await postsQueryRepository.getPosts(queryParams, blogId);
+    const posts = await this.postsQueryRepository.getPosts(queryParams, blogId);
 
     return res.status(HttpStatus.OK).json(posts);
   }
@@ -77,14 +83,14 @@ export class BlogsController {
     const blogId = req.params.id;
     const { content, shortDescription, title } = req.body;
 
-    const newPostId = await postsService.createPost({
+    const newPostId = await this.postsService.createPost({
       blogId,
       content,
       shortDescription,
       title,
     });
 
-    const newPost = await postsQueryRepository.getCreatedPost(newPostId);
+    const newPost = await this.postsQueryRepository.getCreatedPost(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
   }

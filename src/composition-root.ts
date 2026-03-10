@@ -22,6 +22,7 @@ import { PostsRepository } from "./posts/repository/posts-repository";
 import { PostsQueryRepository } from "./posts/repository/posts-query-repository";
 import { PostsService } from "./posts/application/posts-service";
 import { PostsController } from "./posts/api/controller/posts-controller";
+import { CommentsQueryRepository } from "./comments/repository/comments-query-repository";
 
 export const container = new Container();
 
@@ -34,6 +35,7 @@ container.bind(UsersRepository).to(UsersRepository);
 container.bind(SessionsRepository).to(SessionsRepository);
 container.bind(UsersQueryRepository).to(UsersQueryRepository);
 container.bind(CommentsRepository).to(CommentsRepository);
+container.bind(CommentsQueryRepository).to(CommentsQueryRepository);
 container.bind(BlogsRepository).to(BlogsRepository);
 container.bind(BlogsQueryRepository).to(BlogsQueryRepository);
 container.bind(PostsRepository).to(PostsRepository);

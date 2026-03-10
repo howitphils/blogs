@@ -3,22 +3,23 @@ import { UsersRepository } from "./../../users/repository/users-repository";
 import { inject, injectable } from "inversify";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
-import { postsRepository } from "../../posts/repository/posts-repository";
 import {
   CommentDbModel,
   CreateCommentDto,
   UpdateCommentDto,
 } from "../types/comments-types";
+import { PostsRepository } from "../../posts/repository/posts-repository";
 
 @injectable()
 export class CommentsService {
   constructor(
     @inject(UsersRepository) private usersRepository: UsersRepository,
     @inject(CommentsRepository) private commentsRepository: CommentsRepository,
+    @inject(PostsRepository) private postsRepository: PostsRepository,
   ) {}
 
   async createComment(dto: CreateCommentDto): Promise<string> {
-    await postsRepository.getPostByIdOrFail(dto.postId);
+    await this.postsRepository.getPostByIdOrFail(dto.postId);
 
     const user = await this.usersRepository.getUserByIdOrFail(dto.userId);
 

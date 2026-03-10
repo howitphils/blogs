@@ -1,3 +1,4 @@
+import { CommentsQueryRepository } from "./../../repository/comments-query-repository";
 import { CommentsService } from "./../../application/comments-service";
 import { Response } from "express";
 import { HttpStatus } from "../../../core/types/http-statuses";
@@ -15,13 +16,16 @@ import {
 import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { matchedData } from "express-validator";
 import { PaginationType } from "../../../core/types/pagination-types";
-import { commentsQueryRepository } from "../../repository/comments-query-repository";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export class CommentsController {
   constructor(
-    @inject(CommentsService) private commentsService: CommentsService,
+    @inject(CommentsService)
+    private commentsService: CommentsService,
+
+    @inject(CommentsQueryRepository)
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   async getAllComments(
@@ -31,7 +35,7 @@ export class CommentsController {
     const postId = req.params.id;
     const sortParams = matchedData<BaseQueryParams>(req);
 
-    const comments = await commentsQueryRepository.getComments(
+    const comments = await this.commentsQueryRepository.getComments(
       sortParams,
       postId,
     );
@@ -46,7 +50,7 @@ export class CommentsController {
     const commentId = req.params.id;
 
     const comment =
-      await commentsQueryRepository.getCommentByIdOrFail(commentId);
+      await this.commentsQueryRepository.getCommentByIdOrFail(commentId);
 
     return res.status(HttpStatus.OK).json(comment);
   }
@@ -65,7 +69,7 @@ export class CommentsController {
       await this.commentsService.createComment(createCommentDto);
 
     const newComment =
-      await commentsQueryRepository.getCreatedComment(newCommentId);
+      await this.commentsQueryRepository.getCreatedComment(newCommentId);
 
     return res.status(HttpStatus.CREATED).json(newComment);
   }
