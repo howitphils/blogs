@@ -1,51 +1,16 @@
-import mongoose from "mongoose";
+import { Schema, model, HydratedDocument } from "mongoose";
 import { User } from "../../application/classes/user";
 
-export const AccountDataSchema = new mongoose.Schema(
-  {
-    login: {
-      type: String,
-      required: true,
-      unique: true,
-      minLength: 1,
-      maxLength: 50,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      minLength: 1,
-      maxLength: 100,
-    },
-    passwordHash: { type: String, required: true },
-    createdAt: { type: String, required: true },
-  },
-  { _id: false },
-);
+import { AccountDataSchema } from "./account-data-schema";
+import { EmailConfirmationSchema } from "./email-confirmation-schema";
+import { PasswordRecoverySchema } from "./password-recovery-schema";
 
-export const EmailConfirmationSchema = new mongoose.Schema(
-  {
-    confirmationCode: { type: String, required: true },
-    expDate: { type: Date, required: true },
-    isConfirmed: { type: Boolean, required: true },
-  },
-  { _id: false },
-);
+export type UserDbDocumentType = HydratedDocument<User>;
 
-export const PasswordRecoverySchema = new mongoose.Schema(
-  {
-    recoveryCode: { type: String, required: true, default: null },
-    expDate: { type: Date, required: true },
-  },
-  { _id: false },
-);
-
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   accountData: { type: AccountDataSchema, required: true },
   emailConfirmation: { type: EmailConfirmationSchema, required: true },
   passwordRecovery: { type: PasswordRecoverySchema, required: true },
 });
 
-export const UserModel = mongoose.model("User", UserSchema);
-
-export type UserDbDocumentType = mongoose.HydratedDocument<User>;
+export const UserModel = model("User", UserSchema);

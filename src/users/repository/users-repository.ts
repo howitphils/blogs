@@ -1,5 +1,4 @@
 import { ObjectId, WithId } from "mongodb";
-import { usersCollection } from "../../db/mongodb";
 import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
 import { User } from "../application/classes/user";
@@ -9,6 +8,10 @@ import { UserDbDocumentType, UserModel } from "./schemas/user-schema";
 
 @injectable()
 export class UsersRepository {
+  async save(user: UserDbDocumentType) {
+    await user.save();
+  }
+
   async getUserByIdOrFail(id: string): Promise<Promise<UserDbDocumentType>> {
     const user = await UserModel.findById(id);
 
@@ -19,18 +22,10 @@ export class UsersRepository {
     return user;
   }
 
-  async createUser(userDto: User): Promise<string> {
-    const { insertedId } = await usersCollection.insertOne(userDto);
-
-    return insertedId.toString();
-  }
-
   async deleteUser(userId: string): Promise<void> {
-    const deleteResult = await usersCollection.deleteOne({
-      _id: new ObjectId(userId),
-    });
+    const deletedUser = await UserModel.findByIdAndDelete(userId);
 
-    if (deleteResult.deletedCount === 0) {
+    if (!deletedUser) {
       throw new ServerError("User was not deleted");
     }
   }
@@ -38,8 +33,8 @@ export class UsersRepository {
   async getExistingUser(
     login: string,
     email: string,
-  ): Promise<WithId<User> | null> {
-    return usersCollection.findOne({
+  ): Promise<UserDbDocumentType | null> {
+    return UserModel.findOne({
       $or: [
         {
           "accountData.login": {
@@ -59,8 +54,8 @@ export class UsersRepository {
 
   async getUserByLoginOrEmail(
     loginOrEmail: string,
-  ): Promise<WithId<User> | null> {
-    return usersCollection.findOne({
+  ): Promise<UserDbDocumentType | null> {
+    return UserModel.findOne({
       $or: [
         {
           "accountData.login": {
@@ -78,8 +73,10 @@ export class UsersRepository {
     });
   }
 
-  async getUserByConfirmationCodeOrFail(code: string): Promise<WithId<User>> {
-    const user = await usersCollection.findOne({
+  async getUserByConfirmationCodeOrFail(
+    code: string,
+  ): Promise<UserDbDocumentType> {
+    const user = await UserModel.findOne({
       "emailConfirmation.confirmationCode": code,
     });
 
@@ -91,7 +88,7 @@ export class UsersRepository {
   }
 
   async updateIsConfirmed(code: string): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
+    const updateResult = await UserModel.updateOne(
       {
         "emailConfirmation.confirmationCode": code,
       },
@@ -113,7 +110,7 @@ export class UsersRepository {
     code: string,
     expDate: Date,
   ): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
+    const updateResult = await UserModel.updateOne(
       {
         "accountData.email": email,
       },
@@ -135,7 +132,7 @@ export class UsersRepository {
     recoveryCode: string,
     expDate: Date,
   ): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
+    const updateResult = await UserModel.updateOne(
       {
         "accountData.email": email,
       },
@@ -155,7 +152,7 @@ export class UsersRepository {
   async getUserByRecoveryCodeOrFail(
     recoveryCode: string,
   ): Promise<WithId<User>> {
-    const user = await usersCollection.findOne({
+    const user = await UserModel.findOne({
       "passwordRecovery.recoveryCode": recoveryCode,
     });
 
@@ -170,7 +167,7 @@ export class UsersRepository {
     userId: ObjectId,
     passwordHash: string,
   ): Promise<void> {
-    const updateResult = await usersCollection.updateOne(
+    const updateResult = await UserModel.updateOne(
       {
         _id: userId,
       },
