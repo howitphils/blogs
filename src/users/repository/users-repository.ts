@@ -4,13 +4,14 @@ import { UserNotFoundError } from "../application/errors/users-errors";
 import { User } from "../application/classes/user";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { injectable } from "inversify";
-import { UserDbDocumentType, UserModel } from "./schemas/user-schema";
+import { UserModel } from "./schemas/user-schema";
+import { UserDbDocumentType } from "../types/users-types";
 
 @injectable()
 export class UsersRepository {
-  async save(user: UserDbDocumentType) {
-    await user.save();
-  }
+  // async save(user: UserDbDocumentType) {
+  //   await user.save();
+  // }
 
   async getUserByIdOrFail(id: string): Promise<Promise<UserDbDocumentType>> {
     const user = await UserModel.findById(id);
@@ -20,6 +21,12 @@ export class UsersRepository {
     }
 
     return user;
+  }
+
+  async createUser(dto: User): Promise<string> {
+    const user = await UserModel.insertOne(dto);
+
+    return user.id;
   }
 
   async deleteUser(userId: string): Promise<void> {

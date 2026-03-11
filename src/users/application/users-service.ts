@@ -15,10 +15,6 @@ import { PasswordService } from "../../core/services/password-service";
 import { SessionsRepository } from "../repository/sessions-repository";
 import { inject, injectable } from "inversify";
 import { appSettings } from "../../app-settings";
-import {
-  UserDbDocumentType,
-  UserModel,
-} from "../repository/schemas/user-schema";
 
 @injectable()
 export class UsersService {
@@ -36,9 +32,9 @@ export class UsersService {
 
     const user = await this.userFactory(dto, true);
 
-    await this.usersRepository.save(user);
+    const userId = await this.usersRepository.createUser(user);
 
-    return user.id;
+    return userId;
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -95,7 +91,7 @@ export class UsersService {
 
     const user = await this.userFactory(dto, false);
 
-    await this.usersRepository.save(user);
+    await this.usersRepository.createUser(user);
 
     this.emailService
       .sendRegistrationEmail(dto.email, user.emailConfirmation.confirmationCode)
@@ -240,12 +236,12 @@ export class UsersService {
   private async userFactory(
     dto: UserInputModel,
     isConfirmed: boolean,
-  ): Promise<UserDbDocumentType> {
+  ): Promise<User> {
     const confirmationCode = this.tokenService.createRandomCode();
     const expDate = this.dateService.addHours(2);
     const passwordHash = await this.passwordService.generateHash(dto.password);
 
-    const user = new User(
+    return new User(
       dto.login,
       dto.email,
       passwordHash,
@@ -253,9 +249,5 @@ export class UsersService {
       expDate,
       isConfirmed,
     );
-
-    const dbUser = new UserModel(user);
-
-    return dbUser;
   }
 }
