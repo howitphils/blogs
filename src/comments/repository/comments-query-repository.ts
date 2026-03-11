@@ -1,14 +1,12 @@
 import { PostsRepository } from "./../../posts/repository/posts-repository";
-import { ObjectId, WithId } from "mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
-import { CommentDbModel, CommentViewModel } from "../types/comments-types";
+import { CommentDbDocument, CommentViewModel } from "../types/comments-types";
 import { calculateSkip } from "../../core/utils/calculate-skip";
-import { commentsCollection } from "../../db/mongodb";
 import { CommentNotFoundError } from "../application/errors/comments-errors";
 import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 import { inject, injectable } from "inversify";
+import { CommentModel } from "./schemas/comment-schema";
 
 @injectable()
 export class CommentsQueryRepository {
@@ -26,14 +24,12 @@ export class CommentsQueryRepository {
 
     const filter = { postId };
 
-    const comments = await commentsCollection
-      .find(filter)
+    const comments = await CommentModel.find(filter)
       .skip(calculateSkip(pageNumber, pageSize))
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection })
-      .toArray();
+      .sort({ [sortBy]: sortDirection });
 
-    const totalCount = await commentsCollection.countDocuments(filter);
+    const totalCount = await CommentModel.countDocuments(filter);
 
     return {
       page: pageNumber,
@@ -45,30 +41,14 @@ export class CommentsQueryRepository {
   }
 
   async getCommentByIdOrFail(id: string): Promise<CommentViewModel> {
-    const dbComment = await commentsCollection.findOne({
-      _id: new ObjectId(id),
-    });
-
-    if (!dbComment) {
-      throw new CommentNotFoundError();
-    }
+    const dbComment = await CommentModel.findById(id).orFail(
+      new CommentNotFoundError(),
+    );
 
     return this.mapFromDbToView(dbComment);
   }
 
-  async getCreatedComment(id: string): Promise<CommentViewModel> {
-    const dbComment = await commentsCollection.findOne({
-      _id: new ObjectId(id),
-    });
-
-    if (!dbComment) {
-      throw new ServerError("Created Comment was not found");
-    }
-
-    return this.mapFromDbToView(dbComment);
-  }
-
-  private mapFromDbToView(comment: WithId<CommentDbModel>): CommentViewModel {
+  private mapFromDbToView(comment: CommentDbDocument): CommentViewModel {
     return {
       id: comment._id.toString(),
       content: comment.content,

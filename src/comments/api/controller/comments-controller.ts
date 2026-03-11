@@ -69,7 +69,7 @@ export class CommentsController {
       await this.commentsService.createComment(createCommentDto);
 
     const newComment =
-      await this.commentsQueryRepository.getCreatedComment(newCommentId);
+      await this.commentsQueryRepository.getCommentByIdOrFail(newCommentId);
 
     return res.status(HttpStatus.CREATED).json(newComment);
   }

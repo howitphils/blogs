@@ -60,7 +60,7 @@ export class UsersService {
     }
 
     const deviceId = this.tokenService.createRandomCode();
-    const userId = user._id.toString();
+    const userId = user.id;
 
     const accessToken = this.tokenService.createAccessToken(userId);
     const refreshToken = this.tokenService.createRefreshToken(userId, deviceId);

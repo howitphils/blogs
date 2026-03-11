@@ -2,7 +2,7 @@ import { Schema } from "mongoose";
 
 export const PasswordRecoverySchema = new Schema(
   {
-    recoveryCode: { type: String, required: true, default: null },
+    recoveryCode: { type: String, default: null },
     expDate: { type: Date, required: true },
   },
   { _id: false },

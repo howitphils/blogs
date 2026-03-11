@@ -1,16 +1,18 @@
-import { ObjectId, WithId } from "mongodb";
-import { sessionsCollection, usersCollection } from "../../db/mongodb";
 import { PaginationType } from "../../core/types/pagination-types";
-import { UserQueryParams, UserViewModel } from "../types/users-types";
+import {
+  UserDbDocumentType,
+  UserQueryParams,
+  UserViewModel,
+} from "../types/users-types";
 import { calculateSkip } from "../../core/utils/calculate-skip";
 import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 import { createUserFilter } from "../utils/create-user-filter";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { UserNotFoundError } from "../application/errors/users-errors";
 import { MeInfoViewModel } from "../types/auth-types";
 import { SessionViewModel } from "../types/sessions-types";
-import { User } from "../application/classes/user";
 import { injectable } from "inversify";
+import { UserModel } from "./schemas/user/user-schema";
+import { SessionModel } from "./schemas/sessions/session-schema";
 
 @injectable()
 export class UsersQueryRepository {
@@ -28,13 +30,12 @@ export class UsersQueryRepository {
 
     const filter = createUserFilter(searchLoginTerm, searchEmailTerm);
 
-    const users = await usersCollection
-      .find(filter)
+    const users = await UserModel.find(filter)
       .skip(calculateSkip(pageNumber, pageSize))
       .limit(pageSize)
-      .sort({ [`accountData.${sortBy}`]: sortDirection })
-      .toArray();
-    const totalCount = await usersCollection.countDocuments(filter);
+      .sort({ [`accountData.${sortBy}`]: sortDirection });
+
+    const totalCount = await UserModel.countDocuments(filter);
 
     return {
       page: pageNumber,
@@ -45,32 +46,26 @@ export class UsersQueryRepository {
     };
   }
 
-  async getCreatedUser(id: string): Promise<UserViewModel> {
-    const user = await usersCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!user) {
-      throw new ServerError("Created user is not found");
-    }
+  async getUserByIdOrFail(id: string): Promise<UserViewModel> {
+    const user = await UserModel.findById(id).orFail(new UserNotFoundError());
 
     return this.mapFromDbToView(user);
   }
 
   async getMyInfo(userId: string): Promise<MeInfoViewModel> {
-    const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
-
-    if (!user) {
-      throw new UserNotFoundError();
-    }
+    const user = await UserModel.findById(userId).orFail(
+      new UserNotFoundError(),
+    );
 
     return {
+      userId: user.id,
       login: user.accountData.login,
       email: user.accountData.email,
-      userId: user._id.toString(),
     };
   }
 
   async getUsersSessions(userId: string): Promise<SessionViewModel[]> {
-    const sessions = await sessionsCollection.find({ userId }).toArray();
+    const sessions = await SessionModel.find({ userId });
 
     return sessions.map((session) => ({
       ip: session.ip,
@@ -80,9 +75,9 @@ export class UsersQueryRepository {
     }));
   }
 
-  mapFromDbToView(user: WithId<User>): UserViewModel {
+  mapFromDbToView(user: UserDbDocumentType): UserViewModel {
     return {
-      id: user._id.toString(),
+      id: user.id,
       email: user.accountData.email,
       login: user.accountData.login,
       createdAt: user.accountData.createdAt,

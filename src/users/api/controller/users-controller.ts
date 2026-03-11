@@ -43,7 +43,8 @@ export class UsersController {
   ): Promise<Response> {
     const newUserId = await this.usersService.addUser(req.body);
 
-    const newUser = await this.usersQueryRepository.getCreatedUser(newUserId);
+    const newUser =
+      await this.usersQueryRepository.getUserByIdOrFail(newUserId);
 
     return res.status(HttpStatus.CREATED).json(newUser);
   }

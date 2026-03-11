@@ -2,7 +2,6 @@ import { CommentsRepository } from "./../repository/comments-repository";
 import { UsersRepository } from "./../../users/repository/users-repository";
 import { inject, injectable } from "inversify";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import {
   CommentDbModel,
   CreateCommentDto,
@@ -41,11 +40,7 @@ export class CommentsService {
       throw new ForbiddenError("Forbidden action for this user");
     }
 
-    const updateResult = await this.commentsRepository.updateComment(dto);
-
-    if (!updateResult) {
-      throw new ServerError("Comment was not updated");
-    }
+    return this.commentsRepository.updateComment(dto.id, dto.content);
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {
@@ -55,10 +50,6 @@ export class CommentsService {
       throw new ForbiddenError("Forbidden action for this user");
     }
 
-    const deleteResult = await this.commentsRepository.deleteComment(id);
-
-    if (!deleteResult) {
-      throw new ServerError("Comment was not deleted");
-    }
+    return this.commentsRepository.deleteComment(id);
   }
 }

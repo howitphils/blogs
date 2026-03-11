@@ -9,7 +9,7 @@ export class SessionsRepository {
     await SessionModel.insertOne(dto);
   }
 
-  async deleteSession(userId: string, deviceId: string) {
+  async deleteSession(userId: string, deviceId: string): Promise<void> {
     await SessionModel.deleteOne({
       userId,
       deviceId,

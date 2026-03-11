@@ -82,10 +82,8 @@ export class UsersRepository {
         "emailConfirmation.confirmationCode": code,
       },
       {
-        $set: {
-          "emailConfirmation.isConfirmed": true,
-          "emailConfirmation.expDate": new Date(),
-        },
+        "emailConfirmation.isConfirmed": true,
+        "emailConfirmation.expDate": new Date(),
       },
     ).orFail(new UserNotFoundError());
   }
@@ -131,15 +129,10 @@ export class UsersRepository {
   }
 
   async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
-    await UserModel.updateOne(
-      {
-        id,
-      },
-      {
-        "accountData.passwordHash": passwordHash,
-        "passwordRecovery.recoveryCode": null,
-        "passwordRecovery.expDate": new Date(),
-      },
-    ).orFail(new UserNotFoundError());
+    await UserModel.findByIdAndUpdate(id, {
+      "accountData.passwordHash": passwordHash,
+      "passwordRecovery.recoveryCode": null,
+      "passwordRecovery.expDate": new Date(),
+    }).orFail(new UserNotFoundError());
   }
 }
