@@ -1,3 +1,5 @@
+import { HydratedDocument } from "mongoose";
+
 export type SessionDbModel = {
   userId: string;
   iat: number;
@@ -13,3 +15,5 @@ export type SessionViewModel = {
   lastActiveDate: number;
   deviceId: string;
 };
+
+export type SessionDbDocument = HydratedDocument<SessionDbModel>;

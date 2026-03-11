@@ -1,3 +1,5 @@
+import { HydratedDocument } from "mongoose";
+
 export type CommentInputModel = {
   content: string; //max:300;min:20
 };
@@ -33,3 +35,5 @@ export type CommentDbModel = {
   userLogin: string;
   createdAt: string;
 };
+
+export type CommentDbDocument = HydratedDocument<CommentDbModel>;
