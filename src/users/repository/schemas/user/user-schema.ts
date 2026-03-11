@@ -1,9 +1,9 @@
 import { Schema, model } from "mongoose";
-import { User } from "../../application/classes/user";
 
 import { AccountDataSchema } from "./account-data-schema";
 import { EmailConfirmationSchema } from "./email-confirmation-schema";
 import { PasswordRecoverySchema } from "./password-recovery-schema";
+import { User } from "../../../application/classes/user";
 
 const userSchema = new Schema<User>({
   accountData: { type: AccountDataSchema, required: true },

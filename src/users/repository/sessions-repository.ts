@@ -1,19 +1,17 @@
-import { sessionsCollection } from "../../db/mongodb";
 import { SessionDbModel } from "../types/sessions-types";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { NotFoundError } from "../../core/middlewares/error-handling/custom-errors/not-found-error";
 import { injectable } from "inversify";
+import { SessionModel } from "./schemas/sessions/session-schema";
 
 @injectable()
 export class SessionsRepository {
-  async createSession(session: SessionDbModel): Promise<string> {
-    const { insertedId } = await sessionsCollection.insertOne(session);
-
-    return insertedId.toString();
+  async createSession(dto: SessionDbModel): Promise<void> {
+    await SessionModel.insertOne(dto);
   }
 
   async deleteSession(userId: string, deviceId: string) {
-    const deleteResult = await sessionsCollection.deleteOne({
+    const deleteResult = await SessionModel.deleteOne({
       userId,
       deviceId,
     });
@@ -24,7 +22,7 @@ export class SessionsRepository {
   }
 
   async deleteAllSessions(userId: string, deviceId: string) {
-    const deleteResult = await sessionsCollection.deleteMany({
+    const deleteResult = await SessionModel.deleteMany({
       userId,
       deviceId: { $ne: deviceId },
     });
@@ -35,7 +33,7 @@ export class SessionsRepository {
   }
 
   async getSessionByDeviceIdOrFail(deviceId: string): Promise<SessionDbModel> {
-    const session = await sessionsCollection.findOne({
+    const session = await SessionModel.findOne({
       deviceId,
     });
 
@@ -51,7 +49,7 @@ export class SessionsRepository {
     iat: number,
     exp: number,
   ): Promise<void> {
-    const updateResult = await sessionsCollection.updateOne(
+    const updateResult = await SessionModel.updateOne(
       { deviceId },
       { $set: { iat, exp } },
     );

@@ -38,7 +38,6 @@ export class UsersService {
   }
 
   async deleteUser(id: string): Promise<void> {
-    await this.usersRepository.getUserByIdOrFail(id);
     await this.usersRepository.deleteUser(id);
   }
 
@@ -216,7 +215,7 @@ export class UsersService {
 
     const passwordHash = await this.passwordService.generateHash(newPassword);
 
-    await this.usersRepository.updatePasswordHash(user._id, passwordHash);
+    await this.usersRepository.updatePasswordHash(user.id, passwordHash);
   }
 
   private async checkUnique(login: string, email: string): Promise<void> {

@@ -1,11 +1,9 @@
-import { ObjectId, WithId } from "mongodb";
 import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
 import { User } from "../application/classes/user";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { injectable } from "inversify";
-import { UserModel } from "./schemas/user-schema";
 import { UserDbDocumentType } from "../types/users-types";
+import { UserModel } from "./schemas/user/user-schema";
 
 @injectable()
 export class UsersRepository {
@@ -14,13 +12,7 @@ export class UsersRepository {
   // }
 
   async getUserByIdOrFail(id: string): Promise<Promise<UserDbDocumentType>> {
-    const user = await UserModel.findById(id);
-
-    if (!user) {
-      throw new UserNotFoundError();
-    }
-
-    return user;
+    return UserModel.findById(id).orFail(new UserNotFoundError());
   }
 
   async createUser(dto: User): Promise<string> {
@@ -30,11 +22,7 @@ export class UsersRepository {
   }
 
   async deleteUser(userId: string): Promise<void> {
-    const deletedUser = await UserModel.findByIdAndDelete(userId);
-
-    if (!deletedUser) {
-      throw new ServerError("User was not deleted");
-    }
+    await UserModel.findByIdAndDelete(userId).orFail(new UserNotFoundError());
   }
 
   async getExistingUser(
@@ -83,19 +71,13 @@ export class UsersRepository {
   async getUserByConfirmationCodeOrFail(
     code: string,
   ): Promise<UserDbDocumentType> {
-    const user = await UserModel.findOne({
+    return UserModel.findOne({
       "emailConfirmation.confirmationCode": code,
-    });
-
-    if (!user) {
-      throw new UserNotFoundError();
-    }
-
-    return user;
+    }).orFail(new UserNotFoundError());
   }
 
   async updateIsConfirmed(code: string): Promise<void> {
-    const updateResult = await UserModel.updateOne(
+    await UserModel.updateOne(
       {
         "emailConfirmation.confirmationCode": code,
       },
@@ -105,11 +87,7 @@ export class UsersRepository {
           "emailConfirmation.expDate": new Date(),
         },
       },
-    );
-
-    if (updateResult.matchedCount === 0) {
-      throw new ServerError("Confirmation status was not updated");
-    }
+    ).orFail(new UserNotFoundError());
   }
 
   async updateConfirmationCodeAndExp(
@@ -117,21 +95,15 @@ export class UsersRepository {
     code: string,
     expDate: Date,
   ): Promise<void> {
-    const updateResult = await UserModel.updateOne(
+    await UserModel.updateOne(
       {
         "accountData.email": email,
       },
       {
-        $set: {
-          "emailConfirmation.confirmationCode": code,
-          "emailConfirmation.expDate": expDate,
-        },
+        "emailConfirmation.confirmationCode": code,
+        "emailConfirmation.expDate": expDate,
       },
-    );
-
-    if (updateResult.matchedCount === 0) {
-      throw new ServerError("Confirmation code was not updated");
-    }
+    ).orFail(new UserNotFoundError());
   }
 
   async updateRecoveryCode(
@@ -139,56 +111,35 @@ export class UsersRepository {
     recoveryCode: string,
     expDate: Date,
   ): Promise<void> {
-    const updateResult = await UserModel.updateOne(
+    await UserModel.updateOne(
       {
         "accountData.email": email,
       },
       {
-        $set: {
-          "passwordRecovery.recoveryCode": recoveryCode,
-          "passwordRecovery.expDate": expDate,
-        },
+        "passwordRecovery.recoveryCode": recoveryCode,
+        "passwordRecovery.expDate": expDate,
       },
-    );
-
-    if (updateResult.matchedCount === 0) {
-      throw new ServerError("User's recovery code was not updated");
-    }
+    ).orFail(new UserNotFoundError());
   }
 
   async getUserByRecoveryCodeOrFail(
     recoveryCode: string,
-  ): Promise<WithId<User>> {
-    const user = await UserModel.findOne({
+  ): Promise<UserDbDocumentType> {
+    return UserModel.findOne({
       "passwordRecovery.recoveryCode": recoveryCode,
-    });
-
-    if (!user) {
-      throw new UserNotFoundError();
-    }
-
-    return user;
+    }).orFail(new UserNotFoundError());
   }
 
-  async updatePasswordHash(
-    userId: ObjectId,
-    passwordHash: string,
-  ): Promise<void> {
-    const updateResult = await UserModel.updateOne(
+  async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
+    await UserModel.updateOne(
       {
-        _id: userId,
+        id,
       },
       {
-        $set: {
-          "accountData.passwordHash": passwordHash,
-          "passwordRecovery.recoveryCode": null,
-          "passwordRecovery.expDate": new Date(),
-        },
+        "accountData.passwordHash": passwordHash,
+        "passwordRecovery.recoveryCode": null,
+        "passwordRecovery.expDate": new Date(),
       },
-    );
-
-    if (updateResult.matchedCount === 0) {
-      throw new ServerError("User's password was not updated");
-    }
+    ).orFail(new UserNotFoundError());
   }
 }
