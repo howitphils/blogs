@@ -10,15 +10,13 @@ export class BlogsRepository {
   }
 
   async createBlog(blogDto: BlogDbModel): Promise<string> {
-    const newBlog = new BlogModel(blogDto);
-
-    const blog = await BlogModel.insertOne(newBlog);
+    const blog = await BlogModel.insertOne(blogDto);
 
     return blog.id;
   }
 
   async updateBlog(dto: UpdateBlogDtoModel): Promise<void> {
-    BlogModel.findByIdAndUpdate(dto.blogId, {
+    await BlogModel.findByIdAndUpdate(dto.blogId, {
       description: dto.description,
       name: dto.name,
       websiteUrl: dto.websiteUrl,
@@ -26,6 +24,6 @@ export class BlogsRepository {
   }
 
   async deleteBlog(blogId: string): Promise<void> {
-    BlogModel.findByIdAndDelete(blogId).orFail(new BlogNotFoundError());
+    await BlogModel.findByIdAndDelete(blogId).orFail(new BlogNotFoundError());
   }
 }

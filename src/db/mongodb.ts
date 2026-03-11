@@ -5,6 +5,7 @@ import { CommentDbModel } from "../comments/types/comments-types";
 import { SessionDbModel } from "../users/types/sessions-types";
 import { ServerError } from "../core/middlewares/error-handling/custom-errors/server-error";
 import { User } from "../users/application/classes/user";
+import mongoose from "mongoose";
 
 export let db: Db; // Export for tests (TESTING API). It will contain db name, that was up and running after runDb function
 
@@ -35,9 +36,17 @@ export const runDb = async (url: string, dbName: string) => {
 };
 
 export const clearCollections = async () => {
-  const collections = await db.listCollections().toArray();
+  const collections = Object.keys(mongoose.connection.collections);
 
   for (const coll of collections) {
-    await db.collection(coll.name).deleteMany({});
+    await mongoose.connection.collection(coll).deleteMany({});
   }
 };
+
+// export const clearCollections = async () => {
+//   const collections = await db.listCollections().toArray();
+
+//   for (const coll of collections) {
+//     await db.collection(coll.name).deleteMany({});
+//   }
+// };

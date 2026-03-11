@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
-export const EmailConfirmationSchema = new mongoose.Schema(
+export const EmailConfirmationSchema = new Schema(
   {
     confirmationCode: { type: String, required: true },
     expDate: { type: Date, required: true },

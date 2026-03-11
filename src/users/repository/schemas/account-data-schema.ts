@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
-export const AccountDataSchema = new mongoose.Schema(
+export const AccountDataSchema = new Schema(
   {
     login: {
       type: String,
