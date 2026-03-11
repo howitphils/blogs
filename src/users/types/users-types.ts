@@ -1,4 +1,6 @@
+import { HydratedDocument } from "mongoose";
 import { BaseQueryParams } from "../../core/types/query-params-types";
+import { User } from "../application/classes/user";
 
 export type UserInputModel = {
   login: string; // max length 10, min: 3, unique, pattern: ^[a-zA-Z0-9_-]*$
@@ -24,3 +26,5 @@ export interface UserQueryParams extends BaseQueryParams {
   searchLoginTerm: string | null;
   searchEmailTerm: string | null;
 }
+
+export type UserDbDocumentType = HydratedDocument<User>;

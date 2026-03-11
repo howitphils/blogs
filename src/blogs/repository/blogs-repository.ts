@@ -1,7 +1,11 @@
-import { BlogDbModel, UpdateBlogDtoModel } from "../types/blogs-types";
+import {
+  BlogDbDocument,
+  BlogDbModel,
+  UpdateBlogDtoModel,
+} from "../types/blogs-types";
 import { BlogNotFoundError } from "../application/errors/blogs-errors";
 import { injectable } from "inversify";
-import { BlogDbDocument, BlogModel } from "./schemas/blog-schema";
+import { BlogModel } from "./schemas/blog-schema";
 
 @injectable()
 export class BlogsRepository {

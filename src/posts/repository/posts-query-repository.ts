@@ -1,12 +1,10 @@
-import { ObjectId, WithId } from "mongodb";
-import { postsCollection } from "../../db/mongodb";
-import { PostDbModel, PostViewModel } from "../types/posts-types";
+import { PostDbDocument, PostViewModel } from "../types/posts-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BaseQueryParams } from "../../core/types/query-params-types";
 import { PostNotFoundError } from "../application/errors/posts-errors";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { BlogsQueryRepository } from "../../blogs/repository/blogs-query-repository";
 import { inject, injectable } from "inversify";
+import { PostModel } from "./schemas/post-schema";
 
 @injectable()
 export class PostsQueryRepository {
@@ -31,14 +29,12 @@ export class PostsQueryRepository {
 
     const skip = (pageNumber - 1) * pageSize;
 
-    const posts = await postsCollection
-      .find(filter)
+    const posts = await PostModel.find(filter)
       .skip(skip)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection })
-      .toArray();
+      .sort({ [sortBy]: sortDirection });
 
-    const totalCount = await postsCollection.countDocuments(filter);
+    const totalCount = await PostModel.countDocuments(filter);
 
     return {
       page: pageNumber,
@@ -50,26 +46,12 @@ export class PostsQueryRepository {
   }
 
   async getPostByIdOrFail(id: string): Promise<PostViewModel> {
-    const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!dbPost) {
-      throw new PostNotFoundError();
-    }
+    const dbPost = await PostModel.findById(id).orFail(new PostNotFoundError());
 
     return this.mapFromDbToView(dbPost);
   }
 
-  async getCreatedPost(id: string): Promise<PostViewModel> {
-    const dbPost = await postsCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!dbPost) {
-      throw new ServerError("Created post was not found");
-    }
-
-    return this.mapFromDbToView(dbPost);
-  }
-
-  private mapFromDbToView(post: WithId<PostDbModel>): PostViewModel {
+  private mapFromDbToView(post: PostDbDocument): PostViewModel {
     return {
       id: post._id.toString(),
       blogId: post.blogId,

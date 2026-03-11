@@ -1,59 +1,38 @@
-import { postsCollection } from "./../../db/mongodb";
-import { PostDbModel, UpdatePostDtoModel } from "../types/posts-types";
-import { ObjectId } from "mongodb";
+import {
+  PostDbDocument,
+  PostDbModel,
+  UpdatePostDtoModel,
+} from "../types/posts-types";
 import { PostNotFoundError } from "../application/errors/posts-errors";
 import { injectable } from "inversify";
+import { PostModel } from "./schemas/post-schema";
 
 @injectable()
 export class PostsRepository {
   async createPost(dto: PostDbModel): Promise<string> {
-    const { insertedId } = await postsCollection.insertOne(dto);
+    const post = await PostModel.insertOne(dto);
 
-    return insertedId.toString();
+    return post.id;
   }
 
-  async getPostByIdOrFail(postId: string): Promise<PostDbModel> {
-    const post = await postsCollection.findOne({ _id: new ObjectId(postId) });
-
-    if (!post) {
-      throw new PostNotFoundError();
-    }
-
-    return post;
+  async getPostByIdOrFail(postId: string): Promise<PostDbDocument> {
+    return PostModel.findById(postId).orFail(new PostNotFoundError());
   }
 
-  async updatePost(dto: UpdatePostDtoModel): Promise<boolean> {
-    const updateResult = await postsCollection.updateOne(
-      { _id: new ObjectId(dto.id) },
-      {
-        $set: {
-          title: dto.title,
-          blogId: dto.blogId,
-          content: dto.content,
-          shortDescription: dto.shortDescription,
-        },
-      },
-    );
-
-    return updateResult.matchedCount !== 0;
+  async updatePost(dto: UpdatePostDtoModel): Promise<void> {
+    await PostModel.findByIdAndUpdate(dto.id, {
+      title: dto.title,
+      blogId: dto.blogId,
+      content: dto.content,
+      shortDescription: dto.shortDescription,
+    }).orFail(new PostNotFoundError());
   }
 
-  async deletePost(postId: string): Promise<boolean> {
-    const deleteResult = await postsCollection.deleteOne({
-      _id: new ObjectId(postId),
-    });
-
-    return deleteResult.deletedCount !== 0;
+  async deletePost(postId: string): Promise<void> {
+    await PostModel.findByIdAndDelete(postId).orFail(new PostNotFoundError());
   }
 
   async updateBlogNameForPost(blogId: string, blogName: string): Promise<void> {
-    await postsCollection.updateMany(
-      { blogId },
-      {
-        $set: {
-          blogName,
-        },
-      },
-    );
+    await PostModel.updateMany({ blogId }, { blogName });
   }
 }

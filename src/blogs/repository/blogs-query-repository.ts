@@ -1,9 +1,13 @@
 import { calculatePagesCount } from "./../../core/utils/calculate-pages-count";
-import { BlogQueryParams, BlogViewModel } from "../types/blogs-types";
+import {
+  BlogDbDocument,
+  BlogQueryParams,
+  BlogViewModel,
+} from "../types/blogs-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BlogNotFoundError } from "../application/errors/blogs-errors";
 import { injectable } from "inversify";
-import { BlogDbDocument, BlogModel } from "./schemas/blog-schema";
+import { BlogModel } from "./schemas/blog-schema";
 
 @injectable()
 export class BlogsQueryRepository {

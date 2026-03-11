@@ -1,9 +1,7 @@
-import { HydratedDocument, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import { BlogDbModel } from "../../types/blogs-types";
 
-export type BlogDbDocument = HydratedDocument<BlogDbModel>;
-
-const BlogSchema = new Schema<BlogDbModel>({
+const blogSchema = new Schema<BlogDbModel>({
   name: {
     type: String,
     required: true,
@@ -28,4 +26,4 @@ const BlogSchema = new Schema<BlogDbModel>({
   isMemberShip: { type: Boolean, required: true, default: false },
 });
 
-export const BlogModel = model("Blogs", BlogSchema);
+export const BlogModel = model("Blogs", blogSchema);

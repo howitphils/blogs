@@ -1,3 +1,4 @@
+import { HydratedDocument } from "mongoose";
 import { BaseQueryParams } from "../../core/types/query-params-types";
 
 export type BlogInputModel = {
@@ -33,3 +34,5 @@ export type BlogDbModel = {
 export interface BlogQueryParams extends BaseQueryParams {
   searchNameTerm: string | null;
 }
+
+export type BlogDbDocument = HydratedDocument<BlogDbModel>;

@@ -53,7 +53,8 @@ export class PostsController {
 
     const newPostId = await this.postsService.createPost(dto);
 
-    const newPost = await this.postsQueryRepository.getCreatedPost(newPostId);
+    const newPost =
+      await this.postsQueryRepository.getPostByIdOrFail(newPostId);
 
     return res.status(HttpStatus.CREATED).json(newPost);
   }

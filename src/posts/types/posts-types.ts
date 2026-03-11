@@ -1,3 +1,5 @@
+import { HydratedDocument } from "mongoose";
+
 export type PostInputModel = {
   title: string; // max length 30
   shortDescription: string; // max length 100
@@ -37,3 +39,5 @@ export type PostForBlogInputModel = {
   shortDescription: string; // max length 100
   content: string; // max length 1000
 };
+
+export type PostDbDocument = HydratedDocument<PostDbModel>;

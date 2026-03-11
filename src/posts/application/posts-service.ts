@@ -6,7 +6,6 @@ import {
   PostInputModel,
   UpdatePostDtoModel,
 } from "../types/posts-types";
-import { PostNotFoundError } from "./errors/posts-errors";
 
 @injectable()
 export class PostsService {
@@ -31,18 +30,10 @@ export class PostsService {
   }
 
   async updatePost(dto: UpdatePostDtoModel): Promise<void> {
-    const updateResult = await this.postsRepository.updatePost(dto);
-
-    if (!updateResult) {
-      throw new PostNotFoundError();
-    }
+    return this.postsRepository.updatePost(dto);
   }
 
   async deletePost(postId: string): Promise<void> {
-    const deleteResult = await this.postsRepository.deletePost(postId);
-
-    if (!deleteResult) {
-      throw new PostNotFoundError();
-    }
+    return this.postsRepository.deletePost(postId);
   }
 }
