@@ -1,6 +1,5 @@
 import { BlogsRepository } from "./../repository/blogs-repository";
 import { inject, injectable } from "inversify";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import {
   BlogDbModel,
   BlogInputModel,
@@ -34,20 +33,10 @@ export class BlogsService {
       await this.postsRepository.updateBlogNameForPost(dto.blogId, dto.name);
     }
 
-    const updateResult = await this.blogsRepository.updateBlog(dto);
-
-    if (!updateResult) {
-      throw new ServerError("Blog was not updated");
-    }
+    await this.blogsRepository.updateBlog(dto);
   }
 
   async deleteBlog(blogId: string): Promise<void> {
-    await this.blogsRepository.getBlogByIdOrFail(blogId);
-
-    const result = await this.blogsRepository.deleteBlog(blogId);
-
-    if (!result) {
-      throw new ServerError("Blog was not deleted");
-    }
+    await this.blogsRepository.deleteBlog(blogId);
   }
 }

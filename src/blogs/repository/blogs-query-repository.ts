@@ -1,14 +1,9 @@
-import { ObjectId, WithId } from "mongodb";
-import {
-  BlogDbModel,
-  BlogQueryParams,
-  BlogViewModel,
-} from "../types/blogs-types";
-import { blogsCollection } from "../../db/mongodb";
+import { calculatePagesCount } from "./../../core/utils/calculate-pages-count";
+import { BlogQueryParams, BlogViewModel } from "../types/blogs-types";
 import { PaginationType } from "../../core/types/pagination-types";
 import { BlogNotFoundError } from "../application/errors/blogs-errors";
-import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { injectable } from "inversify";
+import { BlogDbDocument, BlogModel } from "./schemas/blog-schema";
 
 @injectable()
 export class BlogsQueryRepository {
@@ -24,18 +19,16 @@ export class BlogsQueryRepository {
       ? { name: { $regex: searchNameTerm, $options: "i" } }
       : {};
 
-    const blogs = await blogsCollection
-      .find(filter)
+    const blogs = await BlogModel.find(filter)
       .skip(skip)
       .limit(pageSize)
-      .sort({ [sortBy]: sortDirection })
-      .toArray();
+      .sort({ [sortBy]: sortDirection });
 
-    const totalCount = await blogsCollection.countDocuments(filter);
+    const totalCount = await BlogModel.countDocuments(filter);
 
     return {
       page: pageNumber,
-      pagesCount: Math.ceil(totalCount / pageSize),
+      pagesCount: calculatePagesCount(totalCount, pageSize),
       pageSize,
       totalCount,
       items: blogs.map(this.mapFromDbToView),
@@ -43,26 +36,12 @@ export class BlogsQueryRepository {
   }
 
   async getBlogByIdOrFail(id: string): Promise<BlogViewModel> {
-    const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!dbBlog) {
-      throw new BlogNotFoundError();
-    }
+    const dbBlog = await BlogModel.findById(id).orFail(new BlogNotFoundError());
 
     return this.mapFromDbToView(dbBlog);
   }
 
-  async getCreatedBlog(id: string): Promise<BlogViewModel> {
-    const dbBlog = await blogsCollection.findOne({ _id: new ObjectId(id) });
-
-    if (!dbBlog) {
-      throw new ServerError("Created blog was not found");
-    }
-
-    return this.mapFromDbToView(dbBlog);
-  }
-
-  private mapFromDbToView(blog: WithId<BlogDbModel>): BlogViewModel {
+  private mapFromDbToView(blog: BlogDbDocument): BlogViewModel {
     return {
       id: blog._id.toString(),
       description: blog.description,

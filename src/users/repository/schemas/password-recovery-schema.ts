@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
-export const PasswordRecoverySchema = new mongoose.Schema(
+export const PasswordRecoverySchema = new Schema(
   {
     recoveryCode: { type: String, required: true, default: null },
     expDate: { type: Date, required: true },

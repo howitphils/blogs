@@ -5,7 +5,6 @@ import { CommentDbModel } from "../comments/types/comments-types";
 import { SessionDbModel } from "../users/types/sessions-types";
 import { ServerError } from "../core/middlewares/error-handling/custom-errors/server-error";
 import { User } from "../users/application/classes/user";
-import mongoose from "mongoose";
 
 export let db: Db; // Export for tests (TESTING API). It will contain db name, that was up and running after runDb function
 
@@ -18,13 +17,6 @@ export let sessionsCollection: Collection<SessionDbModel>;
 export const runDb = async (url: string, dbName: string) => {
   const mongoClient = new MongoClient(url);
   db = mongoClient.db(dbName);
-
-  await mongoose.connect(url);
-  console.log("mongoose connected");
-
-  await mongoose.disconnect();
-
-  console.log("mongoose disconnected");
 
   blogsCollection = db.collection("blogsCollection");
   postsCollection = db.collection("postsCollection");

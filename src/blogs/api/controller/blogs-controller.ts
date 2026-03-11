@@ -69,9 +69,9 @@ export class BlogsController {
     res: Response<PaginationType<PostViewModel>>,
   ): Promise<Response> {
     const blogId = req.params.id;
-    const queryParams = matchedData<BaseQueryParams>(req);
+    const sortParams = matchedData<BaseQueryParams>(req);
 
-    const posts = await this.postsQueryRepository.getPosts(queryParams, blogId);
+    const posts = await this.postsQueryRepository.getPosts(sortParams, blogId);
 
     return res.status(HttpStatus.OK).json(posts);
   }
@@ -101,7 +101,8 @@ export class BlogsController {
   ): Promise<Response> {
     const newBlogId = await this.blogsService.createBlog(req.body);
 
-    const newBlog = await this.blogsQueryRepository.getCreatedBlog(newBlogId);
+    const newBlog =
+      await this.blogsQueryRepository.getBlogByIdOrFail(newBlogId);
 
     return res.status(HttpStatus.CREATED).json(newBlog);
   }
