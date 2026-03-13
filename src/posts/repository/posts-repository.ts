@@ -19,8 +19,8 @@ export class PostsRepository {
     return PostModel.findById(postId).orFail(new PostNotFoundError());
   }
 
-  async updatePost(dto: UpdatePostDtoModel): Promise<void> {
-    await PostModel.findByIdAndUpdate(dto.id, {
+  async updatePost(dto: UpdatePostDtoModel): Promise<PostDbDocument> {
+    return PostModel.findByIdAndUpdate(dto.id, {
       title: dto.title,
       blogId: dto.blogId,
       content: dto.content,
@@ -28,8 +28,8 @@ export class PostsRepository {
     }).orFail(new PostNotFoundError());
   }
 
-  async deletePost(postId: string): Promise<void> {
-    await PostModel.findByIdAndDelete(postId).orFail(new PostNotFoundError());
+  async deletePost(postId: string): Promise<PostDbDocument> {
+    return PostModel.findByIdAndDelete(postId).orFail(new PostNotFoundError());
   }
 
   async updateBlogNameForPost(blogId: string, blogName: string): Promise<void> {

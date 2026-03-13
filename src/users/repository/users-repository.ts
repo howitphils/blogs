@@ -21,8 +21,8 @@ export class UsersRepository {
     return user.id;
   }
 
-  async deleteUser(userId: string): Promise<void> {
-    await UserModel.findByIdAndDelete(userId).orFail(new UserNotFoundError());
+  async deleteUser(userId: string): Promise<UserDbDocumentType> {
+    return UserModel.findByIdAndDelete(userId).orFail(new UserNotFoundError());
   }
 
   async getExistingUser(
@@ -92,8 +92,8 @@ export class UsersRepository {
     email: string,
     code: string,
     expDate: Date,
-  ): Promise<void> {
-    await UserModel.updateOne(
+  ): Promise<UserDbDocumentType> {
+    return UserModel.findOneAndUpdate(
       {
         "accountData.email": email,
       },
@@ -108,8 +108,8 @@ export class UsersRepository {
     email: string,
     recoveryCode: string,
     expDate: Date,
-  ): Promise<void> {
-    await UserModel.updateOne(
+  ): Promise<UserDbDocumentType> {
+    return UserModel.findOneAndUpdate(
       {
         "accountData.email": email,
       },
@@ -128,8 +128,11 @@ export class UsersRepository {
     }).orFail(new UserNotFoundError());
   }
 
-  async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
-    await UserModel.findByIdAndUpdate(id, {
+  async updatePasswordHash(
+    id: string,
+    passwordHash: string,
+  ): Promise<UserDbDocumentType> {
+    return UserModel.findByIdAndUpdate(id, {
       "accountData.passwordHash": passwordHash,
       "passwordRecovery.recoveryCode": null,
       "passwordRecovery.expDate": new Date(),

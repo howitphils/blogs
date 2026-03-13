@@ -1,4 +1,5 @@
 import { HydratedDocument } from "mongoose";
+import { LikeInfoViewModel, LikeStatuses } from "../../core/types/likes";
 
 export type CommentInputModel = {
   content: string; //max:300;min:20
@@ -26,6 +27,7 @@ export type CommentViewModel = {
   content: string;
   commentatorInfo: CommentatorInfo;
   createdAt: string;
+  likesInfo: LikeInfoViewModel;
 };
 
 export type CommentDbModel = {
@@ -37,3 +39,9 @@ export type CommentDbModel = {
 };
 
 export type CommentDbDocument = HydratedDocument<CommentDbModel>;
+
+export type CommentLikeDbModel = {
+  commentId: string;
+  userId: string;
+  status: LikeStatuses;
+};

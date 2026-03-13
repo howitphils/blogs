@@ -5,12 +5,15 @@ import { SessionNotFoundError } from "../application/errors/session-errors";
 
 @injectable()
 export class SessionsRepository {
-  async createSession(dto: SessionDbModel): Promise<void> {
-    await SessionModel.insertOne(dto);
+  async createSession(dto: SessionDbModel): Promise<SessionDbDocument> {
+    return SessionModel.insertOne(dto);
   }
 
-  async deleteSession(userId: string, deviceId: string): Promise<void> {
-    await SessionModel.deleteOne({
+  async deleteSession(
+    userId: string,
+    deviceId: string,
+  ): Promise<SessionDbDocument> {
+    return SessionModel.findOneAndDelete({
       userId,
       deviceId,
     }).orFail(new SessionNotFoundError());
@@ -35,8 +38,8 @@ export class SessionsRepository {
     deviceId: string,
     iat: number,
     exp: number,
-  ): Promise<void> {
-    await SessionModel.updateOne({ deviceId }, { iat, exp }).orFail(
+  ): Promise<SessionDbDocument> {
+    return SessionModel.findOneAndUpdate({ deviceId }, { iat, exp }).orFail(
       new SessionNotFoundError(),
     );
   }

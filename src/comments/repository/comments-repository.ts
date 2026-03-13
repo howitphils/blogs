@@ -15,13 +15,15 @@ export class CommentsRepository {
     return CommentModel.findById(id).orFail(new CommentNotFoundError());
   }
 
-  async updateComment(id: string, content: string): Promise<void> {
-    await CommentModel.findByIdAndUpdate(id, {
+  async updateComment(id: string, content: string): Promise<CommentDbDocument> {
+    return CommentModel.findByIdAndUpdate(id, {
       content,
     }).orFail(new CommentNotFoundError());
   }
 
-  async deleteComment(id: string): Promise<void> {
-    await CommentModel.findByIdAndDelete(id).orFail(new CommentNotFoundError());
+  async deleteComment(id: string): Promise<CommentDbDocument> {
+    return CommentModel.findByIdAndDelete(id).orFail(
+      new CommentNotFoundError(),
+    );
   }
 }

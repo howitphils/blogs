@@ -19,15 +19,15 @@ export class BlogsRepository {
     return blog.id;
   }
 
-  async updateBlog(dto: UpdateBlogDtoModel): Promise<void> {
-    await BlogModel.findByIdAndUpdate(dto.blogId, {
+  async updateBlog(dto: UpdateBlogDtoModel): Promise<BlogDbDocument> {
+    return BlogModel.findByIdAndUpdate(dto.blogId, {
       description: dto.description,
       name: dto.name,
       websiteUrl: dto.websiteUrl,
     }).orFail(new BlogNotFoundError());
   }
 
-  async deleteBlog(blogId: string): Promise<void> {
-    await BlogModel.findByIdAndDelete(blogId).orFail(new BlogNotFoundError());
+  async deleteBlog(blogId: string): Promise<BlogDbDocument> {
+    return BlogModel.findByIdAndDelete(blogId).orFail(new BlogNotFoundError());
   }
 }
