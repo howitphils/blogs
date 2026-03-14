@@ -7,6 +7,8 @@ const commentSchema = new Schema<CommentDbModel>({
   userId: { type: String, required: true },
   userLogin: { type: String, required: true, trim: true, minlength: 1 },
   createdAt: { type: String, required: true },
+  likesCount: { type: Number, required: true, default: 0, min: 0 },
+  dislikesCount: { type: Number, required: true, default: 0, min: 0 },
 });
 
 export const CommentModel = model("Comments", commentSchema);

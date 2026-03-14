@@ -70,6 +70,20 @@ export class CommentsService {
 
       await this.commentLikesRepository.create(newLike);
 
+      if (dto.likeStatus === LikeStatuses.LIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount + 1,
+          comment.dislikesCount,
+        );
+      } else if (dto.likeStatus === LikeStatuses.DISLIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount,
+          comment.dislikesCount + 1,
+        );
+      }
+
       return;
     }
 
@@ -124,8 +138,6 @@ export class CommentsService {
         );
       }
     }
-
-    // TODO: update comments like/dislike count
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {
