@@ -5,15 +5,14 @@ export type CommentInputModel = {
   content: string; //max:300;min:20
 };
 
+export type UpdateLikeStatusInputModel = {
+  likeStatus: LikeStatuses;
+};
+
 export type CreateCommentDto = {
   content: string;
   postId: string;
   userId: string;
-};
-
-export type CommentatorInfo = {
-  userId: string;
-  userLogin: string;
 };
 
 export type UpdateCommentDto = {
@@ -22,12 +21,10 @@ export type UpdateCommentDto = {
   userId: string;
 };
 
-export type CommentViewModel = {
-  id: string;
-  content: string;
-  commentatorInfo: CommentatorInfo;
-  createdAt: string;
-  likesInfo: LikeInfoViewModel;
+export type UpdateLikeStatusDto = {
+  userId: string;
+  commentId: string;
+  likeStatus: LikeStatuses;
 };
 
 export type CommentDbModel = {
@@ -36,12 +33,29 @@ export type CommentDbModel = {
   postId: string;
   userLogin: string;
   createdAt: string;
+  likesCount: number;
+  dislikesCount: number;
 };
-
-export type CommentDbDocument = HydratedDocument<CommentDbModel>;
 
 export type CommentLikeDbModel = {
   commentId: string;
   userId: string;
   status: LikeStatuses;
+};
+
+export type CommentLikeDbDocument = HydratedDocument<CommentLikeDbModel>;
+
+export type CommentDbDocument = HydratedDocument<CommentDbModel>;
+
+export type CommentatorInfoViewModel = {
+  userId: string;
+  userLogin: string;
+};
+
+export type CommentViewModel = {
+  id: string;
+  content: string;
+  commentatorInfo: CommentatorInfoViewModel;
+  createdAt: string;
+  likesInfo: LikeInfoViewModel;
 };

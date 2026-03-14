@@ -2,7 +2,7 @@ import { Router } from "express";
 import { validateUserQueryParams } from "../validations/users-query-validation";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { validateUserBody } from "../validations/users-body-validation";
-import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
+import { validateParamsId } from "../../../core/middlewares/validation/params-id-validations";
 import { container } from "../../../composition-root";
 import { UsersController } from "../controller/users-controller";
 

@@ -2,7 +2,7 @@ import { validateQueryParams } from "./../../../core/middlewares/validation/base
 import { Router } from "express";
 import { validateBlogBody } from "../validations/blog-body-validation";
 import { basicAuthGuard } from "../../../core/middlewares/authentication/basic-auth";
-import { validateParamsId } from "../../../core/middlewares/validation/params-id-validation";
+import { validateParamsId } from "../../../core/middlewares/validation/params-id-validations";
 import { validationChainResult } from "../../../core/middlewares/validation/validation-chain-result";
 import { validateBlogQueryParams } from "../validations/blog-query-validation";
 import { validatePostForBlogBody } from "../validations/blog-post-body-validations";

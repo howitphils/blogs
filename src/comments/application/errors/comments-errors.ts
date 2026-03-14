@@ -7,3 +7,10 @@ export class CommentNotFoundError extends HttpError {
     this.name = "CommentNotFoundError";
   }
 }
+
+export class CommentLikeNotFoundError extends HttpError {
+  constructor() {
+    super("Comment's like was not found", HttpStatus.NOT_FOUND);
+    this.name = "CommentLikeNotFoundError";
+  }
+}

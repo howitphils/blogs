@@ -12,6 +12,8 @@ import {
   CommentInputModel,
   CreateCommentDto,
   UpdateCommentDto,
+  UpdateLikeStatusInputModel,
+  UpdateLikeStatusDto,
 } from "../../types/comments-types";
 import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { matchedData } from "express-validator";
@@ -85,6 +87,21 @@ export class CommentsController {
     };
 
     await this.commentsService.updateComment(updateCommendDto);
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  }
+
+  async updateLikeStatus(
+    req: RequestWithParamsIdAndBody<UpdateLikeStatusInputModel>,
+    res: Response,
+  ): Promise<Response> {
+    const updateLikeStatusDto: UpdateLikeStatusDto = {
+      userId: req.user.userId,
+      commentId: req.params.id,
+      likeStatus: req.body.likeStatus,
+    };
+
+    await this.commentsService.updateLikeStatus(updateLikeStatusDto);
 
     return res.sendStatus(HttpStatus.NO_CONTENT);
   }

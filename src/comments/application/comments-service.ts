@@ -4,16 +4,21 @@ import { inject, injectable } from "inversify";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 import {
   CommentDbModel,
+  CommentLikeDbModel,
   CreateCommentDto,
   UpdateCommentDto,
+  UpdateLikeStatusDto,
 } from "../types/comments-types";
 import { PostsRepository } from "../../posts/repository/posts-repository";
+import { CommentLikesRepository } from "../repository/comment-like-repository";
 
 @injectable()
 export class CommentsService {
   constructor(
     @inject(UsersRepository) private usersRepository: UsersRepository,
     @inject(CommentsRepository) private commentsRepository: CommentsRepository,
+    @inject(CommentLikesRepository)
+    private commentLikesRepository: CommentLikesRepository,
     @inject(PostsRepository) private postsRepository: PostsRepository,
   ) {}
 
@@ -40,7 +45,30 @@ export class CommentsService {
       throw new ForbiddenError("Forbidden action for this user");
     }
 
-    return this.commentsRepository.updateComment(dto.id, dto.content);
+    await this.commentsRepository.update(dto.id, dto.content);
+  }
+
+  async updateLikeStatus(dto: UpdateLikeStatusDto): Promise<void> {
+    const comment = await this.commentsRepository.getCommentByIdOrFail(
+      dto.commentId,
+    );
+
+    const like = await this.commentLikesRepository.getLikeOrFail(
+      dto.userId,
+      dto.commentId,
+    );
+
+    if (!like) {
+      const newLike: CommentLikeDbModel = {
+        status: dto.likeStatus,
+        commentId: dto.commentId,
+        userId: dto.userId,
+      };
+
+      await this.commentLikesRepository.create(newLike);
+    }
+
+    await this.commentsRepository.update(dto.id, dto.content);
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {
@@ -50,6 +78,6 @@ export class CommentsService {
       throw new ForbiddenError("Forbidden action for this user");
     }
 
-    return this.commentsRepository.deleteComment(id);
+    await this.commentsRepository.delete(id);
   }
 }
