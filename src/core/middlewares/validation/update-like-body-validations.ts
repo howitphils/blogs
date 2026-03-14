@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import { LikeStatuses } from "../../types/likes";
+import { LikeStatuses } from "../../types/likes-types";
 
 const availdableLikeStatuses = Object.values(LikeStatuses);
 

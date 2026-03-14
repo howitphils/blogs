@@ -13,7 +13,7 @@ export class CommentLikesRepository {
     await CommentLikeModel.insertOne(dto);
   }
 
-  async getLikeOrFail(
+  async get(
     userId: string,
     commentId: string,
   ): Promise<CommentLikeDbDocument | null> {
@@ -22,6 +22,7 @@ export class CommentLikesRepository {
 
   async update(dto: UpdateLikeStatusDto): Promise<CommentLikeDbModel> {
     const { commentId, likeStatus, userId } = dto;
+
     return CommentLikeModel.findOneAndUpdate(
       { userId, commentId },
       {

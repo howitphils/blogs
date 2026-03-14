@@ -9,3 +9,7 @@ export type LikeInfoViewModel = {
   dislikesCount: number;
   myStatus: LikeStatuses;
 };
+
+export type UsersLikeStatuses = {
+  [key: string]: LikeStatuses;
+};

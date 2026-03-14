@@ -33,6 +33,8 @@ export class CommentsService {
       userId: dto.userId,
       userLogin: user.accountData.login,
       createdAt: new Date().toISOString(),
+      likesCount: 0,
+      dislikesCount: 0,
     };
 
     return this.commentsRepository.createComment(newComment);
@@ -53,7 +55,7 @@ export class CommentsService {
       dto.commentId,
     );
 
-    const like = await this.commentLikesRepository.getLikeOrFail(
+    const like = await this.commentLikesRepository.get(
       dto.userId,
       dto.commentId,
     );
@@ -68,7 +70,9 @@ export class CommentsService {
       await this.commentLikesRepository.create(newLike);
     }
 
-    await this.commentsRepository.update(dto.id, dto.content);
+    await this.commentLikesRepository.update(dto);
+
+    // await this.commentsRepository.update(dto.id, dto.content);
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {

@@ -1,5 +1,5 @@
 import { HydratedDocument } from "mongoose";
-import { LikeInfoViewModel, LikeStatuses } from "../../core/types/likes";
+import { LikeInfoViewModel, LikeStatuses } from "../../core/types/likes-types";
 
 export type CommentInputModel = {
   content: string; //max:300;min:20
