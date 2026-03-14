@@ -11,6 +11,7 @@ import {
 } from "../types/comments-types";
 import { PostsRepository } from "../../posts/repository/posts-repository";
 import { CommentLikesRepository } from "../repository/comment-like-repository";
+import { LikeStatuses } from "../../core/types/likes-types";
 
 @injectable()
 export class CommentsService {
@@ -75,6 +76,54 @@ export class CommentsService {
     if (like.status === dto.likeStatus) return;
 
     await this.commentLikesRepository.update(dto);
+
+    if (dto.likeStatus === LikeStatuses.NONE) {
+      if (like.status === LikeStatuses.LIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount - 1,
+          comment.dislikesCount,
+        );
+      } else if (like.status === LikeStatuses.DISLIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount,
+          comment.dislikesCount - 1,
+        );
+      }
+    }
+
+    if (dto.likeStatus === LikeStatuses.LIKE) {
+      if (like.status === LikeStatuses.NONE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount + 1,
+          comment.dislikesCount,
+        );
+      } else if (like.status === LikeStatuses.DISLIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount + 1,
+          comment.dislikesCount - 1,
+        );
+      }
+    }
+
+    if (dto.likeStatus === LikeStatuses.DISLIKE) {
+      if (like.status === LikeStatuses.NONE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount,
+          comment.dislikesCount + 1,
+        );
+      } else if (like.status === LikeStatuses.LIKE) {
+        await this.commentsRepository.updateLikesCount(
+          comment.id,
+          comment.likesCount - 1,
+          comment.dislikesCount + 1,
+        );
+      }
+    }
 
     // TODO: update comments like/dislike count
   }

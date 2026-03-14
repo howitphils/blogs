@@ -34,12 +34,14 @@ export class CommentsController {
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
     res: Response<PaginationType<CommentViewModel>>,
   ): Promise<Response> {
+    const userId = req.user?.userId;
     const postId = req.params.id;
     const sortParams = matchedData<BaseQueryParams>(req);
 
     const comments = await this.commentsQueryRepository.getComments(
       sortParams,
       postId,
+      userId,
     );
 
     return res.status(HttpStatus.OK).json(comments);
@@ -49,10 +51,13 @@ export class CommentsController {
     req: RequestWithParamsId,
     res: Response<CommentViewModel>,
   ): Promise<Response> {
+    const userId = req.user?.userId;
     const commentId = req.params.id;
 
-    const comment =
-      await this.commentsQueryRepository.getCommentByIdOrFail(commentId);
+    const comment = await this.commentsQueryRepository.getCommentByIdOrFail(
+      commentId,
+      userId,
+    );
 
     return res.status(HttpStatus.OK).json(comment);
   }

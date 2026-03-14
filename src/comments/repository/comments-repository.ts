@@ -44,7 +44,14 @@ export class CommentsRepository {
     );
   }
 
-  async updateLikesCount() {}
-
-  async updateDislikesCount() {}
+  async updateLikesCount(
+    commentId: string,
+    likesCount: number,
+    dislikesCount: number,
+  ) {
+    await CommentModel.findByIdAndUpdate(commentId, {
+      likesCount,
+      dislikesCount,
+    });
+  }
 }
