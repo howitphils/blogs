@@ -10,6 +10,7 @@ import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user
 import { validateCommentBody } from "../../../comments/api/validations/comment-body-validations";
 import { container } from "../../../composition-root";
 import { CommentsController } from "../../../comments/api/controller/comments-controller";
+import { jwtAuthOptionalGuard } from "../../../core/middlewares/authentication/jwt-optional-auth";
 
 const commentsController = container.get(CommentsController);
 const postsController = container.get(PostsController);
@@ -22,12 +23,14 @@ postsRouter.get(
   validationChainResult,
   postsController.getAllPosts.bind(postsController),
 );
+
 postsRouter.get(
   "/:id",
   validateParamsId,
   validationChainResult,
   postsController.getPostById.bind(postsController),
 );
+
 postsRouter.post(
   "/",
   basicAuthGuard,
@@ -35,6 +38,7 @@ postsRouter.post(
   validationChainResult,
   postsController.createPost.bind(postsController),
 );
+
 postsRouter.put(
   "/:id",
   basicAuthGuard,
@@ -43,6 +47,7 @@ postsRouter.put(
   validationChainResult,
   postsController.updatePost.bind(postsController),
 );
+
 postsRouter.delete(
   "/:id",
   basicAuthGuard,
@@ -53,11 +58,13 @@ postsRouter.delete(
 
 postsRouter.get(
   "/:id/comments",
+  jwtAuthOptionalGuard,
   validateParamsId,
   validateQueryParams,
   validationChainResult,
   commentsController.getAllComments.bind(commentsController),
 );
+
 postsRouter.post(
   "/:id/comments",
   jwtAuthGuard,

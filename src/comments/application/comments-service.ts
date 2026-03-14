@@ -68,11 +68,15 @@ export class CommentsService {
       };
 
       await this.commentLikesRepository.create(newLike);
+
+      return;
     }
+
+    if (like.status === dto.likeStatus) return;
 
     await this.commentLikesRepository.update(dto);
 
-    // await this.commentsRepository.update(dto.id, dto.content);
+    // TODO: update comments like/dislike count
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {

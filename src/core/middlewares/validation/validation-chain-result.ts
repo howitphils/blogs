@@ -24,7 +24,7 @@ const errorFormatter = (error: ValidationError): FieldError => {
 };
 
 export const validationChainResult = (
-  req: Request<{}, {}, {}, any>,
+  req: Request<{}, {}, {}, {}>,
   res: Response,
   next: NextFunction,
 ) => {

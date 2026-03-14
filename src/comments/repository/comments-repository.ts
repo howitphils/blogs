@@ -43,4 +43,8 @@ export class CommentsRepository {
       new CommentNotFoundError(),
     );
   }
+
+  async updateLikesCount() {}
+
+  async updateDislikesCount() {}
 }
