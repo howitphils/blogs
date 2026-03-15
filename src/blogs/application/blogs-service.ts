@@ -37,6 +37,6 @@ export class BlogsService {
   }
 
   async deleteBlog(blogId: string): Promise<void> {
-    return this.blogsRepository.deleteBlog(blogId);
+    await this.blogsRepository.deleteBlog(blogId);
   }
 }

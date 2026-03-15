@@ -17,8 +17,10 @@ export type UserViewModel = {
 
 export type CreateUserDtoType = {
   login: string;
-  password: string;
   email: string;
+  passwordHash: string;
+  confirmationCode: string;
+  expDate: Date;
   isConfirmed: boolean;
 };
 

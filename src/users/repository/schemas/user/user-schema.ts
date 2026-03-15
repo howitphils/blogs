@@ -11,4 +11,6 @@ const userSchema = new Schema<User>({
   passwordRecovery: { type: PasswordRecoverySchema, required: true },
 });
 
+userSchema.loadClass(User);
+
 export const UserModel = model("Users", userSchema);

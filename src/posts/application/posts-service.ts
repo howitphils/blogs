@@ -30,10 +30,10 @@ export class PostsService {
   }
 
   async updatePost(dto: UpdatePostDtoModel): Promise<void> {
-    return this.postsRepository.updatePost(dto);
+    await this.postsRepository.updatePost(dto);
   }
 
   async deletePost(postId: string): Promise<void> {
-    return this.postsRepository.deletePost(postId);
+    await this.postsRepository.deletePost(postId);
   }
 }

@@ -1,24 +1,17 @@
 import { safeRegex } from "../utils/safe-regex";
 import { UserNotFoundError } from "../application/errors/users-errors";
-import { User } from "../application/classes/user";
 import { injectable } from "inversify";
 import { UserDbDocumentType } from "../types/users-types";
 import { UserModel } from "./schemas/user/user-schema";
 
 @injectable()
 export class UsersRepository {
-  // async save(user: UserDbDocumentType) {
-  //   await user.save();
-  // }
+  async save(user: UserDbDocumentType) {
+    await user.save();
+  }
 
   async getUserByIdOrFail(id: string): Promise<Promise<UserDbDocumentType>> {
     return UserModel.findById(id).orFail(new UserNotFoundError());
-  }
-
-  async createUser(dto: User): Promise<string> {
-    const user = await UserModel.insertOne(dto);
-
-    return user.id;
   }
 
   async deleteUser(userId: string): Promise<UserDbDocumentType> {
@@ -76,50 +69,6 @@ export class UsersRepository {
     }).orFail(new UserNotFoundError());
   }
 
-  async updateIsConfirmed(code: string): Promise<void> {
-    await UserModel.updateOne(
-      {
-        "emailConfirmation.confirmationCode": code,
-      },
-      {
-        "emailConfirmation.isConfirmed": true,
-        "emailConfirmation.expDate": new Date(),
-      },
-    ).orFail(new UserNotFoundError());
-  }
-
-  async updateConfirmationCodeAndExp(
-    email: string,
-    code: string,
-    expDate: Date,
-  ): Promise<UserDbDocumentType> {
-    return UserModel.findOneAndUpdate(
-      {
-        "accountData.email": email,
-      },
-      {
-        "emailConfirmation.confirmationCode": code,
-        "emailConfirmation.expDate": expDate,
-      },
-    ).orFail(new UserNotFoundError());
-  }
-
-  async updateRecoveryCode(
-    email: string,
-    recoveryCode: string,
-    expDate: Date,
-  ): Promise<UserDbDocumentType> {
-    return UserModel.findOneAndUpdate(
-      {
-        "accountData.email": email,
-      },
-      {
-        "passwordRecovery.recoveryCode": recoveryCode,
-        "passwordRecovery.expDate": expDate,
-      },
-    ).orFail(new UserNotFoundError());
-  }
-
   async getUserByRecoveryCodeOrFail(
     recoveryCode: string,
   ): Promise<UserDbDocumentType> {
@@ -127,15 +76,58 @@ export class UsersRepository {
       "passwordRecovery.recoveryCode": recoveryCode,
     }).orFail(new UserNotFoundError());
   }
+  // async updateIsConfirmed(code: string): Promise<void> {
+  //   await UserModel.updateOne(
+  //     {
+  //       "emailConfirmation.confirmationCode": code,
+  //     },
+  //     {
+  //       "emailConfirmation.isConfirmed": true,
+  //       "emailConfirmation.expDate": new Date(),
+  //     },
+  //   ).orFail(new UserNotFoundError());
+  // }
 
-  async updatePasswordHash(
-    id: string,
-    passwordHash: string,
-  ): Promise<UserDbDocumentType> {
-    return UserModel.findByIdAndUpdate(id, {
-      "accountData.passwordHash": passwordHash,
-      "passwordRecovery.recoveryCode": null,
-      "passwordRecovery.expDate": new Date(),
-    }).orFail(new UserNotFoundError());
-  }
+  // async updateConfirmationCodeAndExp(
+  //   email: string,
+  //   code: string,
+  //   expDate: Date,
+  // ): Promise<UserDbDocumentType> {
+  //   return UserModel.findOneAndUpdate(
+  //     {
+  //       "accountData.email": email,
+  //     },
+  //     {
+  //       "emailConfirmation.confirmationCode": code,
+  //       "emailConfirmation.expDate": expDate,
+  //     },
+  //   ).orFail(new UserNotFoundError());
+  // }
+
+  // async updateRecoveryCode(
+  //   email: string,
+  //   recoveryCode: string,
+  //   expDate: Date,
+  // ): Promise<UserDbDocumentType> {
+  //   return UserModel.findOneAndUpdate(
+  //     {
+  //       "accountData.email": email,
+  //     },
+  //     {
+  //       "passwordRecovery.recoveryCode": recoveryCode,
+  //       "passwordRecovery.expDate": expDate,
+  //     },
+  //   ).orFail(new UserNotFoundError());
+  // }
+
+  // async updatePasswordHash(
+  //   id: string,
+  //   passwordHash: string,
+  // ): Promise<UserDbDocumentType> {
+  //   return UserModel.findByIdAndUpdate(id, {
+  //     "accountData.passwordHash": passwordHash,
+  //     "passwordRecovery.recoveryCode": null,
+  //     "passwordRecovery.expDate": new Date(),
+  //   }).orFail(new UserNotFoundError());
+  // }
 }

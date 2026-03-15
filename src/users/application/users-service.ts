@@ -1,9 +1,8 @@
 import { UnauthorizedError } from "../../core/middlewares/error-handling/custom-errors/unauthorized-error";
 import { UsersRepository } from "../repository/users-repository";
-import { UserInputModel } from "../types/users-types";
+import { UserDbDocumentType, UserInputModel } from "../types/users-types";
 import { NotUniqueUserError, UserNotFoundError } from "./errors/users-errors";
 import { LoginInfo, TokenPairModel } from "../types/auth-types";
-import { BadRequestError } from "../../core/middlewares/error-handling/custom-errors/bad-request-error";
 import { ServerError } from "../../core/middlewares/error-handling/custom-errors/server-error";
 import { ForbiddenError } from "../../core/middlewares/error-handling/custom-errors/forbidden-error";
 import { SessionDbModel } from "../types/sessions-types";
@@ -32,9 +31,23 @@ export class UsersService {
 
     const user = await this.userFactory(dto, true);
 
-    const userId = await this.usersRepository.createUser(user);
+    await this.usersRepository.save(user);
 
-    return userId;
+    return user.id;
+  }
+
+  async registerUser(dto: UserInputModel): Promise<void> {
+    await this.checkUnique(dto.login, dto.email);
+
+    const user = await this.userFactory(dto, false);
+
+    await this.usersRepository.save(user);
+
+    this.emailService
+      .sendRegistrationEmail(dto.email, user.emailConfirmation.confirmationCode)
+      .catch((err) => {
+        console.log(appSettings.emailSubjects.registration, err);
+      });
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -85,20 +98,6 @@ export class UsersService {
     return { accessToken, refreshToken };
   }
 
-  async registerUser(dto: UserInputModel): Promise<void> {
-    await this.checkUnique(dto.login, dto.email);
-
-    const user = await this.userFactory(dto, false);
-
-    await this.usersRepository.createUser(user);
-
-    this.emailService
-      .sendRegistrationEmail(dto.email, user.emailConfirmation.confirmationCode)
-      .catch((err) => {
-        console.log(appSettings.emailSubjects.registration, err);
-      });
-  }
-
   async refreshTokens(
     userId: string,
     deviceId: string,
@@ -129,15 +128,9 @@ export class UsersService {
       throw new UserNotFoundError();
     }
 
-    if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestError("Email is already confirmed");
-    }
+    user.confirmEmail();
 
-    if (user.emailConfirmation.expDate < new Date()) {
-      throw new BadRequestError("Confirmation code is already expired");
-    }
-
-    await this.usersRepository.updateIsConfirmed(code);
+    await this.usersRepository.save(user);
   }
 
   async resendEmail(email: string): Promise<void> {
@@ -147,18 +140,12 @@ export class UsersService {
       throw new UserNotFoundError();
     }
 
-    if (user.emailConfirmation.isConfirmed) {
-      throw new BadRequestError("Email is already confirmed");
-    }
-
     const newConfirmationCode = this.tokenService.createRandomCode();
     const newExpDate = this.dateService.addHours(2);
 
-    await this.usersRepository.updateConfirmationCodeAndExp(
-      email,
-      newConfirmationCode,
-      newExpDate,
-    );
+    user.updateConfirmationInfo(newConfirmationCode, newExpDate);
+
+    await this.usersRepository.save(user);
 
     this.emailService
       .sendRegistrationEmail(email, newConfirmationCode)
@@ -193,7 +180,9 @@ export class UsersService {
     const recoveryCode = this.tokenService.createRandomCode();
     const expDate = this.dateService.addHours(2);
 
-    await this.usersRepository.updateRecoveryCode(email, recoveryCode, expDate);
+    user.updatePasswordRecoveryInfo(recoveryCode, expDate);
+
+    await this.usersRepository.save(user);
 
     this.emailService
       .sendPasswordRecoveryEmail(email, recoveryCode)
@@ -209,13 +198,11 @@ export class UsersService {
     const user =
       await this.usersRepository.getUserByRecoveryCodeOrFail(recoveryCode);
 
-    if (user.passwordRecovery.expDate < new Date()) {
-      throw new BadRequestError("Recovery code is already expired");
-    }
-
     const passwordHash = await this.passwordService.generateHash(newPassword);
 
-    await this.usersRepository.updatePasswordHash(user.id, passwordHash);
+    user.updatePasswordHash(passwordHash);
+
+    await this.usersRepository.save(user);
   }
 
   private async checkUnique(login: string, email: string): Promise<void> {
@@ -235,12 +222,12 @@ export class UsersService {
   private async userFactory(
     dto: UserInputModel,
     isConfirmed: boolean,
-  ): Promise<User> {
+  ): Promise<UserDbDocumentType> {
     const confirmationCode = this.tokenService.createRandomCode();
     const expDate = this.dateService.addHours(2);
     const passwordHash = await this.passwordService.generateHash(dto.password);
 
-    return new User(
+    return User.createUser(
       dto.login,
       dto.email,
       passwordHash,
