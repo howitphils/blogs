@@ -42,7 +42,7 @@ export class CommentsService {
   }
 
   async updateComment(dto: UpdateCommentDto): Promise<void> {
-    const comment = await this.commentsRepository.getCommentByIdOrFail(dto.id);
+    const comment = await this.commentsRepository.getByIdOrFail(dto.id);
 
     if (comment.userId !== dto.userId) {
       throw new ForbiddenError("Forbidden action for this user");
@@ -52,9 +52,7 @@ export class CommentsService {
   }
 
   async updateLikeStatus(dto: UpdateLikeStatusDto): Promise<void> {
-    const comment = await this.commentsRepository.getCommentByIdOrFail(
-      dto.commentId,
-    );
+    const comment = await this.commentsRepository.getByIdOrFail(dto.commentId);
 
     const like = await this.commentLikesRepository.get(
       dto.userId,
@@ -91,6 +89,7 @@ export class CommentsService {
 
     await this.commentLikesRepository.update(dto);
 
+    // IF NONE
     if (dto.likeStatus === LikeStatuses.NONE) {
       if (like.status === LikeStatuses.LIKE) {
         await this.commentsRepository.updateLikesCount(
@@ -107,6 +106,7 @@ export class CommentsService {
       }
     }
 
+    //IF LIKED
     if (dto.likeStatus === LikeStatuses.LIKE) {
       if (like.status === LikeStatuses.NONE) {
         await this.commentsRepository.updateLikesCount(
@@ -123,6 +123,7 @@ export class CommentsService {
       }
     }
 
+    //IF DISLIKED
     if (dto.likeStatus === LikeStatuses.DISLIKE) {
       if (like.status === LikeStatuses.NONE) {
         await this.commentsRepository.updateLikesCount(
@@ -141,7 +142,7 @@ export class CommentsService {
   }
 
   async deleteComment(id: string, userId: string): Promise<void> {
-    const comment = await this.commentsRepository.getCommentByIdOrFail(id);
+    const comment = await this.commentsRepository.getByIdOrFail(id);
 
     if (comment.userId !== userId) {
       throw new ForbiddenError("Forbidden action for this user");

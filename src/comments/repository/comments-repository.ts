@@ -1,15 +1,7 @@
-import {
-  CommentDbDocument,
-  CommentDbModel,
-  CommentLikeDbDocument,
-} from "../types/comments-types";
-import {
-  CommentLikeNotFoundError,
-  CommentNotFoundError,
-} from "../application/errors/comments-errors";
+import { CommentDbDocument, CommentDbModel } from "../types/comments-types";
+import { CommentNotFoundError } from "../application/errors/comments-errors";
 import { injectable } from "inversify";
 import { CommentModel } from "./schemas/comment-schema";
-import { CommentLikeModel } from "./schemas/like-schema";
 
 @injectable()
 export class CommentsRepository {
@@ -19,17 +11,8 @@ export class CommentsRepository {
     return comment.id;
   }
 
-  async getCommentByIdOrFail(id: string): Promise<CommentDbDocument> {
+  async getByIdOrFail(id: string): Promise<CommentDbDocument> {
     return CommentModel.findById(id).orFail(new CommentNotFoundError());
-  }
-
-  async getLikeOrFail(
-    userId: string,
-    commentId: string,
-  ): Promise<CommentLikeDbDocument> {
-    return CommentLikeModel.findOne({ commentId, userId }).orFail(
-      new CommentLikeNotFoundError(),
-    );
   }
 
   async update(id: string, content: string): Promise<CommentDbDocument> {
