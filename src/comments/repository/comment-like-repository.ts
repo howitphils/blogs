@@ -1,7 +1,7 @@
 import {
   CommentLikeDbDocument,
   CommentLikeDbModel,
-  UpdateLikeStatusDto,
+  UpdateCommentLikeStatusDto,
 } from "../types/comments-types";
 import { injectable } from "inversify";
 import { CommentLikeModel } from "./schemas/comment-like-schema";
@@ -20,7 +20,7 @@ export class CommentLikesRepository {
     return CommentLikeModel.findOne({ commentId, userId });
   }
 
-  async update(dto: UpdateLikeStatusDto): Promise<CommentLikeDbModel> {
+  async update(dto: UpdateCommentLikeStatusDto): Promise<CommentLikeDbModel> {
     const { commentId, likeStatus, userId } = dto;
 
     return CommentLikeModel.findOneAndUpdate(

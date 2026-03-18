@@ -4,7 +4,9 @@ import { BlogsRepository } from "../../blogs/repository/blogs-repository";
 import {
   PostDbModel,
   PostInputModel,
+  PostLikeDbModel,
   UpdatePostDtoModel,
+  UpdatePostLikeStatusDto,
 } from "../types/posts-types";
 
 @injectable()
@@ -34,6 +36,16 @@ export class PostsService {
 
   async updatePost(dto: UpdatePostDtoModel): Promise<void> {
     await this.postsRepository.updatePost(dto);
+  }
+
+  async updatePostLikeStatus(dto: UpdatePostLikeStatusDto): Promise<void> {
+    const post = await this.postsRepository.getPostByIdOrFail(dto.postId);
+
+    const like = post.likes.find((like) => like.userId === dto.userId);
+
+    if (!like) {
+      const newLike: PostLikeDbModel = {};
+    }
   }
 
   async deletePost(postId: string): Promise<void> {

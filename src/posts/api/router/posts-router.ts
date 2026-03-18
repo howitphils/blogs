@@ -11,6 +11,7 @@ import { validateCommentBody } from "../../../comments/api/validations/comment-b
 import { container } from "../../../composition-root";
 import { CommentsController } from "../../../comments/api/controller/comments-controller";
 import { jwtAuthOptionalGuard } from "../../../core/middlewares/authentication/jwt-optional-auth";
+import { validateLikeStatusBody } from "../../../core/middlewares/validation/update-like-body-validations";
 
 const commentsController = container.get(CommentsController);
 const postsController = container.get(PostsController);
@@ -20,6 +21,7 @@ export const postsRouter = Router();
 // TODO: update like status route
 postsRouter.get(
   "/",
+  jwtAuthOptionalGuard,
   validateQueryParams,
   validationChainResult,
   postsController.getAllPosts.bind(postsController),
@@ -27,6 +29,7 @@ postsRouter.get(
 
 postsRouter.get(
   "/:id",
+  jwtAuthOptionalGuard,
   validateParamsId,
   validationChainResult,
   postsController.getPostById.bind(postsController),
@@ -47,6 +50,16 @@ postsRouter.put(
   validatePostBody,
   validationChainResult,
   postsController.updatePost.bind(postsController),
+);
+
+postsRouter.put(
+  "/:id/like-status",
+  jwtAuthGuard,
+  checkUserInReq,
+  validateParamsId,
+  validateLikeStatusBody,
+  validationChainResult,
+  postsController.updatePostLikeStatus.bind(postsController),
 );
 
 postsRouter.delete(

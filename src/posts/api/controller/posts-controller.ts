@@ -13,6 +13,7 @@ import { matchedData } from "express-validator";
 import { PaginationType } from "../../../core/types/pagination-types";
 import { inject, injectable } from "inversify";
 import { PostsService } from "../../application/posts-service";
+import { UpdateLikeStatusInputModel } from "../../../comments/types/comments-types";
 
 @injectable()
 export class PostsController {
@@ -69,6 +70,22 @@ export class PostsController {
     await this.postsService.updatePost({
       id: postId,
       ...dto,
+    });
+
+    return res.sendStatus(HttpStatus.NO_CONTENT);
+  }
+
+  async updatePostLikeStatus(
+    req: RequestWithParamsIdAndBody<UpdateLikeStatusInputModel>,
+    res: Response,
+  ): Promise<Response> {
+    const userId = req.user.userId;
+    const postId = req.params.id;
+
+    await this.postsService.updatePostLikeStatus({
+      postId,
+      userId,
+      status: req.body.likeStatus,
     });
 
     return res.sendStatus(HttpStatus.NO_CONTENT);

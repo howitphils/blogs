@@ -60,6 +60,12 @@ export type PostLikeDbModel = {
   createdAt: string;
 };
 
+export type UpdatePostLikeStatusDto = {
+  postId: string;
+  userId: string;
+  status: LikeStatuses;
+};
+
 export type PostLikeViewModel = {
   addedAt: string;
   userId: string;

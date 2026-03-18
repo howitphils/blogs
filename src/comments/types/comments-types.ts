@@ -21,7 +21,7 @@ export type UpdateCommentDto = {
   userId: string;
 };
 
-export type UpdateLikeStatusDto = {
+export type UpdateCommentLikeStatusDto = {
   userId: string;
   commentId: string;
   likeStatus: LikeStatuses;

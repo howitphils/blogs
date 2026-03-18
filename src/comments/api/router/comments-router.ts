@@ -6,7 +6,7 @@ import { jwtAuthGuard } from "../../../core/middlewares/authentication/jwt-auth"
 import { checkUserInReq } from "../../../core/middlewares/utility/check-req-user";
 import { container } from "../../../composition-root";
 import { CommentsController } from "../controller/comments-controller";
-import { validateLikeStatus } from "../../../core/middlewares/validation/update-like-body-validations";
+import { validateLikeStatusBody } from "../../../core/middlewares/validation/update-like-body-validations";
 import { jwtAuthOptionalGuard } from "../../../core/middlewares/authentication/jwt-optional-auth";
 
 const commentsController = container.get(CommentsController);
@@ -36,7 +36,7 @@ commentsRouter.put(
   jwtAuthGuard,
   checkUserInReq,
   validateParamsId,
-  validateLikeStatus,
+  validateLikeStatusBody,
   validationChainResult,
   commentsController.updateLikeStatus.bind(commentsController),
 );

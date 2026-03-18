@@ -7,7 +7,7 @@ import {
   CommentLikeDbModel,
   CreateCommentDto,
   UpdateCommentDto,
-  UpdateLikeStatusDto,
+  UpdateCommentLikeStatusDto,
 } from "../types/comments-types";
 import { PostsRepository } from "../../posts/repository/posts-repository";
 import { CommentLikesRepository } from "../repository/comment-like-repository";
@@ -51,7 +51,7 @@ export class CommentsService {
     await this.commentsRepository.update(dto.id, dto.content);
   }
 
-  async updateLikeStatus(dto: UpdateLikeStatusDto): Promise<void> {
+  async updateLikeStatus(dto: UpdateCommentLikeStatusDto): Promise<void> {
     const comment = await this.commentsRepository.getByIdOrFail(dto.commentId);
 
     const like = await this.commentLikesRepository.get(

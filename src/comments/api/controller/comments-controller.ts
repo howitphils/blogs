@@ -13,7 +13,7 @@ import {
   CreateCommentDto,
   UpdateCommentDto,
   UpdateLikeStatusInputModel,
-  UpdateLikeStatusDto,
+  UpdateCommentLikeStatusDto,
 } from "../../types/comments-types";
 import { BaseQueryParams } from "../../../core/types/query-params-types";
 import { matchedData } from "express-validator";
@@ -100,7 +100,7 @@ export class CommentsController {
     req: RequestWithParamsIdAndBody<UpdateLikeStatusInputModel>,
     res: Response,
   ): Promise<Response> {
-    const updateLikeStatusDto: UpdateLikeStatusDto = {
+    const updateLikeStatusDto: UpdateCommentLikeStatusDto = {
       userId: req.user.userId,
       commentId: req.params.id,
       likeStatus: req.body.likeStatus,
