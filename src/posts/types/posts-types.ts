@@ -39,6 +39,8 @@ export type PostDbModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
+  likesCount: number;
+  dislikesCount: number;
   likes: PostLikeDbModel[];
 };
 
@@ -58,7 +60,7 @@ export type PostLikeDbModel = {
   createdAt: string;
 };
 
-type PostLikeViewModel = {
+export type PostLikeViewModel = {
   addedAt: string;
   userId: string;
   login: string;

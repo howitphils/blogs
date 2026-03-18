@@ -24,6 +24,9 @@ export class PostsService {
       content: dto.content,
       createdAt: new Date().toISOString(),
       shortDescription: dto.shortDescription,
+      likes: [],
+      dislikesCount: 0,
+      likesCount: 0,
     };
 
     return this.postsRepository.createPost(newPost);

@@ -17,6 +17,7 @@ const postsController = container.get(PostsController);
 
 export const postsRouter = Router();
 
+// TODO: update like status route
 postsRouter.get(
   "/",
   validateQueryParams,
