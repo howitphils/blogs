@@ -4,7 +4,7 @@ import {
   UpdateLikeStatusDto,
 } from "../types/comments-types";
 import { injectable } from "inversify";
-import { CommentLikeModel } from "./schemas/like-schema";
+import { CommentLikeModel } from "./schemas/comment-like-schema";
 import { CommentLikeNotFoundError } from "../application/errors/comments-errors";
 
 @injectable()

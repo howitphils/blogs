@@ -64,6 +64,7 @@ export class CommentsService {
         status: dto.likeStatus,
         commentId: dto.commentId,
         userId: dto.userId,
+        createdAt: new Date(),
       };
 
       await this.commentLikesRepository.create(newLike);

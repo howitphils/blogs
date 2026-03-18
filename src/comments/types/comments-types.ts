@@ -41,6 +41,7 @@ export type CommentLikeDbModel = {
   commentId: string;
   userId: string;
   status: LikeStatuses;
+  createdAt: Date;
 };
 
 export type CommentLikeDbDocument = HydratedDocument<CommentLikeDbModel>;

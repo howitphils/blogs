@@ -1,4 +1,5 @@
 import { HydratedDocument } from "mongoose";
+import { LikeStatuses } from "../../core/types/likes-types";
 
 export type PostInputModel = {
   title: string; // max length 30
@@ -15,6 +16,12 @@ export type PostViewModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: LikeStatuses;
+    newestLikes: PostLikeViewModel[];
+  };
 };
 
 export type UpdatePostDtoModel = {
@@ -32,6 +39,7 @@ export type PostDbModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
+  likes: PostLikeDbModel[];
 };
 
 export type PostForBlogInputModel = {
@@ -41,3 +49,17 @@ export type PostForBlogInputModel = {
 };
 
 export type PostDbDocument = HydratedDocument<PostDbModel>;
+
+export type PostLikeDbModel = {
+  postId: string;
+  userId: string;
+  login: string;
+  status: LikeStatuses;
+  createdAt: string;
+};
+
+type PostLikeViewModel = {
+  addedAt: string;
+  userId: string;
+  login: string;
+};

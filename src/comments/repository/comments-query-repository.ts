@@ -7,7 +7,7 @@ import { CommentNotFoundError } from "../application/errors/comments-errors";
 import { calculatePagesCount } from "../../core/utils/calculate-pages-count";
 import { inject, injectable } from "inversify";
 import { CommentModel } from "./schemas/comment-schema";
-import { CommentLikeModel } from "./schemas/like-schema";
+import { CommentLikeModel } from "./schemas/comment-like-schema";
 import { LikeStatuses, UsersLikeStatuses } from "../../core/types/likes-types";
 
 @injectable()
