@@ -8,6 +8,7 @@ import { validateBlogQueryParams } from "../validations/blog-query-validation";
 import { validatePostForBlogBody } from "../validations/blog-post-body-validations";
 import { container } from "../../../composition-root";
 import { BlogsController } from "../controller/blogs-controller";
+import { jwtAuthOptionalGuard } from "../../../core/middlewares/authentication/jwt-optional-auth";
 
 const blogsController = container.get(BlogsController);
 
@@ -28,6 +29,7 @@ blogsRouter.get(
 
 blogsRouter.get(
   "/:id/posts",
+  jwtAuthOptionalGuard,
   validateParamsId,
   validateQueryParams,
   validationChainResult,

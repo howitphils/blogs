@@ -68,10 +68,15 @@ export class BlogsController {
     req: RequestWithParamsIdAndQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
   ): Promise<Response> {
+    const userId = req.user?.userId;
     const blogId = req.params.id;
     const sortParams = matchedData<BaseQueryParams>(req);
 
-    const posts = await this.postsQueryRepository.getPosts(sortParams, blogId);
+    const posts = await this.postsQueryRepository.getPosts(
+      sortParams,
+      blogId,
+      userId,
+    );
 
     return res.status(HttpStatus.OK).json(posts);
   }

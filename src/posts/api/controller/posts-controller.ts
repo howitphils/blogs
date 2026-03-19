@@ -29,7 +29,7 @@ export class PostsController {
     req: RequestWithQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
   ): Promise<Response> {
-    const userId = req?.user.userId;
+    const userId = req.user?.userId;
     const sortParams = matchedData<BaseQueryParams>(req);
 
     const posts = await this.postsQueryRepository.getPosts(
@@ -46,7 +46,7 @@ export class PostsController {
     res: Response<PostViewModel>,
   ): Promise<Response> {
     const postId = req.params.id;
-    const userId = req?.user.userId;
+    const userId = req.user?.userId;
 
     const post = await this.postsQueryRepository.getPostByIdOrFail(
       postId,
