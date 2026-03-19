@@ -85,7 +85,7 @@ export class PostsController {
     await this.postsService.updatePostLikeStatus({
       postId,
       userId,
-      status: req.body.likeStatus,
+      likeStatus: req.body.likeStatus,
     });
 
     return res.sendStatus(HttpStatus.NO_CONTENT);

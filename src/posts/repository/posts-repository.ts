@@ -1,11 +1,13 @@
 import {
   PostDbDocument,
   PostDbModel,
+  PostLikeDbModel,
   UpdatePostDtoModel,
 } from "../types/posts-types";
 import { PostNotFoundError } from "../application/errors/posts-errors";
 import { injectable } from "inversify";
 import { PostModel } from "./schemas/post-schema";
+import { LikeStatuses } from "../../core/types/likes-types";
 
 @injectable()
 export class PostsRepository {
@@ -34,5 +36,41 @@ export class PostsRepository {
 
   async updateBlogNameForPost(blogId: string, blogName: string): Promise<void> {
     await PostModel.updateMany({ blogId }, { blogName });
+  }
+
+  async addPostLike(
+    id: string,
+    like: PostLikeDbModel,
+    likesCount: number,
+    dislikesCount: number,
+  ) {
+    return PostModel.findByIdAndUpdate(id, {
+      $push: {
+        likes: like,
+      },
+      $set: {
+        likesCount,
+        dislikesCount,
+      },
+    });
+  }
+  async updatePostLikeStatus(
+    postId: string,
+    userId: string,
+    newStatus: LikeStatuses,
+    likesCount: number,
+    dislikesCount: number,
+  ) {
+    return PostModel.updateOne(
+      { _id: postId },
+      {
+        $set: {
+          "likes.$[elem].status": newStatus,
+          likesCount,
+          dislikesCount,
+        },
+      },
+      { arrayFilters: [{ "elem.userId": userId }] },
+    );
   }
 }

@@ -63,7 +63,7 @@ export type PostLikeDbModel = {
 export type UpdatePostLikeStatusDto = {
   postId: string;
   userId: string;
-  status: LikeStatuses;
+  likeStatus: LikeStatuses;
 };
 
 export type PostLikeViewModel = {
