@@ -43,7 +43,7 @@ export class PostsRepository {
     like: PostLikeDbModel,
     likesCount: number,
     dislikesCount: number,
-  ) {
+  ): Promise<PostDbDocument> {
     return PostModel.findByIdAndUpdate(id, {
       $push: {
         likes: like,
@@ -52,8 +52,9 @@ export class PostsRepository {
         likesCount,
         dislikesCount,
       },
-    });
+    }).orFail(new PostNotFoundError());
   }
+
   async updatePostLikeStatus(
     postId: string,
     userId: string,

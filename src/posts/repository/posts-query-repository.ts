@@ -100,7 +100,7 @@ export class PostsQueryRepository {
       title: post.title,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: post.dislikesCount,
+        likesCount: post.likesCount,
         dislikesCount: post.dislikesCount,
         myStatus: userLikeStatus,
         newestLikes: this.getNewestLikes(post.likes),
@@ -110,6 +110,7 @@ export class PostsQueryRepository {
 
   private getNewestLikes(likes: PostLikeDbModel[]) {
     return likes
+      .filter((like) => like.status === LikeStatuses.LIKE)
       .sort((a, b) => {
         if (b.createdAt > a.createdAt) {
           return 1;

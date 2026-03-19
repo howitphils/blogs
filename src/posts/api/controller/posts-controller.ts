@@ -29,9 +29,14 @@ export class PostsController {
     req: RequestWithQuery<BaseQueryParams>,
     res: Response<PaginationType<PostViewModel>>,
   ): Promise<Response> {
+    const userId = req?.user.userId;
     const sortParams = matchedData<BaseQueryParams>(req);
 
-    const posts = await this.postsQueryRepository.getPosts(sortParams);
+    const posts = await this.postsQueryRepository.getPosts(
+      sortParams,
+      undefined,
+      userId,
+    );
 
     return res.status(HttpStatus.OK).json(posts);
   }
@@ -41,7 +46,12 @@ export class PostsController {
     res: Response<PostViewModel>,
   ): Promise<Response> {
     const postId = req.params.id;
-    const post = await this.postsQueryRepository.getPostByIdOrFail(postId);
+    const userId = req?.user.userId;
+
+    const post = await this.postsQueryRepository.getPostByIdOrFail(
+      postId,
+      userId,
+    );
 
     return res.status(HttpStatus.OK).json(post);
   }
